@@ -1,0 +1,15 @@
+Task 1 form request rule parity evidence
+
+Source inspected: app/Http/Controllers/Api/Admin/ShowController.php
+Copied rules:
+- title: required|string|max:160
+- slug: nullable|string|max:180|alpha_dash|unique on shows.slug
+- description: nullable|string
+- main_image_path: nullable|string|max:255
+- status: required|Rule::in(['draft', 'published'])
+
+Behavior preserved:
+- CreateShowRequest.authorize() returns true.
+- UpdateShowRequest.authorize() returns true.
+- UpdateShowRequest uses $show = $this->route('show') and Rule::unique('shows', 'slug')->ignore($show).
+- No files under tests/ were created, edited, or deleted in this task.

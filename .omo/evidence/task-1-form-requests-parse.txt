@@ -1,0 +1,5 @@
+Task 1 form request parse evidence (2026-05-24T22:19:09.445658+00:00)
+Verification method: docker run --rm -v /private/var/www/html/projects/ticketera:/app -w /app php:8.2-cli sh -lc 'php -l app/Http/Requests/Admin/CreateShowRequest.php && php -l app/Http/Requests/Admin/UpdateShowRequest.php'
+
+No syntax errors detected in app/Http/Requests/Admin/CreateShowRequest.php
+No syntax errors detected in app/Http/Requests/Admin/UpdateShowRequest.php

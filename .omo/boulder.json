@@ -1,0 +1,219 @@
+{
+  "schema_version": 2,
+  "active_work_id": "show-crud-api-refinement-3d9f9fe9",
+  "works": {
+    "show-crud-api-refinement-3d9f9fe9": {
+      "work_id": "show-crud-api-refinement-3d9f9fe9",
+      "active_plan": "/private/var/www/html/projects/ticketera/.omo/plans/show-crud-api-refinement.md",
+      "plan_name": "show-crud-api-refinement",
+      "status": "completed",
+      "started_at": "2026-05-24T20:18:45.317Z",
+      "updated_at": "2026-05-24T22:30:24.713Z",
+      "session_ids": [
+        "ses_1a50e8c23ffe5bkCjpFGZRBTjV",
+        "ses_1a4515582ffe2LSOzPGs65hlrf",
+        "ses_1a3f56129ffefnEy8qTF3wrx6n",
+        "ses_1a3f560f9ffedBPjXGJZiCnQiX",
+        "ses_1a3f560d4ffemOzEyKdfViviar",
+        "ses_1a3f25e09ffeCi4tIWKURubpSg",
+        "ses_1a3f25ddcffenAQFQXWeLHdJD5"
+      ],
+      "session_origins": {
+        "ses_1a50e8c23ffe5bkCjpFGZRBTjV": "direct",
+        "ses_1a4515582ffe2LSOzPGs65hlrf": "direct",
+        "ses_1a3f56129ffefnEy8qTF3wrx6n": "appended",
+        "ses_1a3f560f9ffedBPjXGJZiCnQiX": "appended",
+        "ses_1a3f560d4ffemOzEyKdfViviar": "appended",
+        "ses_1a3f25e09ffeCi4tIWKURubpSg": "appended",
+        "ses_1a3f25ddcffenAQFQXWeLHdJD5": "appended"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "Create Show Form Requests Without Touching Tests",
+          "session_id": "ses_1a3f1a0abffeYwKNubR0tg5yth",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "started_at": "2026-05-24T20:22:42.209Z",
+          "status": "running",
+          "updated_at": "2026-05-24T22:19:24.504Z"
+        },
+        "todo:2": {
+          "task_key": "todo:2",
+          "task_label": "2",
+          "task_title": "Wire ShowController to Form Requests Without Changing Behavior",
+          "session_id": "ses_1a3ec5610ffevqRLwr7fWTKHsX",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-05-24T22:24:25.457Z",
+          "started_at": "2026-05-24T22:24:25.457Z",
+          "status": "running"
+        },
+        "todo:3": {
+          "task_key": "todo:3",
+          "task_label": "3",
+          "task_title": "Verify No Test Files Were Touched",
+          "session_id": "ses_1a3e833a4ffePcVXerXpoMLh8A",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-low",
+          "updated_at": "2026-05-24T22:26:50.676Z",
+          "started_at": "2026-05-24T22:26:50.676Z",
+          "status": "running"
+        },
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "Plan Compliance Audit — oracle",
+          "session_id": "ses_1a3e506bcffeFtzmlATGuJPULV",
+          "agent": "oracle",
+          "category": "",
+          "started_at": "2026-05-24T22:27:30.301Z",
+          "status": "running",
+          "updated_at": "2026-05-24T22:29:44.478Z"
+        },
+        "final-wave:f3": {
+          "task_key": "final-wave:f3",
+          "task_label": "F3",
+          "task_title": "No-Test Scope QA — unspecified-high",
+          "session_id": "ses_1a3e5064cffeprS9GlbmAtrp41",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-05-24T22:29:25.553Z",
+          "started_at": "2026-05-24T22:29:25.553Z",
+          "status": "running"
+        },
+        "final-wave:f4": {
+          "task_key": "final-wave:f4",
+          "task_label": "F4",
+          "task_title": "Scope Fidelity Check — deep",
+          "session_id": "ses_1a3e5051cffe3iiL5MXT7dH3cD",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "updated_at": "2026-05-24T22:29:41.892Z",
+          "started_at": "2026-05-24T22:29:41.892Z",
+          "status": "running"
+        },
+        "final-wave:f2": {
+          "task_key": "final-wave:f2",
+          "task_label": "F2",
+          "task_title": "Code Quality Review — unspecified-high",
+          "session_id": "ses_1a3e50667ffe79TPJi5v3JV4l6",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-05-24T22:29:47.610Z",
+          "started_at": "2026-05-24T22:29:47.610Z",
+          "status": "running"
+        }
+      },
+      "ended_at": "2026-05-24T22:30:24.713Z",
+      "elapsed_ms": 7899396
+    }
+  },
+  "active_plan": "/private/var/www/html/projects/ticketera/.omo/plans/show-crud-api-refinement.md",
+  "started_at": "2026-05-24T20:18:45.317Z",
+  "status": "completed",
+  "updated_at": "2026-05-24T22:30:24.713Z",
+  "session_ids": [
+    "ses_1a50e8c23ffe5bkCjpFGZRBTjV",
+    "ses_1a4515582ffe2LSOzPGs65hlrf",
+    "ses_1a3f56129ffefnEy8qTF3wrx6n",
+    "ses_1a3f560f9ffedBPjXGJZiCnQiX",
+    "ses_1a3f560d4ffemOzEyKdfViviar",
+    "ses_1a3f25e09ffeCi4tIWKURubpSg",
+    "ses_1a3f25ddcffenAQFQXWeLHdJD5"
+  ],
+  "session_origins": {
+    "ses_1a50e8c23ffe5bkCjpFGZRBTjV": "direct",
+    "ses_1a4515582ffe2LSOzPGs65hlrf": "direct",
+    "ses_1a3f56129ffefnEy8qTF3wrx6n": "appended",
+    "ses_1a3f560f9ffedBPjXGJZiCnQiX": "appended",
+    "ses_1a3f560d4ffemOzEyKdfViviar": "appended",
+    "ses_1a3f25e09ffeCi4tIWKURubpSg": "appended",
+    "ses_1a3f25ddcffenAQFQXWeLHdJD5": "appended"
+  },
+  "plan_name": "show-crud-api-refinement",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "Create Show Form Requests Without Touching Tests",
+      "session_id": "ses_1a3f1a0abffeYwKNubR0tg5yth",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "started_at": "2026-05-24T20:22:42.209Z",
+      "status": "running",
+      "updated_at": "2026-05-24T22:19:24.504Z"
+    },
+    "todo:2": {
+      "task_key": "todo:2",
+      "task_label": "2",
+      "task_title": "Wire ShowController to Form Requests Without Changing Behavior",
+      "session_id": "ses_1a3ec5610ffevqRLwr7fWTKHsX",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-24T22:24:25.457Z",
+      "started_at": "2026-05-24T22:24:25.457Z",
+      "status": "running"
+    },
+    "todo:3": {
+      "task_key": "todo:3",
+      "task_label": "3",
+      "task_title": "Verify No Test Files Were Touched",
+      "session_id": "ses_1a3e833a4ffePcVXerXpoMLh8A",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-low",
+      "updated_at": "2026-05-24T22:26:50.676Z",
+      "started_at": "2026-05-24T22:26:50.676Z",
+      "status": "running"
+    },
+    "final-wave:f1": {
+      "task_key": "final-wave:f1",
+      "task_label": "F1",
+      "task_title": "Plan Compliance Audit — oracle",
+      "session_id": "ses_1a3e506bcffeFtzmlATGuJPULV",
+      "agent": "oracle",
+      "category": "",
+      "started_at": "2026-05-24T22:27:30.301Z",
+      "status": "running",
+      "updated_at": "2026-05-24T22:29:44.478Z"
+    },
+    "final-wave:f3": {
+      "task_key": "final-wave:f3",
+      "task_label": "F3",
+      "task_title": "No-Test Scope QA — unspecified-high",
+      "session_id": "ses_1a3e5064cffeprS9GlbmAtrp41",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-05-24T22:29:25.553Z",
+      "started_at": "2026-05-24T22:29:25.553Z",
+      "status": "running"
+    },
+    "final-wave:f4": {
+      "task_key": "final-wave:f4",
+      "task_label": "F4",
+      "task_title": "Scope Fidelity Check — deep",
+      "session_id": "ses_1a3e5051cffe3iiL5MXT7dH3cD",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-05-24T22:29:41.892Z",
+      "started_at": "2026-05-24T22:29:41.892Z",
+      "status": "running"
+    },
+    "final-wave:f2": {
+      "task_key": "final-wave:f2",
+      "task_label": "F2",
+      "task_title": "Code Quality Review — unspecified-high",
+      "session_id": "ses_1a3e50667ffe79TPJi5v3JV4l6",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-05-24T22:29:47.610Z",
+      "started_at": "2026-05-24T22:29:47.610Z",
+      "status": "running"
+    }
+  },
+  "agent": "atlas",
+  "ended_at": "2026-05-24T22:30:24.713Z",
+  "elapsed_ms": 7899396
+}

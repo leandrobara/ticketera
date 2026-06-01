@@ -1,0 +1,7 @@
+Controller inspection summary
+
+- Imports: `CreateShowRequest` and `UpdateShowRequest` are imported; `Request` remains for `index(Request $request)`; `Rule` is removed.
+- Signatures: `store(CreateShowRequest $request)` and `update(UpdateShowRequest $request, Show $show)` now use form requests.
+- Validation access: both methods call `$request->validated()`; `validatedData()` is removed from the controller.
+- Unchanged behavior: `index()`, `show()`, and `destroy()` remain unchanged, including slug fallback, published_at handling, and JSON/status responses.
+- Scope check: only validation extraction changed in this controller.

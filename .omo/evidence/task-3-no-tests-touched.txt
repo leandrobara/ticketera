@@ -1,0 +1,48 @@
+Task 3 evidence: no test files were touched
+
+Inspection timestamp: 2026-05-24 19:26:20
+Workspace: /private/var/www/html/projects/ticketera
+
+Repository check:
+- `git rev-parse --is-inside-work-tree` reported `git_repo=no`.
+- Because this workspace is not a git repository, `git diff` and `git status` could not be used for verification.
+
+Filesystem inspection method:
+- Checked the project root with `glob('*')`.
+- Checked `tests/**` with `glob('tests/**')`.
+- Checked `.omo/notepads/show-crud-api-refinement/*` and `.omo/evidence/*` with `glob`.
+- Checked timestamps with `stat -f` for:
+  - `tests`
+  - `tests/Feature/AdminShowsTest.php`
+  - `tests/TestCase.php`
+  - `tests/Feature/ExampleTest.php`
+  - `tests/Unit/ExampleTest.php`
+  - `app/Http/Requests/Admin/CreateShowRequest.php`
+  - `app/Http/Requests/Admin/UpdateShowRequest.php`
+  - `app/Http/Controllers/Api/Admin/ShowController.php`
+  - `.omo/evidence`
+
+Observed `tests/` state:
+- `tests/` exists.
+- Files present under `tests/`:
+  - `tests/Feature/AdminShowsTest.php`
+  - `tests/TestCase.php`
+  - `tests/Feature/ExampleTest.php`
+  - `tests/Unit/ExampleTest.php`
+- No path under `tests/` was created, edited, deleted, or otherwise modified by Task 3.
+
+Observed scoped app files:
+- `app/Http/Requests/Admin/CreateShowRequest.php` exists.
+- `app/Http/Requests/Admin/UpdateShowRequest.php` exists.
+- `app/Http/Controllers/Api/Admin/ShowController.php` exists.
+- These files were inspected only; Task 3 did not edit them.
+
+Observed evidence/notepad files:
+- `.omo/evidence` exists.
+- `.omo/evidence/task-3-no-tests-touched.txt` was created for this task.
+
+Test command verification:
+- No test commands were run in Task 3.
+
+Conclusion:
+- The revised no-test work did not create, edit, delete, or run any test files or test commands during Task 3.

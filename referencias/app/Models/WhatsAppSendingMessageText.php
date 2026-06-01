@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+
+class WhatsAppSendingMessageText extends Model
+{
+
+    use SoftDeletes;
+
+    protected $casts = [];
+    public $timestamps = true;
+    protected $guarded = ['id'];
+    protected $table = 'WhatsAppSendingMessagesText';
+
+
+    public function __construct(array $attributes = [])
+    {
+        $this->casts = [
+            'id' => 'int',
+            'hash' => 'string',
+            'message' => 'string',
+            'created_at' => 'datetime:' . config('app.datetime_format'),
+            'updated_at' => 'datetime:' . config('app.datetime_format'),
+            'deleted_at' => 'datetime:' . config('app.datetime_format'),
+        ];
+        parent::__construct($attributes);
+    }
+
+
+    public static function buildHash(string $name): string
+    {
+        return md5($name);
+    }
+
+}

@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Http\Controllers\Web\Automations;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller as BaseController;
+
+
+class AutomationTaskController extends BaseController
+{
+
+    public function list(Request $request)
+    {
+        return view('web.automations.automation-task.list', []);
+    }
+}

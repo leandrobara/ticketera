@@ -1,0 +1,5 @@
+Container ticketera-mysql-1  Recreate
+Container ticketera-mysql-1  Recreated
+Container ticketera-mysql-1  Starting
+Container ticketera-mysql-1  Started
+No syntax errors detected in app/Http/Controllers/Api/Admin/ShowController.php
