@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\BuyerController;
 use App\Http\Controllers\Api\Admin\OrderController;
 use App\Http\Controllers\Api\Admin\OrderItemController;
@@ -13,9 +13,19 @@ use App\Http\Controllers\Api\Admin\PresentationController;
 use App\Http\Controllers\Api\Admin\PresentationTicketTypeController;
 
 
+// ADMIN API ROUTES
 Route::group(['prefix' => 'admin'], function () {
 
+    // login
+    Route::middleware('throttle:admin-login')->group(function () {
+        Route::post('/auth/login', [AuthController::class, 'login']);
+    });
+
     Route::middleware('admin.token')->group(function () {
+        // auth
+        Route::get('/auth/me', [AuthController::class, 'me']);
+        Route::post('/auth/logout', [AuthController::class, 'logout']);
+
         // shows
         Route::get('/shows', [ShowController::class, 'list']);
         Route::post('/shows', [ShowController::class, 'create']);
@@ -78,16 +88,5 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/payments/{payment}', [PaymentController::class, 'show']);
         Route::put('/payments/{payment}', [PaymentController::class, 'update']);
         Route::delete('/payments/{payment}', [PaymentController::class, 'delete']);
-    });
-
-    // login
-    Route::middleware('throttle:admin-login')->group(function () {
-        Route::post('/auth/login', [AuthController::class, 'login']);
-    });
-
-    // logout
-    Route::middleware('admin.token')->group(function () {
-        Route::get('/auth/me', [AuthController::class, 'me']);
-        Route::post('/auth/logout', [AuthController::class, 'logout']);
     });
 });
