@@ -1,10 +1,12 @@
 <?php
 
-use App\Http\Controllers\Dashboard\ShowController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ShowController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard/shows', [ShowController::class, 'index']);
+Route::redirect('/admin', '/admin/shows');
+Route::get('/admin/login', [ShowController::class, 'index']);
+Route::get('/admin/shows', [ShowController::class, 'index']);
