@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderItem extends Model
@@ -16,6 +17,8 @@ class OrderItem extends Model
         'order_id',
         'quantity',
         'unit_price',
+        'subtotal_amount',
+        'discount_amount',
         'total_amount',
         'presentation_ticket_type_id',
     ];
@@ -24,8 +27,10 @@ class OrderItem extends Model
     {
         return [
             'quantity' => 'integer',
-            'unit_price' => 'integer',
-            'total_amount' => 'integer',
+            'unit_price' => 'decimal:6',
+            'subtotal_amount' => 'decimal:6',
+            'discount_amount' => 'decimal:6',
+            'total_amount' => 'decimal:6',
         ];
     }
 
@@ -37,5 +42,10 @@ class OrderItem extends Model
     public function presentationTicketType(): BelongsTo
     {
         return $this->belongsTo(PresentationTicketType::class);
+    }
+
+    public function promotionSnapshot(): HasOne
+    {
+        return $this->hasOne(OrderItemPromotion::class);
     }
 }

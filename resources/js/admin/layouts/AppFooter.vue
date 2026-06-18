@@ -1,14 +1,7 @@
 <template>
-	<footer class="footer footer-transparent d-print-none">
+	<footer class="footer footer-transparent d-print-none pt-0">
 		<div class="container-xl">
-			<div class="row text-center align-items-center flex-row-reverse">
-				<div class="col-lg-auto ms-lg-auto">
-					MVP cultural platform
-				</div>
-				<div class="col-12 col-lg-auto mt-3 mt-lg-0">
-					Ticketera admin
-				</div>
-			</div>
+			Todos los derechos reservados. Ticketera {{ new Date().getFullYear() }} &copy;.
 		</div>
 	</footer>
 </template>

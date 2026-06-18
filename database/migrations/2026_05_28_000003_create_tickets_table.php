@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('show_id')->constrained('shows')->cascadeOnDelete();
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
+            $table->foreignId('order_item_id')->constrained('order_items')->cascadeOnDelete();
             $table->foreignId('presentation_id')->constrained('presentations')->cascadeOnDelete();
             $table->foreignId('presentation_ticket_type_id')->nullable()->constrained('presentation_ticket_types')->nullOnDelete();
             $table->string('code')->unique();

@@ -13,10 +13,10 @@ return new class extends Migration
             $table->foreignId('show_id')->constrained('shows')->cascadeOnDelete();
             $table->foreignId('presentation_id')->constrained('presentations')->cascadeOnDelete();
             $table->string('name');
-            $table->unsignedInteger('price');
+            $table->decimal('price', 18, 6);
             $table->unsignedInteger('stock')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->unsignedInteger('sort_order')->default(0);
+            $table->unsignedInteger('sort_order')->nullable(false)->default(1);
 
             $table->timestamps();
             $table->softDeletes();

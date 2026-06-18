@@ -10,7 +10,13 @@ class OrderRepository
     public function listPaginated(array $filters, int $limit = 20): LengthAwarePaginator
     {
         return Order::query()
-            ->with(['buyer', 'presentation', 'items', 'tickets'])
+            ->with([
+                'buyer',
+                'presentation.show',
+                'items.promotionSnapshot',
+                'tickets.orderItem',
+                'tickets.presentationTicketType',
+            ])
             ->when($filters['buyer_id'] ?? null, fn ($query, int $buyerId) => $query->where('buyer_id', $buyerId))
             ->when($filters['presentation_id'] ?? null, fn ($query, int $presentationId) => $query->where('presentation_id', $presentationId))
             ->when($filters['status'] ?? null, fn ($query, string $status) => $query->where('status', $status))
@@ -34,18 +40,33 @@ class OrderRepository
 
     public function getOne(Order $order): Order
     {
-        return $order->load(['buyer', 'presentation', 'createdByUser', 'items', 'tickets', 'payments']);
+        return $order->load([
+            'buyer',
+            'presentation.show',
+            'createdByUser',
+            'items.promotionSnapshot',
+            'tickets.orderItem',
+            'tickets.presentationTicketType',
+            'payments',
+        ]);
     }
 
     public function store(array $attrs): Order
     {
-        return Order::create($attrs)->load(['buyer', 'presentation']);
+        return Order::create($attrs)->load(['buyer', 'presentation.show']);
     }
 
     public function update(Order $order, array $attrs): Order
     {
         $order->update($attrs);
-        return $order->fresh(['buyer', 'presentation', 'items', 'tickets', 'payments']);
+        return $order->fresh([
+            'buyer',
+            'presentation.show',
+            'items.promotionSnapshot',
+            'tickets.orderItem',
+            'tickets.presentationTicketType',
+            'payments',
+        ]);
     }
 
     public function delete(Order $order): void

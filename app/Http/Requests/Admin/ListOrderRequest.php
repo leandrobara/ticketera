@@ -14,8 +14,8 @@ class ListOrderRequest extends FormRequest
             'buyer_id' => ['nullable', 'integer', 'exists:buyers,id'],
             'presentation_id' => ['nullable', 'integer', 'exists:presentations,id'],
             'source' => ['nullable', Rule::in(['CHECKOUT', 'ADMIN'])],
-            'status' => ['nullable', Rule::in(['PENDING', 'APPROVED', 'REJECTED', 'IN_PROCESS', 'WAIVED', 'CANCELED', 'EXPIRED', 'REFUNDED'])],
-            'payment_method' => ['nullable', Rule::in(['MERCADO_PAGO', 'CASH', 'BANK_TRANSFER', 'COMPLIMENTARY', 'OTHER'])],
+            'status' => ['nullable', Rule::in(['PENDING', 'APPROVED', 'REJECTED', 'IN_PROCESS', 'CANCELED', 'EXPIRED', 'REFUNDED'])],
+            'payment_method' => ['nullable', Rule::in(['MERCADO_PAGO', 'CASH', 'BANK_TRANSFER', 'FREE', 'OTHER'])],
         ];
     }
 }

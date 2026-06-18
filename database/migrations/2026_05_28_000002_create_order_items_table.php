@@ -15,8 +15,10 @@ return new class extends Migration
             $table->foreignId('presentation_ticket_type_id')->nullable()->constrained('presentation_ticket_types')->nullOnDelete();
             $table->string('name');
             $table->unsignedInteger('quantity');
-            $table->unsignedInteger('unit_price');
-            $table->unsignedInteger('total_amount');
+            $table->decimal('unit_price', 18, 6);
+            $table->decimal('subtotal_amount', 18, 6);
+            $table->decimal('discount_amount', 18, 6)->default(0);
+            $table->decimal('total_amount', 18, 6);
 
             $table->timestamps();
             $table->softDeletes();

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('provider_payment_id')->nullable()->index();
             $table->string('provider_preference_id')->nullable()->index();
             $table->string('provider_status')->nullable()->index();
-            $table->unsignedInteger('amount');
+            $table->decimal('amount', 18, 6);
             $table->string('currency', 3)->default('ARS');
             $table->json('raw_response')->nullable();
             $table->timestamp('paid_at')->nullable();

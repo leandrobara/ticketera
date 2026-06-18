@@ -4,6 +4,7 @@ namespace App\Services\Api\Admin;
 
 use App\Models\OrderItem;
 use App\Repositories\OrderItemRepository;
+use Brick\Math\BigDecimal;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OrderItemService
@@ -26,18 +27,25 @@ class OrderItemService
 
     public function create(array $data): OrderItem
     {
-        $data['total_amount'] = $data['total_amount'] ?? ($data['quantity'] * $data['unit_price']);
+        $data['subtotal_amount'] = $data['subtotal_amount']
+            ?? $this->multiply($data['unit_price'], $data['quantity']);
+        $data['discount_amount'] = $data['discount_amount'] ?? '0.000000';
+        $data['total_amount'] = $data['total_amount']
+            ?? $this->subtract($data['subtotal_amount'], $data['discount_amount']);
 
         return $this->orderItemRepository->store($data);
     }
 
     public function update(OrderItem $orderItem, array $data): OrderItem
     {
-        if (! array_key_exists('total_amount', $data)) {
-            $quantity = $data['quantity'] ?? $orderItem->quantity;
-            $unitPrice = $data['unit_price'] ?? $orderItem->unit_price;
-            $data['total_amount'] = $quantity * $unitPrice;
-        }
+        $quantity = $data['quantity'] ?? $orderItem->quantity;
+        $unitPrice = $data['unit_price'] ?? $orderItem->unit_price;
+        $data['subtotal_amount'] = $data['subtotal_amount']
+            ?? $this->multiply($unitPrice, $quantity);
+        $data['discount_amount'] = $data['discount_amount']
+            ?? $orderItem->discount_amount;
+        $data['total_amount'] = $data['total_amount']
+            ?? $this->subtract($data['subtotal_amount'], $data['discount_amount']);
 
         return $this->orderItemRepository->update($orderItem, $data);
     }
@@ -45,5 +53,19 @@ class OrderItemService
     public function delete(OrderItem $orderItem): void
     {
         $this->orderItemRepository->delete($orderItem);
+    }
+
+    private function multiply(string $amount, int $quantity): string
+    {
+        return (string) BigDecimal::of($amount)
+            ->multipliedBy($quantity)
+            ->toScale(6);
+    }
+
+    private function subtract(string $subtotal, string $discount): string
+    {
+        return (string) BigDecimal::of($subtotal)
+            ->minus($discount)
+            ->toScale(6);
     }
 }

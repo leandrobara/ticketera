@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PresentationTicketType extends Model
@@ -24,7 +25,7 @@ class PresentationTicketType extends Model
     protected function casts(): array
     {
         return [
-            'price' => 'integer',
+            'price' => 'decimal:6',
             'stock' => 'integer',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
@@ -47,5 +48,10 @@ class PresentationTicketType extends Model
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
+    }
+
+    public function promotion(): HasOne
+    {
+        return $this->hasOne(Promotion::class);
     }
 }

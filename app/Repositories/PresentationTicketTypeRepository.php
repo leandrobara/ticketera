@@ -10,7 +10,12 @@ class PresentationTicketTypeRepository
     public function listPaginated(array $filters, int $limit = 20): LengthAwarePaginator
     {
         return PresentationTicketType::query()
-            ->with('presentation')
+            ->with(['presentation.show', 'promotion'])
+            ->withCount([
+                'tickets as sold_tickets_count' => function ($query) {
+                    $query->whereIn('status', ['VALID', 'USED']);
+                },
+            ])
             ->when($filters['presentation_id'] ?? null, function ($query, int $presentationId) {
                 $query->where('presentation_id', $presentationId);
             })
@@ -22,24 +27,24 @@ class PresentationTicketTypeRepository
             })
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->paginate($limit);
+            ->paginate($filters['per_page'] ?? $limit);
     }
 
     public function getOne(PresentationTicketType $presentationTicketType): PresentationTicketType
     {
-        return $presentationTicketType->load('presentation');
+        return $presentationTicketType->load('presentation.show');
     }
 
     public function store(array $attrs): PresentationTicketType
     {
         $ticketType = PresentationTicketType::create($attrs);
-        return $ticketType->load('presentation');
+        return $ticketType->load('presentation.show');
     }
 
     public function update(PresentationTicketType $presentationTicketType, array $attrs): PresentationTicketType
     {
         $presentationTicketType->update($attrs);
-        return $presentationTicketType->fresh('presentation');
+        return $presentationTicketType->fresh('presentation.show');
     }
 
     public function delete(PresentationTicketType $presentationTicketType): void
@@ -47,4 +52,3 @@ class PresentationTicketTypeRepository
         $presentationTicketType->delete();
     }
 }
-

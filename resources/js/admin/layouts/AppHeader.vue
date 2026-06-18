@@ -1,4 +1,6 @@
 <script setup>
+  import { computed } from 'vue';
+
   // emits
   defineEmits(['logout']);
 
@@ -9,6 +11,18 @@
       required: true,
     },
   });
+
+  // data
+  const currentPath = window.location.pathname;
+
+  // computed
+  const isShowsActive = computed(() => currentPath === '/admin/shows');
+  const isOrdersActive = computed(() => currentPath === '/admin/orders');
+  const isPromotionsActive = computed(() => currentPath === '/admin/promotions');
+  const isVenuesActive = computed(() => currentPath === '/admin/venues');
+  const isPresentationsActive = computed(() => currentPath === '/admin/presentations');
+  const isPresentationTicketTypesActive = computed(() => currentPath === '/admin/presentation-ticket-types');
+  const isBuyersActive = computed(() => currentPath === '/admin/buyers');
 </script>
 
 <template>
@@ -61,22 +75,61 @@
       <div class="navbar">
         <div class="container-xl">
           <ul class="navbar-nav">
-            <li class="nav-item active dropdown">
+            <li class="nav-item" :class="{ active: isShowsActive }">
               <a
-                class="nav-link dropdown-toggle"
-                href="#navbar-shows"
-                data-bs-toggle="dropdown"
-                data-bs-auto-close="outside"
-                role="button"
-                aria-expanded="false"
+                class="nav-link"
+                href="/admin/shows"
               >
                 <span class="nav-link-title">Shows</span>
               </a>
-              <div id="navbar-shows" class="dropdown-menu">
-                <a class="dropdown-item active" href="/admin/shows">
-                  Listado
-                </a>
-              </div>
+            </li>
+            <li class="nav-item" :class="{ active: isOrdersActive }">
+              <a
+                class="nav-link"
+                href="/admin/orders"
+              >
+                <span class="nav-link-title">Entradas</span>
+              </a>
+            </li>
+            <li class="nav-item" :class="{ active: isPresentationsActive }">
+              <a
+                class="nav-link"
+                href="/admin/presentations"
+              >
+                <span class="nav-link-title">Funciones</span>
+              </a>
+            </li>
+            <li class="nav-item" :class="{ active: isPresentationTicketTypesActive }">
+              <a
+                class="nav-link"
+                href="/admin/presentation-ticket-types"
+              >
+                <span class="nav-link-title">Tipos de entrada</span>
+              </a>
+            </li>
+            <li class="nav-item" :class="{ active: isPromotionsActive }">
+              <a
+                class="nav-link"
+                href="/admin/promotions"
+              >
+                <span class="nav-link-title">Promociones</span>
+              </a>
+            </li>
+            <li class="nav-item" :class="{ active: isVenuesActive }">
+              <a
+                class="nav-link"
+                href="/admin/venues"
+              >
+                <span class="nav-link-title">Espacios</span>
+              </a>
+            </li>
+            <li class="nav-item" :class="{ active: isBuyersActive }">
+              <a
+                class="nav-link"
+                href="/admin/buyers"
+              >
+                <span class="nav-link-title">Compradores</span>
+              </a>
             </li>
           </ul>
         </div>

@@ -14,6 +14,7 @@ class CreateTicketRequest extends FormRequest
             'checked_in_at' => ['nullable', 'date'],
             'show_id' => ['required', 'integer', 'exists:shows,id'],
             'order_id' => ['required', 'integer', 'exists:orders,id'],
+            'order_item_id' => ['required', 'integer', 'exists:order_items,id'],
             'status' => ['nullable', Rule::in(['VALID', 'USED', 'CANCELED'])],
             'code' => ['nullable', 'string', 'max:255', 'unique:tickets,code'],
             'presentation_id' => ['required', 'integer', 'exists:presentations,id'],

@@ -10,3 +10,9 @@ Route::get('/', function () {
 Route::redirect('/admin', '/admin/shows');
 Route::get('/admin/login', [ShowController::class, 'index']);
 Route::get('/admin/shows', [ShowController::class, 'index']);
+Route::get('/admin/venues', [ShowController::class, 'index']);
+Route::get('/admin/presentations', [ShowController::class, 'index']);
+Route::get('/admin/presentation-ticket-types', [ShowController::class, 'index']);
+Route::get('/admin/promotions', [ShowController::class, 'index']);
+Route::get('/admin/orders', [ShowController::class, 'index']);
+Route::get('/admin/buyers', [ShowController::class, 'index']);

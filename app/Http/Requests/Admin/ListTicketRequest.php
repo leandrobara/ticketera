@@ -15,6 +15,7 @@ class ListTicketRequest extends FormRequest
             'presentation_id' => ['nullable', 'integer', 'exists:presentations,id'],
             'presentation_ticket_type_id' => ['nullable', 'integer', 'exists:presentation_ticket_types,id'],
             'status' => ['nullable', Rule::in(['VALID', 'USED', 'CANCELED'])],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:500'],
         ];
     }
 }

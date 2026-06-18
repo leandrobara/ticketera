@@ -11,6 +11,11 @@ class PresentationRepository
     {
         return Presentation::query()
             ->with(['show', 'venue'])
+            ->withCount([
+                'tickets as sold_tickets_count' => function ($query) {
+                    $query->whereIn('status', ['VALID', 'USED']);
+                },
+            ])
             ->when($filters['show_id'] ?? null, function ($query, int $showId) {
                 $query->where('show_id', $showId);
             })
@@ -49,4 +54,3 @@ class PresentationRepository
         $presentation->delete();
     }
 }
-

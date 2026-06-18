@@ -12,7 +12,7 @@ class ListPresentationTicketTypeRequest extends FormRequest
             'search' => ['nullable', 'string', 'max:160'],
             'presentation_id' => ['nullable', 'integer', 'exists:presentations,id'],
             'is_active' => ['nullable', 'boolean'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:1000'],
         ];
     }
 }
-

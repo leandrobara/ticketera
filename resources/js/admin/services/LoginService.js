@@ -1,4 +1,4 @@
-import axios from 'axios';
+import ApiService from '@/admin/services/ApiService';
 
 let instance = null;
 
@@ -14,7 +14,7 @@ export default class LoginService {
 
   async login({ email, password }) {
 
-    const response = await axios.post('/api/admin/auth/login', {
+    const response = await ApiService.getInstance().post('/api/admin/auth/login', {
       email: email,
       password: password,
     });
@@ -24,13 +24,13 @@ export default class LoginService {
 
 
   async me() {
-    const user = await axios.get('/api/admin/auth/me');
+    const user = await ApiService.getInstance().get('/api/admin/auth/me');
     return user;
   }
 
 
   async logout() {
-    const loggedOut = await axios.post('/api/admin/auth/logout');
+    const loggedOut = await ApiService.getInstance().post('/api/admin/auth/logout');
     return loggedOut;
   }
 

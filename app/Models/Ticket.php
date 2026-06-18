@@ -15,6 +15,7 @@ class Ticket extends Model
         'status',
         'show_id',
         'order_id',
+        'order_item_id',
         'canceled_at',
         'checked_in_at',
         'presentation_id',
@@ -32,6 +33,11 @@ class Ticket extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function orderItem(): BelongsTo
+    {
+        return $this->belongsTo(OrderItem::class);
     }
 
     public function presentation(): BelongsTo

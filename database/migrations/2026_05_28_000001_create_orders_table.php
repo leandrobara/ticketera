@@ -21,7 +21,6 @@ return new class extends Migration
                 'APPROVED',
                 'REJECTED',
                 'IN_PROCESS',
-                'WAIVED',
                 'CANCELED',
                 'EXPIRED',
                 'REFUNDED',
@@ -30,11 +29,11 @@ return new class extends Migration
                 'MERCADO_PAGO',
                 'CASH',
                 'BANK_TRANSFER',
-                'COMPLIMENTARY',
+                'FREE',
                 'OTHER',
             ])->default('MERCADO_PAGO');
             $table->unsignedInteger('total_quantity');
-            $table->unsignedInteger('total_amount');
+            $table->decimal('total_amount', 18, 6);
             $table->string('currency', 3)->default('ARS');
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('expires_at')->nullable();

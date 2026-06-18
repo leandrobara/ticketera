@@ -32,7 +32,7 @@ class Order extends Model
     {
         return [
             'expires_at' => 'datetime',
-            'total_amount' => 'integer',
+            'total_amount' => 'decimal:6',
             'approved_at' => 'datetime',
             'total_quantity' => 'integer',
         ];

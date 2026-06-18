@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Api\BaseAPIController;
+use App\Http\Requests\Admin\CancelTicketRequest;
 use App\Http\Requests\Admin\CreateTicketRequest;
 use App\Http\Requests\Admin\DeleteTicketRequest;
 use App\Http\Requests\Admin\GetTicketRequest;
 use App\Http\Requests\Admin\ListTicketRequest;
+use App\Http\Requests\Admin\MarkTicketUsedRequest;
 use App\Http\Requests\Admin\UpdateTicketRequest;
 use App\Models\Ticket;
 use App\Services\Api\Admin\TicketService;
@@ -33,10 +35,19 @@ class TicketController extends BaseAPIController
         return $this->getSuccessResponse(resolve(TicketService::class)->update($ticket, $req->validated()));
     }
 
+    public function cancel(Ticket $ticket, CancelTicketRequest $req): array
+    {
+        return $this->getSuccessResponse(resolve(TicketService::class)->cancel($ticket));
+    }
+
+    public function markUsed(Ticket $ticket, MarkTicketUsedRequest $req): array
+    {
+        return $this->getSuccessResponse(resolve(TicketService::class)->markUsed($ticket));
+    }
+
     public function delete(Ticket $ticket, DeleteTicketRequest $req): array
     {
         resolve(TicketService::class)->delete($ticket);
         return $this->getSuccessResponse($ticket);
     }
 }
-

@@ -1,17 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\OrderItemPricingController;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\BuyerController;
 use App\Http\Controllers\Api\Admin\OrderController;
 use App\Http\Controllers\Api\Admin\OrderItemController;
 use App\Http\Controllers\Api\Admin\PaymentController;
+use App\Http\Controllers\Api\Admin\PromotionController;
 use App\Http\Controllers\Api\Admin\ShowController;
 use App\Http\Controllers\Api\Admin\TicketController;
 use App\Http\Controllers\Api\Admin\VenueController;
 use App\Http\Controllers\Api\Admin\PresentationController;
 use App\Http\Controllers\Api\Admin\PresentationTicketTypeController;
 
+Route::post('/checkout/price-preview', [OrderItemPricingController::class, 'calculateAmounts']);
 
 // ADMIN API ROUTES
 Route::group(['prefix' => 'admin'], function () {
@@ -54,6 +57,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('/presentation-ticket-types/{presentationTicketType}', [PresentationTicketTypeController::class, 'update']);
         Route::delete('/presentation-ticket-types/{presentationTicketType}', [PresentationTicketTypeController::class, 'delete']);
 
+        // promotions
+        Route::get('/promotions', [PromotionController::class, 'list']);
+        Route::post('/promotions', [PromotionController::class, 'create']);
+        Route::get('/promotions/{promotion}', [PromotionController::class, 'show']);
+        Route::put('/promotions/{promotion}', [PromotionController::class, 'update']);
+        Route::delete('/promotions/{promotion}', [PromotionController::class, 'delete']);
+
         // buyers
         Route::get('/buyers', [BuyerController::class, 'list']);
         Route::post('/buyers', [BuyerController::class, 'create']);
@@ -63,9 +73,10 @@ Route::group(['prefix' => 'admin'], function () {
 
         // orders
         Route::get('/orders', [OrderController::class, 'list']);
-        Route::post('/orders', [OrderController::class, 'create']);
+        Route::post('/orders', [OrderController::class, 'createManual']);
         Route::get('/orders/{order}', [OrderController::class, 'show']);
         Route::put('/orders/{order}', [OrderController::class, 'update']);
+        Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel']);
         Route::delete('/orders/{order}', [OrderController::class, 'delete']);
 
         // order items
@@ -80,6 +91,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/tickets', [TicketController::class, 'create']);
         Route::get('/tickets/{ticket}', [TicketController::class, 'show']);
         Route::put('/tickets/{ticket}', [TicketController::class, 'update']);
+        Route::post('/tickets/{ticket}/cancel', [TicketController::class, 'cancel']);
+        Route::post('/tickets/{ticket}/mark-used', [TicketController::class, 'markUsed']);
         Route::delete('/tickets/{ticket}', [TicketController::class, 'delete']);
 
         // payments
