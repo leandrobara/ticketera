@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->unsignedInteger('capacity')->nullable();
-            $table->text('description')->nullable();
+            $table->text('note')->nullable();
             $table->string('address')->nullable();
             $table->string('neighborhood')->nullable();
             $table->string('city')->nullable();

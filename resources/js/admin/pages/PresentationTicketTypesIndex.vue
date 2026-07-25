@@ -1,10 +1,14 @@
 <script setup>
   import { computed, onMounted, ref } from 'vue';
   import PresentationTicketTypeService from '@/admin/services/PresentationTicketTypeService';
+  import ShowService from '@/admin/services/ShowService';
   import PresentationTicketTypeModal from '@/admin/components/presentation-ticket-types/PresentationTicketTypeModal.vue';
+  import { formatDateTime } from '@/admin/helpers/DateTimeFormatHelper';
 
   // data
   const ticketTypes = ref([]);
+  const shows = ref([]);
+  const selectedShowId = ref('');
   const pagination = ref(null);
   const errorMessage = ref('');
   const isLoading = ref(false);
@@ -15,20 +19,6 @@
   const totalTicketTypes = computed(() => pagination.value?.total ?? ticketTypes.value.length);
 
   // methods
-  const formatDateTime = (date) => {
-    if (!date) {
-      return '-';
-    }
-
-    return new Intl.DateTimeFormat('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
-
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -37,12 +27,30 @@
     }).format(amount ?? 0);
   };
 
+  const getPromotionLabel = (ticketType) => {
+    if (!ticketType.promotion_type) {
+      return '-';
+    }
+
+    if (ticketType.promotion_type === 'percent_discount') {
+      return `${ticketType.promotion_name ?? 'Promoción'} - ${Number(ticketType.promotion_value)}%`;
+    }
+
+    if (ticketType.promotion_type === 'fixed_discount') {
+      return `${ticketType.promotion_name ?? 'Promoción'} - ${formatMoney(ticketType.promotion_value)}`;
+    }
+
+    return `${ticketType.promotion_name ?? 'Promoción'} - ${ticketType.promotion_bundle_quantity}x${ticketType.promotion_pay_quantity}`;
+  };
+
   const loadTicketTypes = async () => {
     isLoading.value = true;
     errorMessage.value = '';
 
     try {
-      const response = await PresentationTicketTypeService.getInstance().getPresentationTicketTypes();
+      const response = await PresentationTicketTypeService.getInstance().getPresentationTicketTypes({
+        show_id: selectedShowId.value || undefined,
+      });
       pagination.value = response.data.data;
       ticketTypes.value = response.data.data.data ?? [];
     } catch (error) {
@@ -50,6 +58,19 @@
     } finally {
       isLoading.value = false;
     }
+  };
+
+  const loadShows = async () => {
+    try {
+      const response = await ShowService.getInstance().getShows({ per_page: 1000 });
+      shows.value = response.data.data.data ?? [];
+    } catch (error) {
+      errorMessage.value = 'No se pudo cargar el listado de shows.';
+    }
+  };
+
+  const filterByShow = () => {
+    loadTicketTypes();
   };
 
   const openTicketTypeModal = () => {
@@ -78,7 +99,12 @@
   };
 
   // lifecycle
-  onMounted(loadTicketTypes);
+  onMounted(async () => {
+    await Promise.all([
+      loadShows(),
+      loadTicketTypes(),
+    ]);
+  });
 </script>
 
 <template>
@@ -105,6 +131,25 @@
           {{ errorMessage }}
         </div>
 
+        <div class="card-body border-bottom">
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="ticket-types-show-filter">Show</label>
+              <select
+                id="ticket-types-show-filter"
+                v-model="selectedShowId"
+                class="form-select"
+                @change="filterByShow"
+              >
+                <option value="">Todos los shows</option>
+                <option v-for="show in shows" :key="show.id" :value="show.id">
+                  {{ show.title }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         <div v-if="isLoading" class="card-body">
           <div class="d-flex align-items-center">
             <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
@@ -123,9 +168,10 @@
           <table class="table table-vcenter card-table">
             <thead>
               <tr>
-                <th>Nombre</th>
                 <th>Función</th>
+                <th>Tipo de entrada</th>
                 <th>Precio</th>
+                <th>Promoción</th>
                 <th>Stock</th>
                 <th>Orden</th>
                 <th>Estado</th>
@@ -135,13 +181,31 @@
             <tbody>
               <tr v-for="ticketType in ticketTypes" :key="ticketType.id">
                 <td>
+                  <div class="fw-semibold">
+                    {{ ticketType.presentation?.season?.show?.title ?? '-' }}
+                  </div>
+                  <div class="text-secondary">
+                    {{ formatDateTime(ticketType.presentation?.starts_at) }}
+                  </div>
+                </td>
+                <td>
                   <div class="fw-semibold">{{ ticketType.name }}</div>
                 </td>
                 <td class="text-secondary">
-                  {{ formatDateTime(ticketType.presentation?.starts_at) }}
-                </td>
-                <td class="text-secondary">
                   {{ formatMoney(ticketType.price) }}
+                </td>
+                <td>
+                  <span
+                    v-if="ticketType.promotion_type"
+                    class="badge"
+                    :class="ticketType.promotion_is_active ? 'bg-blue-lt' : 'bg-secondary-lt'"
+                  >
+                    {{ getPromotionLabel(ticketType) }}
+                  </span>
+                  <span v-else class="text-secondary">-</span>
+                  <div v-if="ticketType.promotion_access_code" class="text-secondary small mt-1">
+                    Código: {{ ticketType.promotion_access_code }}
+                  </div>
                 </td>
                 <td class="text-secondary">
                   {{ ticketType.stock ?? '-' }}

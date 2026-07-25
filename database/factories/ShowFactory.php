@@ -18,11 +18,14 @@ class ShowFactory extends Factory
         return [
             'title' => $title,
             'slug' => Str::slug($title).'-'.Str::lower(Str::random(6)),
-            'description' => fake()->paragraphs(2, true),
-            'main_image_path' => null,
-            'status' => fake()->randomElement(['draft', 'published']),
-            'published_at' => null,
+            'subtitle' => fake()->optional()->sentence(),
+            'synopsis' => fake()->paragraphs(2, true),
+            'production_note' => fake()->optional()->paragraph(),
+            'faqs' => [],
+            'service_fee_type' => 'fixed_amount',
+            'service_fee_fixed_amount' => '0.000000',
+            'service_fee_percentage' => null,
+            'service_fee_minimum_unit_amount' => '2000.000000',
         ];
     }
 }
-

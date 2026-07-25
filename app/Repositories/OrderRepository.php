@@ -7,13 +7,28 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OrderRepository
 {
+    public function findApprovedForComment(
+        int $showId,
+        int $buyerId,
+    ): ?Order {
+        return Order::query()
+            ->with(['buyer', 'show'])
+            ->where('show_id', $showId)
+            ->where('buyer_id', $buyerId)
+            ->where('status', 'APPROVED')
+            ->latest('id')
+            ->first();
+    }
+
     public function listPaginated(array $filters, int $limit = 20): LengthAwarePaginator
     {
         return Order::query()
             ->with([
                 'buyer',
-                'presentation.show',
+                'presentation.season.show',
+                'presentation.season.venue',
                 'items.promotionSnapshot',
+                'payments',
                 'tickets.orderItem',
                 'tickets.presentationTicketType',
             ])
@@ -42,7 +57,8 @@ class OrderRepository
     {
         return $order->load([
             'buyer',
-            'presentation.show',
+            'presentation.season.show',
+            'presentation.season.venue',
             'createdByUser',
             'items.promotionSnapshot',
             'tickets.orderItem',
@@ -53,7 +69,7 @@ class OrderRepository
 
     public function store(array $attrs): Order
     {
-        return Order::create($attrs)->load(['buyer', 'presentation.show']);
+        return Order::create($attrs)->load(['buyer', 'presentation.season.show', 'presentation.season.venue']);
     }
 
     public function update(Order $order, array $attrs): Order
@@ -61,7 +77,8 @@ class OrderRepository
         $order->update($attrs);
         return $order->fresh([
             'buyer',
-            'presentation.show',
+            'presentation.season.show',
+            'presentation.season.venue',
             'items.promotionSnapshot',
             'tickets.orderItem',
             'tickets.presentationTicketType',

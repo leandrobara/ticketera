@@ -171,7 +171,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"title\": \"Mi primera obra\",\n    \"slug\": \"mi-primera-obra\",\n    \"description\": \"Una obra independiente para probar el MVP.\",\n    \"genre\": \"Drama\",\n    \"format\": \"Theater\",\n    \"age_rating\": \"ATP\",\n    \"main_image_path\": null,\n    \"status\": \"published\"\n}"
+                            "raw": "{\n    \"title\": \"Mi primera obra\",\n    \"slug\": \"mi-primera-obra\",\n    \"synopsis\": \"Una obra independiente para probar el MVP.\",\n    \"production_note\": \"Nota visible de la producción.\",\n    \"genre\": \"Drama\",\n    \"format\": \"Theater\",\n    \"age_rating\": \"ATP\",\n    \"service_fee_type\": \"percentage\",\n    \"service_fee_fixed_amount\": null,\n    \"service_fee_percentage\": 10,\n    \"service_fee_minimum_unit_amount\": 2000,\n    \"status\": \"published\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/admin/shows",
@@ -316,7 +316,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Sala Independiente\",\n    \"capacity\": 80,\n    \"description\": \"Sala chica para teatro independiente.\",\n    \"address\": \"Av. Corrientes 1234\",\n    \"neighborhood\": \"Almagro\",\n    \"city\": \"Buenos Aires\",\n    \"google_maps_url\": \"https://maps.google.com\",\n    \"has_bar\": true,\n    \"is_accessible\": false,\n    \"has_parking\": false\n}"
+                            "raw": "{\n    \"name\": \"Sala Independiente\",\n    \"capacity\": 80,\n    \"note\": \"Sala chica para teatro independiente. Nota interna o visible del espacio.\",\n    \"address\": \"Av. Corrientes 1234\",\n    \"neighborhood\": \"Almagro\",\n    \"city\": \"Buenos Aires\",\n    \"google_maps_url\": \"https://maps.google.com\",\n    \"has_bar\": true,\n    \"is_accessible\": false,\n    \"has_parking\": false\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/admin/venues",
@@ -414,6 +414,163 @@
             ]
         },
         {
+            "name": "Seasons",
+            "item": [
+                {
+                    "name": "List Seasons",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/seasons?show_id=&venue_id=&status=&search=",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "seasons"
+                            ],
+                            "query": [
+                                {
+                                    "key": "show_id",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "venue_id",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "status",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "search",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Season",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"show_id\": 1,\n    \"venue_id\": 1,\n    \"name\": \"Temporada 2026\",\n    \"status\": \"draft\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/seasons",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "seasons"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Season",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/seasons/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "seasons",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Season",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Temporada 2026\",\n    \"status\": \"published\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/seasons/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "seasons",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Season",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/seasons/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "seasons",
+                                "1"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
             "name": "Presentations",
             "item": [
                 {
@@ -427,7 +584,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/admin/presentations?show_id=&venue_id=&status=&search=",
+                            "raw": "{{base_url}}/api/admin/presentations?season_id=&show_id=&venue_id=&status=&search=",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -437,6 +594,10 @@
                                 "presentations"
                             ],
                             "query": [
+                                {
+                                    "key": "season_id",
+                                    "value": ""
+                                },
                                 {
                                     "key": "show_id",
                                     "value": ""
@@ -473,7 +634,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"show_id\": 1,\n    \"venue_id\": 1,\n    \"status\": \"published\",\n    \"starts_at\": \"2026-06-15 20:30:00\",\n    \"capacity\": 80,\n    \"notes\": \"Primera funcion\"\n}"
+                            "raw": "{\n    \"season_id\": 1,\n    \"status\": \"published\",\n    \"starts_at\": \"2026-06-15 20:30:00\",\n    \"capacity\": 80,\n    \"notes\": \"Primera funcion\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/admin/presentations",

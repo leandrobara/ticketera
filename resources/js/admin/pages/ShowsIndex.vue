@@ -1,7 +1,13 @@
 <script setup>
   import { computed, onMounted, ref } from 'vue';
   import ShowService from '@/admin/services/ShowService';
+  import ShowCreditsModal from '@/admin/components/shows/ShowCreditsModal.vue';
+  import ShowFaqsModal from '@/admin/components/shows/ShowFaqsModal.vue';
+  import ShowImagesModal from '@/admin/components/shows/ShowImagesModal.vue';
+  import ShowLinksModal from '@/admin/components/shows/ShowLinksModal.vue';
   import ShowModal from '@/admin/components/shows/ShowModal.vue';
+  import ShowPerformanceHistoryModal from '@/admin/components/shows/ShowPerformanceHistoryModal.vue';
+  import ShowSocialLinksModal from '@/admin/components/shows/ShowSocialLinksModal.vue';
 
   // data
   const shows = ref([]);
@@ -9,12 +15,34 @@
   const errorMessage = ref('');
   const isLoading = ref(false);
   const showModal = ref(null);
+  const showPerformanceHistoryModal = ref(null);
+  const showCreditsModal = ref(null);
+  const showFaqsModal = ref(null);
+  const showImagesModal = ref(null);
+  const showLinksModal = ref(null);
+  const showSocialLinksModal = ref(null);
 
   // computed
   const hasShows = computed(() => shows.value.length > 0);
   const totalShows = computed(() => pagination.value?.total ?? shows.value.length);
 
   // methods
+  const formatMoney = (amount) => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      maximumFractionDigits: 0,
+    }).format(amount ?? 0);
+  };
+
+  const formatServiceFee = (show) => {
+    if (show.service_fee_type === 'percentage') {
+      return Number(show.service_fee_percentage ?? 0).toLocaleString('es-AR') + '%';
+    }
+
+    return formatMoney(show.service_fee_fixed_amount);
+  };
+
   const loadShows = async () => {
     isLoading.value = true;
     errorMessage.value = '';
@@ -36,6 +64,30 @@
 
   const openUpdateShowModal = (show) => {
     showModal.value.openForUpdate(show);
+  };
+
+  const openShowCreditsModal = (show) => {
+    showCreditsModal.value.open(show);
+  };
+
+  const openShowPerformanceHistoryModal = (show) => {
+    showPerformanceHistoryModal.value.open(show);
+  };
+
+  const openShowImagesModal = (show) => {
+    showImagesModal.value.open(show);
+  };
+
+  const openShowLinksModal = (show) => {
+    showLinksModal.value.open(show);
+  };
+
+  const openShowFaqsModal = (show) => {
+    showFaqsModal.value.open(show);
+  };
+
+  const openShowSocialLinksModal = (show) => {
+    showSocialLinksModal.value.open(show);
   };
 
   const deleteShow = async (show) => {
@@ -103,7 +155,8 @@
               <tr>
                 <th>Título</th>
                 <th>Slug</th>
-                <th>Estado</th>
+                <th>Fee</th>
+                <th>Temporadas</th>
                 <th></th>
               </tr>
             </thead>
@@ -118,13 +171,36 @@
                 <td class="text-secondary">
                   {{ show.slug || '-' }}
                 </td>
-                <td>
-                  <span class="badge" :class="show.status === 'published' ? 'bg-success-lt' : 'bg-secondary-lt'">
-                    {{ show.status }}
-                  </span>
+                <td class="text-secondary">
+                  {{ formatServiceFee(show) }}
                 </td>
+                <td class="text-secondary">{{ show.seasons_count ?? 0 }}</td>
                 <td class="text-end">
                   <div class="btn-list justify-content-end flex-nowrap">
+                    <a
+                      class="btn btn-sm btn-outline-secondary"
+                      :href="`/admin/seasons?show_id=${show.id}`"
+                    >
+                      Temporadas
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary" type="button" @click="openShowCreditsModal(show)">
+                      Créditos
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" type="button" @click="openShowPerformanceHistoryModal(show)">
+                      Histórico
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" type="button" @click="openShowLinksModal(show)">
+                      Links
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" type="button" @click="openShowImagesModal(show)">
+                      Imágenes
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" type="button" @click="openShowSocialLinksModal(show)">
+                      Redes
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" type="button" @click="openShowFaqsModal(show)">
+                      FAQs
+                    </button>
                     <button class="btn btn-sm btn-outline-primary" type="button" @click="openUpdateShowModal(show)">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -180,4 +256,10 @@
   </div>
 
   <ShowModal ref="showModal" @saved="loadShows" />
+  <ShowPerformanceHistoryModal ref="showPerformanceHistoryModal" />
+  <ShowCreditsModal ref="showCreditsModal" />
+  <ShowFaqsModal ref="showFaqsModal" @saved="loadShows" />
+  <ShowImagesModal ref="showImagesModal" @saved="loadShows" />
+  <ShowLinksModal ref="showLinksModal" />
+  <ShowSocialLinksModal ref="showSocialLinksModal" @saved="loadShows" />
 </template>

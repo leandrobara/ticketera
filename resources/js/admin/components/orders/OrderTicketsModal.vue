@@ -1,6 +1,7 @@
 <script setup>
   import { Modal } from 'bootstrap';
   import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+  import { formatDateTime } from '@/admin/helpers/DateTimeFormatHelper';
   import TicketService from '@/admin/services/TicketService';
 
   // emits
@@ -17,7 +18,11 @@
   // computed
   const tickets = computed(() => order.value?.tickets ?? []);
   const orderCode = computed(() => order.value?.code ?? '-');
-  const showTitle = computed(() => order.value?.presentation?.show?.title ?? '-');
+  const showTitle = computed(() => {
+    return order.value?.presentation?.season?.show?.title
+      ?? order.value?.show?.title
+      ?? '-';
+  });
   const presentationDate = computed(() => formatDateTime(order.value?.presentation?.starts_at));
   const buyerName = computed(() => {
     const buyer = order.value?.buyer;
@@ -30,20 +35,6 @@
   });
 
   // methods
-  const formatDateTime = (date) => {
-    if (!date) {
-      return '-';
-    }
-
-    return new Intl.DateTimeFormat('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
-
   const getTicketStatusLabel = (status) => {
     const labels = {
       VALID: 'Válida',
@@ -164,7 +155,7 @@
 
 <template>
   <div ref="modalElement" class="modal modal-blur fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <div>

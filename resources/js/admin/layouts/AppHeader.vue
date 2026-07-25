@@ -17,12 +17,15 @@
 
   // computed
   const isShowsActive = computed(() => currentPath === '/admin/shows');
+  const isSeasonsActive = computed(() => currentPath === '/admin/seasons');
   const isOrdersActive = computed(() => currentPath === '/admin/orders');
-  const isPromotionsActive = computed(() => currentPath === '/admin/promotions');
+  const isPeopleActive = computed(() => currentPath === '/admin/people');
   const isVenuesActive = computed(() => currentPath === '/admin/venues');
   const isPresentationsActive = computed(() => currentPath === '/admin/presentations');
   const isPresentationTicketTypesActive = computed(() => currentPath === '/admin/presentation-ticket-types');
   const isBuyersActive = computed(() => currentPath === '/admin/buyers');
+  const isCommentsActive = computed(() => currentPath === '/admin/comments');
+  const isNewsletterSubscribersActive = computed(() => currentPath === '/admin/newsletter-subscribers');
 </script>
 
 <template>
@@ -41,7 +44,9 @@
       </button>
 
       <h1 class="navbar-brand navbar-brand-autodark pe-0 pe-md-3">
-        <a href="/admin/shows">Ticketera</a>
+        <a href="/admin/shows" aria-label="Entradatix">
+          <img class="admin-brand-logo" :src="'/brand/entradatix-logo.png'" alt="Entradatix">
+        </a>
       </h1>
 
       <div class="navbar-nav flex-row order-md-last">
@@ -83,6 +88,14 @@
                 <span class="nav-link-title">Shows</span>
               </a>
             </li>
+            <li class="nav-item" :class="{ active: isSeasonsActive }">
+              <a
+                class="nav-link"
+                href="/admin/seasons"
+              >
+                <span class="nav-link-title">Temporadas</span>
+              </a>
+            </li>
             <li class="nav-item" :class="{ active: isOrdersActive }">
               <a
                 class="nav-link"
@@ -107,14 +120,6 @@
                 <span class="nav-link-title">Tipos de entrada</span>
               </a>
             </li>
-            <li class="nav-item" :class="{ active: isPromotionsActive }">
-              <a
-                class="nav-link"
-                href="/admin/promotions"
-              >
-                <span class="nav-link-title">Promociones</span>
-              </a>
-            </li>
             <li class="nav-item" :class="{ active: isVenuesActive }">
               <a
                 class="nav-link"
@@ -123,12 +128,33 @@
                 <span class="nav-link-title">Espacios</span>
               </a>
             </li>
+            <li class="nav-item" :class="{ active: isPeopleActive }">
+              <a
+                class="nav-link"
+                href="/admin/people"
+              >
+                <span class="nav-link-title">Personas</span>
+              </a>
+            </li>
             <li class="nav-item" :class="{ active: isBuyersActive }">
               <a
                 class="nav-link"
                 href="/admin/buyers"
               >
                 <span class="nav-link-title">Compradores</span>
+              </a>
+            </li>
+            <li class="nav-item" :class="{ active: isNewsletterSubscribersActive }">
+              <a
+                class="nav-link"
+                href="/admin/newsletter-subscribers"
+              >
+                <span class="nav-link-title">Suscriptores</span>
+              </a>
+            </li>
+            <li class="nav-item" :class="{ active: isCommentsActive }">
+              <a class="nav-link" href="/admin/comments">
+                <span class="nav-link-title">Comentarios</span>
               </a>
             </li>
           </ul>

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Models\Presentation;
+use App\Models\Season;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -14,8 +15,7 @@ class CreatePresentationRequest extends FormRequest
             'notes' => ['nullable', 'string'],
             'starts_at' => ['required', 'date'],
             'capacity' => ['required', 'integer', 'min:0'],
-            'show_id' => ['required', 'integer', 'exists:shows,id'],
-            'venue_id' => ['nullable', 'integer', 'exists:venues,id'],
+            'season_id' => ['required', 'integer', 'exists:seasons,id'],
             'status' => ['required', Rule::in(['draft', 'published', 'sold_out', 'cancelled'])],
         ];
     }
@@ -25,13 +25,11 @@ class CreatePresentationRequest extends FormRequest
         if (!$validator->failed()) {
             $validator->after(function ($validator) {
 
-                $show_id = $this->input('show_id');
-                $venue_id = $this->input('venue_id');
+                $seasonId = $this->input('season_id');
                 $starts_at = $this->input('starts_at');
 
                 $exists = Presentation::query()
-                    ->where('show_id', $show_id)
-                    ->where('venue_id', $venue_id)
+                    ->where('season_id', $seasonId)
                     ->where('starts_at', $starts_at)
                     ->exists()
                 ;
@@ -39,9 +37,14 @@ class CreatePresentationRequest extends FormRequest
                 if ($exists) {
                     $validator->errors()->add(
                         'starts_at',
-                        'A presentation already exists for this show, venue and start time.'
+                        'A presentation already exists for this season and start time.'
                     );
-                    return false;
+                }
+
+                $season = Season::find($seasonId);
+
+                if ($season?->closed_at) {
+                    $validator->errors()->add('season_id', 'season_is_closed');
                 }
             });
         }

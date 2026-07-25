@@ -10,7 +10,7 @@ class PresentationTicketTypeRepository
     public function listPaginated(array $filters, int $limit = 20): LengthAwarePaginator
     {
         return PresentationTicketType::query()
-            ->with(['presentation.show', 'promotion'])
+            ->with(['presentation.season.show', 'presentation.season.venue'])
             ->withCount([
                 'tickets as sold_tickets_count' => function ($query) {
                     $query->whereIn('status', ['VALID', 'USED']);
@@ -18,6 +18,9 @@ class PresentationTicketTypeRepository
             ])
             ->when($filters['presentation_id'] ?? null, function ($query, int $presentationId) {
                 $query->where('presentation_id', $presentationId);
+            })
+            ->when($filters['show_id'] ?? null, function ($query, int $showId) {
+                $query->whereHas('presentation.season', fn ($query) => $query->where('show_id', $showId));
             })
             ->when(array_key_exists('is_active', $filters), function ($query) use ($filters) {
                 $query->where('is_active', $filters['is_active']);
@@ -32,19 +35,19 @@ class PresentationTicketTypeRepository
 
     public function getOne(PresentationTicketType $presentationTicketType): PresentationTicketType
     {
-        return $presentationTicketType->load('presentation.show');
+        return $presentationTicketType->load(['presentation.season.show', 'presentation.season.venue']);
     }
 
     public function store(array $attrs): PresentationTicketType
     {
         $ticketType = PresentationTicketType::create($attrs);
-        return $ticketType->load('presentation.show');
+        return $ticketType->load(['presentation.season.show', 'presentation.season.venue']);
     }
 
     public function update(PresentationTicketType $presentationTicketType, array $attrs): PresentationTicketType
     {
         $presentationTicketType->update($attrs);
-        return $presentationTicketType->fresh('presentation.show');
+        return $presentationTicketType->fresh(['presentation.season.show', 'presentation.season.venue']);
     }
 
     public function delete(PresentationTicketType $presentationTicketType): void

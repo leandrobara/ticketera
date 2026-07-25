@@ -38,7 +38,13 @@ class AdminShowsTest extends TestCase
             ->postJson('/api/admin/shows', [
                 'title' => 'A Real Independent Play',
                 'slug' => 'a-real-independent-play',
-                'description' => 'A first show for the MVP.',
+                'synopsis' => 'A first show for the MVP.',
+                'production_note' => 'A note from production.',
+                'service_fee_type' => 'percentage',
+                'service_fee_fixed_amount' => null,
+                'service_fee_percentage' => '10.000000',
+                'service_fee_minimum_unit_amount' => '2000.000000',
+                'age_rating' => 'ATP',
                 'status' => 'published',
             ])
             ->assertCreated()
@@ -119,7 +125,8 @@ class AdminShowsTest extends TestCase
         $show = Show::factory()->create([
             'title' => 'Binding Example',
             'slug' => 'binding-example',
-            'description' => 'Route-bound show.',
+            'synopsis' => 'Route-bound show.',
+            'production_note' => 'Route-bound production note.',
             'main_image_path' => 'shows/binding-example.jpg',
             'status' => 'published',
         ]);
@@ -131,7 +138,8 @@ class AdminShowsTest extends TestCase
             ->assertJsonPath('id', $show->id)
             ->assertJsonPath('title', 'Binding Example')
             ->assertJsonPath('slug', 'binding-example')
-            ->assertJsonPath('description', 'Route-bound show.')
+            ->assertJsonPath('synopsis', 'Route-bound show.')
+            ->assertJsonPath('production_note', 'Route-bound production note.')
             ->assertJsonPath('main_image_path', 'shows/binding-example.jpg')
             ->assertJsonPath('status', 'published');
     }
@@ -159,7 +167,8 @@ class AdminShowsTest extends TestCase
             ->postJson('/api/admin/shows', [
                 'title' => 'Unauthenticated Show',
                 'slug' => 'unauthenticated-show',
-                'description' => 'Should not be created.',
+                'synopsis' => 'Should not be created.',
+                'production_note' => 'Should not be created.',
                 'status' => 'draft',
             ])
             ->assertUnauthorized()
@@ -178,7 +187,8 @@ class AdminShowsTest extends TestCase
             ->putJson("/api/admin/shows/{$show->id}", [
                 'title' => 'Unauthenticated Update',
                 'slug' => 'unauthenticated-update',
-                'description' => 'Should not update.',
+                'synopsis' => 'Should not update.',
+                'production_note' => 'Should not update.',
                 'status' => 'draft',
             ])
             ->assertUnauthorized()
@@ -369,7 +379,8 @@ class AdminShowsTest extends TestCase
             ->putJson("/api/admin/shows/{$show->id}", [
                 'title' => 'Updated Show',
                 'slug' => 'updated-show',
-                'description' => 'Updated description.',
+                'synopsis' => 'Updated synopsis.',
+                'production_note' => 'Updated production note.',
                 'status' => 'published',
             ])
             ->assertOk()

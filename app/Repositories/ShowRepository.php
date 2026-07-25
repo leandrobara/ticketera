@@ -10,7 +10,13 @@ class ShowRepository
 
     public function listPaginated(?string $search, int $limit = 20): LengthAwarePaginator
     {
-        return Show::query()->latest()->paginate($limit);
+        return Show::query()
+            ->withCount('seasons')
+            ->when($search, function ($query, string $search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate($limit);
     }
 
     

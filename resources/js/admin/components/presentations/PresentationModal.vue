@@ -2,15 +2,13 @@
   import { Modal } from 'bootstrap';
   import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
   import PresentationService from '@/admin/services/PresentationService';
-  import ShowService from '@/admin/services/ShowService';
-  import VenueService from '@/admin/services/VenueService';
+  import SeasonService from '@/admin/services/SeasonService';
 
   // emits
   const emit = defineEmits(['saved']);
 
   // data
-  const shows = ref([]);
-  const venues = ref([]);
+  const seasons = ref([]);
   const mode = ref('create');
   const fieldErrors = ref({});
   const errorMessage = ref('');
@@ -21,9 +19,8 @@
   const currentPresentation = ref(null);
   const form = reactive({
     notes: '',
-    show_id: '',
+    season_id: '',
     capacity: '',
-    venue_id: '',
     starts_at: '',
     status: 'published',
   });
@@ -36,9 +33,8 @@
   // methods
   const resetForm = () => {
     form.notes = '';
-    form.show_id = '';
+    form.season_id = '';
     form.capacity = '';
-    form.venue_id = '';
     form.starts_at = '';
     form.status = 'published';
 
@@ -63,8 +59,7 @@
     form.capacity = presentation.capacity ?? '';
     form.status = presentation.status ?? 'published';
     form.starts_at = toDateTimeLocal(presentation.starts_at);
-    form.show_id = presentation.show_id ?? presentation.show?.id ?? '';
-    form.venue_id = presentation.venue_id ?? presentation.venue?.id ?? '';
+    form.season_id = presentation.season_id ?? presentation.season?.id ?? '';
   
     fieldErrors.value = {};
     errorMessage.value = '';
@@ -79,9 +74,8 @@
       status: form.status,
       starts_at: form.starts_at,
       notes: nullable(form.notes),
-      show_id: Number(form.show_id),
+      season_id: Number(form.season_id),
       capacity: Number(form.capacity),
-      venue_id: form.venue_id === '' ? null : Number(form.venue_id),
     };
   };
 
@@ -93,15 +87,10 @@
     isLoadingOptions.value = true;
 
     try {
-      const [showsResponse, venuesResponse] = await Promise.all([
-        ShowService.getInstance().getShows(),
-        VenueService.getInstance().getVenues(),
-      ]);
-
-      shows.value = showsResponse.data.data.data ?? [];
-      venues.value = venuesResponse.data.data.data ?? [];
+      const response = await SeasonService.getInstance().getSeasons({ per_page: 1000 });
+      seasons.value = response.data.data.data ?? [];
     } catch (error) {
-      errorMessage.value = 'No se pudieron cargar shows y espacios.';
+      errorMessage.value = 'No se pudieron cargar las temporadas.';
     } finally {
       isLoadingOptions.value = false;
     }
@@ -113,10 +102,11 @@
     modalInstance.value.show();
   };
 
-  const openForCreate = async () => {
+  const openForCreate = async (seasonId = null) => {
     mode.value = 'create';
     currentPresentation.value = null;
     resetForm();
+    form.season_id = seasonId ? Number(seasonId) : '';
     await showModal();
   };
 
@@ -153,10 +143,11 @@
     }
   };
 
-  const handleChangeVenue = () => {
-    const selectedVenueId = Number(form.venue_id);
-    const selectedVenue = venues.value.find(venue => venue.id === selectedVenueId);
-    form.capacity = selectedVenue ? selectedVenue.capacity : null;
+  const handleChangeSeason = () => {
+    const selectedSeason = seasons.value.find(
+      (season) => Number(season.id) === Number(form.season_id)
+    );
+    form.capacity = selectedSeason?.venue?.capacity ?? '';
   };
 
   defineExpose({
@@ -196,21 +187,28 @@
           <div class="row">
             <div class="col-md-8">
               <div class="mb-3">
-                <label class="form-label" for="presentation-show-id">Show</label>
+                <label class="form-label" for="presentation-season-id">Temporada</label>
                 <select
-                  id="presentation-show-id"
-                  v-model="form.show_id"
+                  id="presentation-season-id"
+                  v-model="form.season_id"
                   class="form-select"
-                  :class="{ 'is-invalid': getFieldError('show_id') }"
+                  :class="{ 'is-invalid': getFieldError('season_id') }"
+                  @change="handleChangeSeason"
                   required
                 >
-                  <option value="">Seleccionar show</option>
-                  <option v-for="show in shows" :key="show.id" :value="show.id">
-                    {{ show.title }}
+                  <option value="">Seleccionar temporada</option>
+                  <option
+                    v-for="season in seasons"
+                    :key="season.id"
+                    :value="season.id"
+                    :disabled="['finished', 'cancelled'].includes(season.status)"
+                  >
+                    {{ season.show?.title }} - {{ season.venue?.name }}
+                    <template v-if="season.name"> - {{ season.name }}</template>
                   </option>
                 </select>
-                <div v-if="getFieldError('show_id')" class="invalid-feedback">
-                  {{ getFieldError('show_id') }}
+                <div v-if="getFieldError('season_id')" class="invalid-feedback">
+                  {{ getFieldError('season_id') }}
                 </div>
               </div>
             </div>
@@ -238,27 +236,6 @@
           </div>
 
           <div class="row">
-            <div class="col-md-8">
-              <div class="mb-3">
-                <label class="form-label" for="presentation-venue-id">Espacio</label>
-                <select
-                  class="form-select"
-                  v-model="form.venue_id"
-                  id="presentation-venue-id"
-                  @change="handleChangeVenue"
-                  :class="{ 'is-invalid': getFieldError('venue_id') }"
-                >
-                  <option value="">Sin espacio asignado</option>
-                  <option v-for="venue in venues" :key="venue.id" :value="venue.id">
-                    {{ venue.name }}
-                  </option>
-                </select>
-                <div v-if="getFieldError('venue_id')" class="invalid-feedback">
-                  {{ getFieldError('venue_id') }}
-                </div>
-              </div>
-            </div>
-
             <div class="col-md-4">
               <div class="mb-3">
                 <label class="form-label" for="presentation-capacity">Capacidad</label>

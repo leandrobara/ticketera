@@ -13,9 +13,18 @@ class UpdateOrderItemRequest extends FormRequest
             'presentation_ticket_type_id' => ['nullable', 'integer', 'exists:presentation_ticket_types,id'],
             'name' => ['nullable', 'string', 'max:255'],
             'quantity' => ['nullable', 'integer', 'min:1'],
+            'paid_quantity' => ['nullable', 'integer', 'min:0'],
             'unit_price' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
+            'unit_service_fee' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
+            'service_fee_type' => ['nullable', 'in:fixed_amount,percentage'],
+            'service_fee_fixed_amount' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
+            'service_fee_percentage' => ['nullable', 'numeric', 'decimal:0,6', 'min:0', 'max:100'],
+            'service_fee_base_amount' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
+            'service_fee_minimum_applied' => ['nullable', 'boolean'],
+            'service_fee_minimum_unit_amount' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
             'subtotal_amount' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
             'discount_amount' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
+            'service_fee_total_amount' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
             'total_amount' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
         ];
     }

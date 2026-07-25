@@ -6,3 +6,44 @@
     font-weight: 700;
     letter-spacing: 0;
 }
+
+.admin-brand-logo {
+    display: block;
+    height: 34px;
+    width: auto;
+}
+
+.admin-login-brand-logo {
+    display: block;
+    height: 54px;
+    width: auto;
+}
+
+.show-image-preview,
+.show-gallery-thumb {
+    align-items: center;
+    aspect-ratio: 16 / 9;
+    background: var(--tblr-bg-surface-secondary);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
+}
+
+.show-image-preview img,
+.show-gallery-thumb img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.show-image-preview-gallery {
+    min-height: 180px;
+}
+.admin-comments-table .admin-comment-content {
+  min-width: 320px;
+  max-width: 520px;
+  white-space: normal;
+}

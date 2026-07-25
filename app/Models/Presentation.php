@@ -14,9 +14,8 @@ class Presentation extends Model
     protected $fillable = [
         'notes',
         'status',
-        'show_id',
+        'season_id',
         'capacity',
-        'venue_id',
         'starts_at',
     ];
 
@@ -24,24 +23,14 @@ class Presentation extends Model
     {
         return [
             'capacity' => 'integer',
+            'revenue_amount' => 'decimal:6',
             'starts_at' => 'datetime',
         ];
     }
 
-    /**
-     * @return BelongsTo<Show, Presentation>
-     */
-    public function show(): BelongsTo
+    public function season(): BelongsTo
     {
-        return $this->belongsTo(Show::class);
-    }
-
-    /**
-     * @return BelongsTo<Venue, Presentation>
-     */
-    public function venue(): BelongsTo
-    {
-        return $this->belongsTo(Venue::class);
+        return $this->belongsTo(Season::class);
     }
 
     /**
@@ -61,4 +50,5 @@ class Presentation extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
 }

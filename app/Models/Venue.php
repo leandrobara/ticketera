@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Venue extends Model
 {
@@ -12,11 +12,11 @@ class Venue extends Model
 
     protected $fillable = [
         'name',
+        'note',
         'city',
         'address',
         'has_bar',
         'capacity',
-        'description',
         'has_parking',
         'neighborhood',
         'is_accessible',
@@ -33,11 +33,8 @@ class Venue extends Model
         ];
     }
 
-    /**
-     * @return HasMany<Presentation>
-     */
-    public function presentations(): HasMany
+    public function seasons(): HasMany
     {
-        return $this->hasMany(Presentation::class);
+        return $this->hasMany(Season::class);
     }
 }

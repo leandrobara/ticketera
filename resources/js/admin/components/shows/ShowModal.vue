@@ -1,6 +1,7 @@
 <script setup>
   import { Modal } from 'bootstrap';
   import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+  import { normalizeDecimalInput } from '@/admin/helpers/number';
   import ShowService from '@/admin/services/ShowService';
 
   // emits
@@ -16,13 +17,18 @@
   const isSubmitting = ref(false);
   const form = reactive({
     title: '',
+    subtitle: '',
     slug: '',
-    description: '',
+    synopsis: '',
+    additional_information: '',
+    production_note: '',
     genre: '',
     format: '',
+    service_fee_type: 'fixed_amount',
+    service_fee_fixed_amount: '0',
+    service_fee_percentage: '',
+    service_fee_minimum_unit_amount: '2000',
     duration_minutes: '',
-    main_image_path: '',
-    status: 'draft',
     age_rating: 'ATP',
   });
 
@@ -35,26 +41,36 @@
   const resetForm = () => {
     form.slug = '';
     form.title = '';
+    form.subtitle = '';
     form.genre = '';
     form.format = '';
-    form.description = '';
-    form.status = 'draft';
+    form.service_fee_type = 'fixed_amount';
+    form.service_fee_fixed_amount = '0';
+    form.service_fee_percentage = '';
+    form.service_fee_minimum_unit_amount = '2000';
+    form.synopsis = '';
+    form.additional_information = '';
+    form.production_note = '';
     fieldErrors.value = {};
     form.age_rating = 'ATP';
     errorMessage.value = '';
-    form.main_image_path = '';
     form.duration_minutes = '';
   };
 
   const fillForm = (show) => {
     form.slug = show.slug ?? '';
     form.title = show.title ?? '';
+    form.subtitle = show.subtitle ?? '';
     form.genre = show.genre ?? '';
     form.format = show.format ?? '';
-    form.description = show.description ?? '';
-    form.status = show.status ?? 'draft';
+    form.service_fee_type = show.service_fee_type ?? 'fixed_amount';
+    form.service_fee_fixed_amount = normalizeDecimalInput(show.service_fee_fixed_amount);
+    form.service_fee_percentage = normalizeDecimalInput(show.service_fee_percentage);
+    form.service_fee_minimum_unit_amount = normalizeDecimalInput(show.service_fee_minimum_unit_amount);
+    form.synopsis = show.synopsis ?? '';
+    form.additional_information = show.additional_information ?? '';
+    form.production_note = show.production_note ?? '';
     form.age_rating = show.age_rating ?? 'ATP';
-    form.main_image_path = show.main_image_path ?? '';
     form.duration_minutes = show.duration_minutes ?? '';
     fieldErrors.value = {};
     errorMessage.value = '';
@@ -67,13 +83,22 @@
   const getPayload = () => {
     return {
       title: form.title,
+      subtitle: nullable(form.subtitle),
       slug: nullable(form.slug),
-      description: nullable(form.description),
+      synopsis: nullable(form.synopsis),
+      additional_information: nullable(form.additional_information),
+      production_note: nullable(form.production_note),
       genre: nullable(form.genre),
       format: nullable(form.format),
+      service_fee_type: form.service_fee_type,
+      service_fee_fixed_amount: form.service_fee_type === 'fixed_amount'
+        ? (form.service_fee_fixed_amount === '' ? 0 : form.service_fee_fixed_amount)
+        : null,
+      service_fee_percentage: form.service_fee_type === 'percentage'
+        ? form.service_fee_percentage
+        : null,
+      service_fee_minimum_unit_amount: nullable(form.service_fee_minimum_unit_amount),
       duration_minutes: form.duration_minutes === '' ? null : Number(form.duration_minutes),
-      main_image_path: nullable(form.main_image_path),
-      status: form.status,
       age_rating: form.age_rating,
     };
   };
@@ -157,7 +182,7 @@
           </div>
 
           <div class="row">
-            <div class="col-md-8">
+            <div class="col-12">
               <div class="mb-3">
                 <label class="form-label" for="show-title">Título</label>
                 <input
@@ -175,24 +200,50 @@
               </div>
             </div>
 
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label class="form-label" for="show-status">Estado</label>
-                <select
-                  id="show-status"
-                  v-model="form.status"
-                  class="form-select"
-                  :class="{ 'is-invalid': getFieldError('status') }"
-                  required
-                >
-                  <option value="draft">Borrador</option>
-                  <option value="published">Publicada</option>
-                  <option value="archived">Archivada</option>
-                </select>
-                <div v-if="getFieldError('status')" class="invalid-feedback">
-                  {{ getFieldError('status') }}
-                </div>
-              </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="show-subtitle">Subtítulo</label>
+            <input
+              id="show-subtitle"
+              v-model.trim="form.subtitle"
+              class="form-control"
+              :class="{ 'is-invalid': getFieldError('subtitle') }"
+              type="text"
+              maxlength="255"
+              placeholder="Texto breve que acompaña el título en la ficha pública"
+            >
+            <div v-if="getFieldError('subtitle')" class="invalid-feedback">
+              {{ getFieldError('subtitle') }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="show-synopsis">Sinopsis</label>
+            <textarea
+              id="show-synopsis"
+              v-model.trim="form.synopsis"
+              class="form-control"
+              :class="{ 'is-invalid': getFieldError('synopsis') }"
+              rows="4"
+            ></textarea>
+            <div v-if="getFieldError('synopsis')" class="invalid-feedback">
+              {{ getFieldError('synopsis') }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="show-additional-information">Información adicional</label>
+            <textarea
+              id="show-additional-information"
+              v-model.trim="form.additional_information"
+              class="form-control"
+              :class="{ 'is-invalid': getFieldError('additional_information') }"
+              rows="4"
+              placeholder="Premios, reconocimientos u otra información destacada de la obra"
+            ></textarea>
+            <div v-if="getFieldError('additional_information')" class="invalid-feedback">
+              {{ getFieldError('additional_information') }}
             </div>
           </div>
 
@@ -287,34 +338,105 @@
                 </div>
               </div>
             </div>
+
           </div>
 
-          <div class="mb-3">
-            <label class="form-label" for="show-main-image-path">Imagen principal</label>
-            <input
-              id="show-main-image-path"
-              v-model.trim="form.main_image_path"
-              class="form-control"
-              :class="{ 'is-invalid': getFieldError('main_image_path') }"
-              type="text"
-              maxlength="255"
-            >
-            <div v-if="getFieldError('main_image_path')" class="invalid-feedback">
-              {{ getFieldError('main_image_path') }}
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label" for="show-service-fee-type">Tipo de fee</label>
+                <select
+                  id="show-service-fee-type"
+                  v-model="form.service_fee_type"
+                  class="form-select"
+                  :class="{ 'is-invalid': getFieldError('service_fee_type') }"
+                  required
+                >
+                  <option value="fixed_amount">Monto fijo</option>
+                  <option value="percentage">Porcentaje</option>
+                </select>
+                <div v-if="getFieldError('service_fee_type')" class="invalid-feedback">
+                  {{ getFieldError('service_fee_type') }}
+                </div>
+              </div>
+            </div>
+
+            <div v-if="form.service_fee_type === 'fixed_amount'" class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label" for="show-service-fee-fixed-amount">Monto fijo</label>
+                <input
+                  id="show-service-fee-fixed-amount"
+                  v-model="form.service_fee_fixed_amount"
+                  class="form-control"
+                  :class="{ 'is-invalid': getFieldError('service_fee_fixed_amount') }"
+                  type="number"
+                  min="0"
+                  step="0.000001"
+                  required
+                >
+                <div v-if="getFieldError('service_fee_fixed_amount')" class="invalid-feedback">
+                  {{ getFieldError('service_fee_fixed_amount') }}
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label" for="show-service-fee-percentage">Porcentaje</label>
+                <div class="input-group">
+                  <input
+                    id="show-service-fee-percentage"
+                    v-model="form.service_fee_percentage"
+                    class="form-control"
+                    :class="{ 'is-invalid': getFieldError('service_fee_percentage') }"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.000001"
+                    required
+                  >
+                  <span class="input-group-text">%</span>
+                  <div v-if="getFieldError('service_fee_percentage')" class="invalid-feedback">
+                    {{ getFieldError('service_fee_percentage') }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label" for="show-service-fee-minimum-unit-amount">
+                  Fee mínimo por entrada pagada (opcional)
+                </label>
+                <input
+                  id="show-service-fee-minimum-unit-amount"
+                  v-model="form.service_fee_minimum_unit_amount"
+                  class="form-control"
+                  :class="{ 'is-invalid': getFieldError('service_fee_minimum_unit_amount') }"
+                  type="number"
+                  min="0"
+                  step="0.000001"
+                >
+                <div v-if="getFieldError('service_fee_minimum_unit_amount')" class="invalid-feedback">
+                  {{ getFieldError('service_fee_minimum_unit_amount') }}
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="mb-0">
-            <label class="form-label" for="show-description">Descripción</label>
+            <label class="form-label" for="show-production-note">Nota de la producción</label>
             <textarea
-              id="show-description"
-              v-model.trim="form.description"
+              id="show-production-note"
+              v-model.trim="form.production_note"
               class="form-control"
-              :class="{ 'is-invalid': getFieldError('description') }"
-              rows="4"
+              :class="{ 'is-invalid': getFieldError('production_note') }"
+              rows="3"
             ></textarea>
-            <div v-if="getFieldError('description')" class="invalid-feedback">
-              {{ getFieldError('description') }}
+            <div v-if="getFieldError('production_note')" class="invalid-feedback">
+              {{ getFieldError('production_note') }}
             </div>
           </div>
         </div>

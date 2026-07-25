@@ -47,12 +47,16 @@ return Application::configure(basePath: dirname(__DIR__))
             ], $exception->status);
         });
 
-        $exceptions->render(function (ThrottleRequestsException $exception) {
+        $exceptions->render(function (ThrottleRequestsException $exception, Request $request) {
+            $message = $request->is('api/site/shows/*/comment-requests')
+                ? 'too_many_comment_requests'
+                : 'too_many_login_attempts';
+
             return response()->json([
                 'success' => false,
                 'error' => [
                     'code' => 429,
-                    'message' => 'too_many_login_attempts',
+                    'message' => $message,
                 ],
             ], 429);
         });

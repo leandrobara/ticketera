@@ -15,4 +15,18 @@ class DeleteShowRequest extends FormRequest
     {
         return [];
     }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $show = $this->route('show');
+
+            if ($show?->seasons()->withTrashed()->exists()) {
+                $validator->errors()->add(
+                    'show',
+                    'show_with_seasons_cannot_be_deleted'
+                );
+            }
+        });
+    }
 }

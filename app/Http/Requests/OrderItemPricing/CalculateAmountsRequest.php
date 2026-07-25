@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\OrderItemPricing;
 
-use App\Models\Promotion;
+use App\Models\PresentationTicketType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -33,8 +33,8 @@ class CalculateAmountsRequest extends FormRequest
                 'regex:/^[a-z0-9-]+$/',
                 'prohibited_if:payment_method,FREE',
             ],
-            'quantity' => ['required', 'integer', 'min:1'],
-            'payment_method' => ['required', Rule::in(['FREE', 'BANK_TRANSFER', 'CASH'])],
+            'quantity' => ['required', 'integer', 'min:1', 'max:10'],
+            'payment_method' => ['required', Rule::in(['FREE', 'BANK_TRANSFER', 'CASH', 'MERCADO_PAGO'])],
         ];
     }
 
@@ -48,16 +48,18 @@ class CalculateAmountsRequest extends FormRequest
                     return;
                 }
 
-                $promotion = Promotion::query()
-                    ->where('access_code', $promoCode)
+                $promotionTicketType = PresentationTicketType::query()
+                    ->where('promotion_access_code', $promoCode)
+                    ->where('promotion_is_active', true)
+                    ->whereNotNull('promotion_type')
                     ->first();
 
-                if (!$promotion) {
+                if (!$promotionTicketType) {
                     $validator->errors()->add('promo_code', 'invalid_promo_code');
                     return;
                 }
 
-                if ((int) $promotion->presentation_ticket_type_id !== (int) $this->input('presentation_ticket_type_id')) {
+                if ((int) $promotionTicketType->id !== (int) $this->input('presentation_ticket_type_id')) {
                     $validator->errors()->add('promo_code', 'promo_code_not_available_for_ticket_type');
                 }
             });

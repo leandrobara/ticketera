@@ -10,8 +10,7 @@ return new class extends Migration
     {
         Schema::create('presentations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('show_id')->constrained('shows')->cascadeOnDelete();
-            $table->foreignId('venue_id')->nullable()->constrained('venues')->nullOnDelete();
+            $table->foreignId('season_id')->constrained('seasons')->cascadeOnDelete();
             $table->enum('status', ['draft', 'published', 'sold_out', 'cancelled'])->default('published');
             $table->dateTime('starts_at');
             $table->unsignedInteger('capacity');
@@ -20,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['show_id', 'venue_id', 'starts_at']);
+            $table->unique(['season_id', 'starts_at']);
 
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

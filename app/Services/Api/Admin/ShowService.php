@@ -20,7 +20,10 @@ class ShowService
 
     public function list(array $filters): LengthAwarePaginator
     {
-        return $this->showRepository->listPaginated($filters['search'] ?? null);
+        return $this->showRepository->listPaginated(
+            $filters['search'] ?? null,
+            $filters['per_page'] ?? 20,
+        );
     }
 
 
@@ -36,25 +39,12 @@ class ShowService
             $data['slug'] = Str::slug($data['title']);
         }
 
-        $publishedAt = $data['status'] === 'published' ? now() : null;
-        $data['published_at'] = $publishedAt;
-
         return $this->showRepository->store($data);
     }
 
 
     public function update(Show $show, array $data): Show
     {
-        $status = $data['status'] ?? null;
-
-        if ($status == 'draft') {
-            $data['published_at'] = null;
-        }
-            
-        if ($status == 'published') {
-            $data['published_at'] = now();
-        }
-
         return $this->showRepository->update($show, $data);
     }
 

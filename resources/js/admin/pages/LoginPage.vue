@@ -37,8 +37,8 @@
   <div class="page page-center">
     <div class="container-tight py-4">
       <div class="text-center mb-4">
-        <a class="navbar-brand navbar-brand-autodark" href="/admin/login">
-          Ticketera
+        <a class="navbar-brand navbar-brand-autodark justify-content-center" href="/admin/login" aria-label="Entradatix">
+          <img class="admin-login-brand-logo" :src="'/brand/entradatix-logo.png'" alt="Entradatix">
         </a>
       </div>
 

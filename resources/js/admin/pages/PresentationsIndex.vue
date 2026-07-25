@@ -3,6 +3,7 @@
   import PresentationService from '@/admin/services/PresentationService';
   import PresentationModal from '@/admin/components/presentations/PresentationModal.vue';
   import PresentationTicketsModal from '@/admin/components/presentations/PresentationTicketsModal.vue';
+  import { formatDateTime } from '@/admin/helpers/DateTimeFormatHelper';
 
   // data
   const presentations = ref([]);
@@ -11,26 +12,13 @@
   const isLoading = ref(false);
   const presentationModal = ref(null);
   const presentationTicketsModal = ref(null);
+  const seasonId = new URLSearchParams(window.location.search).get('season_id');
 
   // computed
   const hasPresentations = computed(() => presentations.value.length > 0);
   const totalPresentations = computed(() => pagination.value?.total ?? presentations.value.length);
 
   // methods
-  const formatDateTime = (date) => {
-    if (!date) {
-      return '-';
-    }
-
-    return new Intl.DateTimeFormat('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
-
   const getStatusLabel = (status) => {
     const labels = {
       draft: 'Borrador',
@@ -57,12 +45,22 @@
     return Math.max(0, presentation.capacity - presentation.sold_tickets_count);
   };
 
+  const formatMoney = (amount) => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      maximumFractionDigits: 0,
+    }).format(Number(amount ?? 0));
+  };
+
   const loadPresentations = async () => {
     isLoading.value = true;
     errorMessage.value = '';
 
     try {
-      const response = await PresentationService.getInstance().getPresentations();
+      const response = await PresentationService.getInstance().getPresentations(
+        seasonId ? { season_id: seasonId } : {}
+      );
       pagination.value = response.data.data;
       presentations.value = response.data.data.data ?? [];
     } catch (error) {
@@ -73,7 +71,7 @@
   };
 
   const openPresentationModal = () => {
-    presentationModal.value.openForCreate();
+    presentationModal.value.openForCreate(seasonId);
   };
 
   const openUpdatePresentationModal = (presentation) => {
@@ -150,6 +148,7 @@
                 <th>Show</th>
                 <th>Espacio</th>
                 <th>Vendidas</th>
+                <th>Recaudado</th>
                 <th>Restantes</th>
                 <th>Capacidad</th>
                 <th>Estado</th>
@@ -160,17 +159,20 @@
               <tr v-for="presentation in presentations" :key="presentation.id">
                 <td>
                   <div class="fw-semibold">
-                    {{ presentation.show?.title ?? '-' }}
+                    {{ presentation.season?.show?.title ?? '-' }}
                   </div>
                   <div class="text-secondary">
                     {{ formatDateTime(presentation.starts_at) }}
                   </div>
                 </td>
                 <td class="text-secondary">
-                  {{ presentation.venue?.name ?? '-' }}
+                  {{ presentation.season?.venue?.name ?? '-' }}
                 </td>
                 <td class="text-secondary">
                   {{ presentation.sold_tickets_count }}
+                </td>
+                <td class="text-secondary">
+                  {{ formatMoney(presentation.revenue_amount) }}
                 </td>
                 <td class="text-secondary">
                   {{ getRemainingTickets(presentation) }}

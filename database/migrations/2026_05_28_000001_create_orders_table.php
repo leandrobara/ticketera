@@ -36,6 +36,9 @@ return new class extends Migration
             $table->decimal('total_amount', 18, 6);
             $table->string('currency', 3)->default('ARS');
             $table->timestamp('approved_at')->nullable();
+            $table->timestamp('tickets_email_sending_at')->nullable();
+            $table->timestamp('tickets_email_sent_at')->nullable();
+            $table->string('tickets_email_message_id')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->text('notes')->nullable();
 

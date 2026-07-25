@@ -14,10 +14,6 @@ return new class extends Migration
                 ->unique()
                 ->constrained('order_items')
                 ->cascadeOnDelete();
-            $table->foreignId('promotion_id')
-                ->nullable()
-                ->constrained('promotions')
-                ->nullOnDelete();
             $table->string('promotion_name');
             $table->enum('promotion_type', [
                 'percent_discount',
@@ -31,7 +27,7 @@ return new class extends Migration
             $table->decimal('discount_amount', 18, 6);
             $table->timestamp('created_at')->useCurrent();
 
-            $table->index(['promotion_id', 'promotion_type']);
+            $table->index('promotion_type');
 
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

@@ -1,6 +1,8 @@
 <script setup>
   import { Modal } from 'bootstrap';
   import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+  import { formatDateTime } from '@/admin/helpers/DateTimeFormatHelper';
+  import { normalizeDecimalInput } from '@/admin/helpers/number';
   import PresentationService from '@/admin/services/PresentationService';
   import PresentationTicketTypeService from '@/admin/services/PresentationTicketTypeService';
 
@@ -24,28 +26,24 @@
     stock: '',
     sort_order: 1,
     is_active: true,
+    promotion_enabled: false,
+    promotion_name: '',
+    promotion_type: '',
+    promotion_value: '',
+    promotion_bundle_quantity: '',
+    promotion_pay_quantity: '',
+    promotion_access_code: '',
   });
 
   // computed
   const isEditing = computed(() => mode.value === 'update');
   const submitLabel = computed(() => isEditing.value ? 'Guardar cambios' : 'Crear tipo de entrada');
   const modalTitle = computed(() => isEditing.value ? 'Editar tipo de entrada' : 'Crear un nuevo tipo de entrada');
+  const hasPromotion = computed(() => form.promotion_enabled);
+  const promotionNeedsValue = computed(() => ['percent_discount', 'fixed_discount'].includes(form.promotion_type));
+  const promotionIsBundle = computed(() => form.promotion_type === 'buy_x_get_y');
 
   // methods
-  const formatDateTime = (date) => {
-    if (!date) {
-      return '-';
-    }
-
-    return new Intl.DateTimeFormat('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
-
   const resetForm = () => {
     form.presentation_id = '';
     form.name = '';
@@ -53,6 +51,13 @@
     form.stock = '';
     form.sort_order = 1;
     form.is_active = true;
+    form.promotion_enabled = false;
+    form.promotion_name = '';
+    form.promotion_type = '';
+    form.promotion_value = '';
+    form.promotion_bundle_quantity = '';
+    form.promotion_pay_quantity = '';
+    form.promotion_access_code = '';
     fieldErrors.value = {};
     errorMessage.value = '';
   };
@@ -60,10 +65,17 @@
   const fillForm = (ticketType) => {
     form.presentation_id = ticketType.presentation_id ?? ticketType.presentation?.id ?? '';
     form.name = ticketType.name ?? '';
-    form.price = ticketType.price ?? '';
+    form.price = normalizeDecimalInput(ticketType.price);
     form.stock = ticketType.stock ?? '';
     form.sort_order = ticketType.sort_order ?? 1;
     form.is_active = ticketType.is_active ?? true;
+    form.promotion_enabled = Boolean(ticketType.promotion_type && ticketType.promotion_is_active);
+    form.promotion_name = ticketType.promotion_name ?? '';
+    form.promotion_type = ticketType.promotion_type ?? '';
+    form.promotion_value = normalizeDecimalInput(ticketType.promotion_value);
+    form.promotion_bundle_quantity = ticketType.promotion_bundle_quantity ?? '';
+    form.promotion_pay_quantity = ticketType.promotion_pay_quantity ?? '';
+    form.promotion_access_code = ticketType.promotion_access_code ?? '';
     fieldErrors.value = {};
     errorMessage.value = '';
   };
@@ -77,16 +89,24 @@
   };
 
   const getPayload = () => {
-    const presentation = selectedPresentation();
-
     return {
       presentation_id: Number(form.presentation_id),
-      show_id: presentation?.show_id ?? presentation?.show?.id ?? currentTicketType.value?.show_id,
       name: form.name,
       price: form.price,
       is_active: form.is_active,
       sort_order: form.sort_order === '' ? 1 : Number(form.sort_order),
       stock: form.stock === '' ? null : Number(form.stock),
+      promotion_name: hasPromotion.value ? nullable(form.promotion_name) : null,
+      promotion_type: hasPromotion.value ? nullable(form.promotion_type) : null,
+      promotion_value: hasPromotion.value && promotionNeedsValue.value ? form.promotion_value : null,
+      promotion_bundle_quantity: hasPromotion.value && promotionIsBundle.value
+        ? Number(form.promotion_bundle_quantity)
+        : null,
+      promotion_pay_quantity: hasPromotion.value && promotionIsBundle.value
+        ? Number(form.promotion_pay_quantity)
+        : null,
+      promotion_access_code: hasPromotion.value ? nullable(form.promotion_access_code.trim().toLowerCase()) : null,
+      promotion_is_active: hasPromotion.value,
     };
   };
 
@@ -95,7 +115,7 @@
   };
 
   const getPresentationLabel = (presentation) => {
-    const showTitle = presentation.show?.title ?? `Show #${presentation.show_id}`;
+    const showTitle = presentation.season?.show?.title ?? `Temporada #${presentation.season_id}`;
     return `${showTitle} - ${formatDateTime(presentation.starts_at)}`;
   };
 
@@ -110,6 +130,23 @@
     } finally {
       isLoadingOptions.value = false;
     }
+  };
+
+  const resetPromotionFields = () => {
+    if (form.promotion_enabled) {
+      if (!form.promotion_type) {
+        form.promotion_type = 'percent_discount';
+      }
+
+      return;
+    }
+
+    form.promotion_name = '';
+    form.promotion_type = '';
+    form.promotion_value = '';
+    form.promotion_bundle_quantity = '';
+    form.promotion_pay_quantity = '';
+    form.promotion_access_code = '';
   };
 
   const showModal = async () => {
@@ -201,7 +238,7 @@
               id="ticket-type-presentation-id"
               v-model="form.presentation_id"
               class="form-select"
-              :class="{ 'is-invalid': getFieldError('presentation_id') || getFieldError('show_id') }"
+              :class="{ 'is-invalid': getFieldError('presentation_id') }"
               required
             >
               <option value="">Seleccionar función</option>
@@ -212,13 +249,10 @@
             <div v-if="getFieldError('presentation_id')" class="invalid-feedback">
               {{ getFieldError('presentation_id') }}
             </div>
-            <div v-else-if="getFieldError('show_id')" class="invalid-feedback">
-              {{ getFieldError('show_id') }}
-            </div>
           </div>
 
           <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-4">
               <div class="mb-3">
                 <label class="form-label" for="ticket-type-name">Nombre</label>
                 <input
@@ -253,6 +287,7 @@
                 </div>
               </div>
             </div>
+
           </div>
 
           <div class="row">
@@ -299,6 +334,139 @@
                 </label>
                 <div v-if="getFieldError('is_active')" class="invalid-feedback d-block">
                   {{ getFieldError('is_active') }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hr-text">Promoción</div>
+
+          <div class="mb-3">
+            <label class="form-check form-switch">
+              <input
+                v-model="form.promotion_enabled"
+                class="form-check-input"
+                type="checkbox"
+                @change="resetPromotionFields"
+              >
+              <span class="form-check-label">Esta entrada tiene promoción</span>
+            </label>
+          </div>
+
+          <div v-if="hasPromotion">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label" for="ticket-type-promotion-name">Nombre de la promoción</label>
+                  <input
+                    id="ticket-type-promotion-name"
+                    v-model.trim="form.promotion_name"
+                    class="form-control"
+                    :class="{ 'is-invalid': getFieldError('promotion_name') }"
+                    type="text"
+                    maxlength="160"
+                  >
+                  <div v-if="getFieldError('promotion_name')" class="invalid-feedback">
+                    {{ getFieldError('promotion_name') }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label" for="ticket-type-promotion-type">Tipo de promoción</label>
+                  <select
+                    id="ticket-type-promotion-type"
+                    v-model="form.promotion_type"
+                    class="form-select"
+                    :class="{ 'is-invalid': getFieldError('promotion_type') }"
+                    required
+                  >
+                    <option value="">Seleccionar promoción</option>
+                    <option value="percent_discount">Descuento porcentual</option>
+                    <option value="fixed_discount">Descuento fijo</option>
+                    <option value="buy_x_get_y">2x1 / 3x1</option>
+                  </select>
+                  <div v-if="getFieldError('promotion_type')" class="invalid-feedback">
+                    {{ getFieldError('promotion_type') }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div v-if="promotionNeedsValue" class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label" for="ticket-type-promotion-value">
+                    {{ form.promotion_type === 'percent_discount' ? 'Porcentaje' : 'Monto fijo' }}
+                  </label>
+                  <input
+                    id="ticket-type-promotion-value"
+                    v-model="form.promotion_value"
+                    class="form-control"
+                    :class="{ 'is-invalid': getFieldError('promotion_value') }"
+                    type="number"
+                    min="0"
+                    required
+                  >
+                  <div v-if="getFieldError('promotion_value')" class="invalid-feedback">
+                    {{ getFieldError('promotion_value') }}
+                  </div>
+                </div>
+              </div>
+
+              <template v-if="promotionIsBundle">
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label" for="ticket-type-promotion-bundle">Entradas que recibe</label>
+                    <input
+                      id="ticket-type-promotion-bundle"
+                      v-model="form.promotion_bundle_quantity"
+                      class="form-control"
+                      :class="{ 'is-invalid': getFieldError('promotion_bundle_quantity') }"
+                      type="number"
+                      min="2"
+                      required
+                    >
+                    <div v-if="getFieldError('promotion_bundle_quantity')" class="invalid-feedback">
+                      {{ getFieldError('promotion_bundle_quantity') }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label" for="ticket-type-promotion-pay">Entradas que paga</label>
+                    <input
+                      id="ticket-type-promotion-pay"
+                      v-model="form.promotion_pay_quantity"
+                      class="form-control"
+                      :class="{ 'is-invalid': getFieldError('promotion_pay_quantity') }"
+                      type="number"
+                      min="1"
+                      required
+                    >
+                    <div v-if="getFieldError('promotion_pay_quantity')" class="invalid-feedback">
+                      {{ getFieldError('promotion_pay_quantity') }}
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label" for="ticket-type-promotion-access-code">Código</label>
+                  <input
+                    id="ticket-type-promotion-access-code"
+                    v-model.trim="form.promotion_access_code"
+                    class="form-control"
+                    :class="{ 'is-invalid': getFieldError('promotion_access_code') }"
+                    type="text"
+                    maxlength="80"
+                  >
+                  <div v-if="getFieldError('promotion_access_code')" class="invalid-feedback">
+                    {{ getFieldError('promotion_access_code') }}
+                  </div>
                 </div>
               </div>
             </div>

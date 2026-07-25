@@ -1,7 +1,9 @@
 <script setup>
   import { computed, onMounted, ref } from 'vue';
   import OrderService from '@/admin/services/OrderService';
+  import { formatDateTime } from '@/admin/helpers/DateTimeFormatHelper';
   import OrderModal from '@/admin/components/orders/OrderModal.vue';
+  import OrderDetailModal from '@/admin/components/orders/OrderDetailModal.vue';
   import OrderTicketsModal from '@/admin/components/orders/OrderTicketsModal.vue';
 
   // data
@@ -11,6 +13,7 @@
   const isLoading = ref(false);
   const cancellingOrderId = ref(null);
   const orderModal = ref(null);
+  const orderDetailModal = ref(null);
   const orderTicketsModal = ref(null);
 
   // computed
@@ -18,20 +21,6 @@
   const totalOrders = computed(() => pagination.value?.total ?? orders.value.length);
 
   // methods
-  const formatDateTime = (date) => {
-    if (!date) {
-      return '-';
-    }
-
-    return new Intl.DateTimeFormat('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
-
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -57,16 +46,18 @@
   };
 
   const getShowTitle = (order) => {
-    return order.presentation?.show?.title ?? `Show #${order.show_id}`;
+    return order.presentation?.season?.show?.title
+      ?? order.show?.title
+      ?? `Show #${order.show_id}`;
   };
 
   const getPaymentMethodLabel = (paymentMethod) => {
     const labels = {
+      OTHER: 'Otro',
       CASH: 'Efectivo',
-      BANK_TRANSFER: 'Transferencia',
       FREE: 'Gratis / cortesía',
       MERCADO_PAGO: 'MercadoPago',
-      OTHER: 'Otro',
+      BANK_TRANSFER: 'Transferencia',
     };
 
     return labels[paymentMethod] ?? paymentMethod;
@@ -74,13 +65,13 @@
 
   const getStatusLabel = (status) => {
     const labels = {
+      EXPIRED: 'Vencida',
       PENDING: 'Pendiente',
+      REFUNDED: 'Devuelta',
       APPROVED: 'Aprobada',
       REJECTED: 'Rechazada',
-      IN_PROCESS: 'En proceso',
       CANCELED: 'Cancelada',
-      EXPIRED: 'Vencida',
-      REFUNDED: 'Devuelta',
+      IN_PROCESS: 'En proceso',
     };
 
     return labels[status] ?? status;
@@ -91,11 +82,15 @@
       return 'bg-success-lt';
     }
 
+    if (status === 'IN_PROCESS') {
+      return 'bg-primary-lt';
+    }
+
     if (['REJECTED', 'CANCELED', 'EXPIRED'].includes(status)) {
       return 'bg-danger-lt';
     }
 
-    return 'bg-secondary-lt';
+    return 'bg-warning-lt';
   };
 
   const hasValidTickets = (order) => {
@@ -143,6 +138,10 @@
 
   const openOrderTicketsModal = (order) => {
     orderTicketsModal.value.open(order);
+  };
+
+  const openOrderDetailModal = (order) => {
+    orderDetailModal.value.open(order);
   };
 
   const cancelOrder = async (order) => {
@@ -248,6 +247,9 @@
                 </td>
                 <td class="text-end">
                   <div class="btn-list justify-content-end flex-nowrap">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" @click="openOrderDetailModal(order)">
+                      Ver orden
+                    </button>
                     <button class="btn btn-sm btn-outline-secondary" type="button" @click="openOrderTicketsModal(order)">
                       Ver tickets
                     </button>
@@ -271,5 +273,6 @@
   </div>
 
   <OrderModal ref="orderModal" @saved="loadOrders" />
+  <OrderDetailModal ref="orderDetailModal" />
   <OrderTicketsModal ref="orderTicketsModal" @changed="loadOrders" />
 </template>

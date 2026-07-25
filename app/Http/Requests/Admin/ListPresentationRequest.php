@@ -13,6 +13,7 @@ class ListPresentationRequest extends FormRequest
             'search' => ['nullable', 'string', 'max:160'],
             'show_id' => ['nullable', 'integer', 'exists:shows,id'],
             'venue_id' => ['nullable', 'integer', 'exists:venues,id'],
+            'season_id' => ['nullable', 'integer', 'exists:seasons,id'],
             'status' => ['nullable', Rule::in(['draft', 'published', 'sold_out', 'cancelled'])],
         ];
     }

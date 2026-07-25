@@ -16,9 +16,18 @@ class OrderItem extends Model
         'show_id',
         'order_id',
         'quantity',
+        'paid_quantity',
         'unit_price',
+        'unit_service_fee',
+        'service_fee_type',
+        'service_fee_fixed_amount',
+        'service_fee_percentage',
+        'service_fee_base_amount',
+        'service_fee_minimum_applied',
+        'service_fee_minimum_unit_amount',
         'subtotal_amount',
         'discount_amount',
+        'service_fee_total_amount',
         'total_amount',
         'presentation_ticket_type_id',
     ];
@@ -27,9 +36,17 @@ class OrderItem extends Model
     {
         return [
             'quantity' => 'integer',
+            'paid_quantity' => 'integer',
             'unit_price' => 'decimal:6',
+            'unit_service_fee' => 'decimal:6',
+            'service_fee_fixed_amount' => 'decimal:6',
+            'service_fee_percentage' => 'decimal:6',
+            'service_fee_base_amount' => 'decimal:6',
+            'service_fee_minimum_applied' => 'boolean',
+            'service_fee_minimum_unit_amount' => 'decimal:6',
             'subtotal_amount' => 'decimal:6',
             'discount_amount' => 'decimal:6',
+            'service_fee_total_amount' => 'decimal:6',
             'total_amount' => 'decimal:6',
         ];
     }

@@ -10,7 +10,7 @@ class CreateVenueRequest extends FormRequest
     {
         return [
             'has_bar' => ['nullable', 'boolean'],
-            'description' => ['nullable', 'string'],
+            'note' => ['nullable', 'string'],
             'has_parking' => ['nullable', 'boolean'],
             'is_accessible' => ['nullable', 'boolean'],
             'name' => ['required', 'string', 'max:160'],

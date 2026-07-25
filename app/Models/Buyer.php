@@ -22,4 +22,9 @@ class Buyer extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

@@ -11,7 +11,6 @@ class OrderItemPromotion extends Model
 
     protected $fillable = [
         'order_item_id',
-        'promotion_id',
         'promotion_name',
         'promotion_type',
         'promotion_value',
@@ -36,8 +35,4 @@ class OrderItemPromotion extends Model
         return $this->belongsTo(OrderItem::class);
     }
 
-    public function promotion(): BelongsTo
-    {
-        return $this->belongsTo(Promotion::class);
-    }
 }

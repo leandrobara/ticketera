@@ -2,6 +2,9 @@
 
 return [
 
+    'cloudfront_domain' => env('CLOUDFRONT_DOMAIN'),
+    'show_images_path' => env('SHOW_IMAGES_PATH', 'shows'),
+
     /*
     |--------------------------------------------------------------------------
     | Default Filesystem Disk

@@ -10,8 +10,7 @@ class OrderItemPricingController extends BaseAPIController
     public function calculateAmounts(CalculateAmountsRequest $req): array
     {
         return $this->getSuccessResponse(
-            resolve(OrderItemPricingService::class)
-                ->calculateAmounts($req->validated())
+            resolve(OrderItemPricingService::class)->calculateAmounts($req->validated())
         );
     }
 }

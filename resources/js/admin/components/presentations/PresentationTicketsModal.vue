@@ -1,6 +1,7 @@
 <script setup>
   import { Modal } from 'bootstrap';
   import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+  import { formatDateTime } from '@/admin/helpers/DateTimeFormatHelper';
   import TicketService from '@/admin/services/TicketService';
 
   // emits
@@ -17,30 +18,29 @@
   const markingTicketUsedId = ref(null);
 
   // computed
-  const showTitle = computed(() => presentation.value?.show?.title ?? '-');
-  const venueName = computed(() => presentation.value?.venue?.name ?? '-');
+  const showTitle = computed(() => presentation.value?.season?.show?.title ?? '-');
+  const venueName = computed(() => presentation.value?.season?.venue?.name ?? '-');
   const presentationDate = computed(() => formatDateTime(presentation.value?.starts_at));
   const modalTitle = computed(() => `Entradas de ${showTitle.value}`);
   const totalTicketsCount = computed(() => tickets.value.length);
   const validTicketsCount = computed(() => tickets.value.filter((ticket) => ticket.status === 'VALID').length);
   const usedTicketsCount = computed(() => tickets.value.filter((ticket) => ticket.status === 'USED').length);
   const canceledTicketsCount = computed(() => tickets.value.filter((ticket) => ticket.status === 'CANCELED').length);
-
-  // methods
-  const formatDateTime = (date) => {
-    if (!date) {
-      return '-';
+  const revenueAmount = computed(() => tickets.value.reduce((total, ticket) => {
+    if (!['VALID', 'USED'].includes(ticket.status)) {
+      return total;
     }
 
-    return new Intl.DateTimeFormat('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
+    const quantity = Number(ticket.order_item?.quantity ?? 0);
 
+    if (quantity <= 0) {
+      return total;
+    }
+
+    return total + (Number(ticket.order_item?.total_amount ?? 0) / quantity);
+  }, 0));
+
+  // methods
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -88,7 +88,13 @@
   };
 
   const getTicketPrice = (ticket) => {
-    return ticket.order_item?.unit_price ?? 0;
+    const quantity = Number(ticket.order_item?.quantity ?? 0);
+
+    if (quantity <= 0) {
+      return 0;
+    }
+
+    return Number(ticket.order_item?.total_amount ?? 0) / quantity;
   };
 
   const canCancelTicket = (ticket) => {
@@ -225,6 +231,10 @@
               <div class="tickets-summary-label">Canceladas</div>
               <div class="tickets-summary-value">{{ canceledTicketsCount }}</div>
             </div>
+            <div class="tickets-summary-item">
+              <div class="tickets-summary-label">Recaudado</div>
+              <div class="tickets-summary-value">{{ formatMoney(revenueAmount) }}</div>
+            </div>
           </div>
 
           <div v-if="isLoading" class="d-flex align-items-center py-4">
@@ -306,7 +316,7 @@
 <style scoped>
   .tickets-summary {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 1rem;
     padding-bottom: 1rem;
     margin-bottom: 1rem;

@@ -10,7 +10,7 @@ class UpdateVenueRequest extends FormRequest
     {
         return [
             'has_bar' => ['nullable', 'boolean'],
-            'description' => ['nullable', 'string'],
+            'note' => ['nullable', 'string'],
             'has_parking' => ['nullable', 'boolean'],
             'is_accessible' => ['nullable', 'boolean'],
             'name' => ['nullable', 'string', 'max:160'],

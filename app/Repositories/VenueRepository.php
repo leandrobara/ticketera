@@ -14,6 +14,7 @@ class VenueRepository
                 $query->where(function ($query) use ($search) {
                     $query
                         ->where('name', 'like', "%{$search}%")
+                        ->orWhere('note', 'like', "%{$search}%")
                         ->orWhere('address', 'like', "%{$search}%")
                         ->orWhere('neighborhood', 'like', "%{$search}%")
                         ->orWhere('city', 'like', "%{$search}%");
@@ -39,4 +40,3 @@ class VenueRepository
         $venue->delete();
     }
 }
-

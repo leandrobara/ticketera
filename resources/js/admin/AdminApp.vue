@@ -1,11 +1,14 @@
 <script setup>
   import { computed, onMounted, ref } from 'vue';
   import BuyersIndex from './pages/BuyersIndex.vue';
+  import CommentsIndex from './pages/CommentsIndex.vue';
   import LoginPage from './pages/LoginPage.vue';
+  import NewsletterSubscribersIndex from './pages/NewsletterSubscribersIndex.vue';
   import OrdersIndex from './pages/OrdersIndex.vue';
-  import PromotionsIndex from './pages/PromotionsIndex.vue';
+  import PeopleIndex from './pages/PeopleIndex.vue';
   import PresentationsIndex from './pages/PresentationsIndex.vue';
   import PresentationTicketTypesIndex from './pages/PresentationTicketTypesIndex.vue';
+  import SeasonsIndex from './pages/SeasonsIndex.vue';
   import ShowsIndex from './pages/ShowsIndex.vue';
   import VenuesIndex from './pages/VenuesIndex.vue';
   import AppLayout from './layouts/AppLayout.vue';
@@ -26,12 +29,20 @@
       return BuyersIndex;
     }
 
+    if (currentPath.value === '/admin/comments') {
+      return CommentsIndex;
+    }
+
     if (currentPath.value === '/admin/orders') {
       return OrdersIndex;
     }
 
-    if (currentPath.value === '/admin/promotions') {
-      return PromotionsIndex;
+    if (currentPath.value === '/admin/newsletter-subscribers') {
+      return NewsletterSubscribersIndex;
+    }
+
+    if (currentPath.value === '/admin/people') {
+      return PeopleIndex;
     }
 
     if (currentPath.value === '/admin/presentation-ticket-types') {
@@ -40,6 +51,10 @@
 
     if (currentPath.value === '/admin/presentations') {
       return PresentationsIndex;
+    }
+
+    if (currentPath.value === '/admin/seasons') {
+      return SeasonsIndex;
     }
 
     if (currentPath.value === '/admin/venues') {

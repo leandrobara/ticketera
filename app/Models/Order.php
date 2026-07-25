@@ -26,6 +26,9 @@ class Order extends Model
         'payment_method',
         'presentation_id',
         'created_by_user_id',
+        'tickets_email_sent_at',
+        'tickets_email_sending_at',
+        'tickets_email_message_id',
     ];
 
     protected function casts(): array
@@ -35,12 +38,19 @@ class Order extends Model
             'total_amount' => 'decimal:6',
             'approved_at' => 'datetime',
             'total_quantity' => 'integer',
+            'tickets_email_sent_at' => 'datetime',
+            'tickets_email_sending_at' => 'datetime',
         ];
     }
 
     public function buyer(): BelongsTo
     {
         return $this->belongsTo(Buyer::class);
+    }
+
+    public function show(): BelongsTo
+    {
+        return $this->belongsTo(Show::class);
     }
 
     public function presentation(): BelongsTo
@@ -67,4 +77,10 @@ class Order extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
 }

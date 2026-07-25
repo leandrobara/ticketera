@@ -52,6 +52,7 @@ class TicketService
             ]);
 
             resolve(OrderService::class)->syncStatusFromTickets($ticket->order);
+            resolve(OrderService::class)->syncPresentationStatusFromCapacity($ticket->presentation);
 
             return $ticket->fresh(['order.buyer', 'orderItem', 'presentation', 'presentationTicketType']);
         });

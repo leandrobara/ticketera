@@ -16,10 +16,10 @@
   const isSubmitting = ref(false);
   const form = reactive({
     name: '',
+    note: '',
     city: '',
     address: '',
     capacity: '',
-    description: '',
     neighborhood: '',
     google_maps_url: '',
     has_bar: false,
@@ -35,10 +35,10 @@
   // methods
   const resetForm = () => {
     form.name = '';
+    form.note = '';
     form.city = '';
     form.address = '';
     form.capacity = '';
-    form.description = '';
     form.neighborhood = '';
     form.google_maps_url = '';
     form.has_bar = false;
@@ -50,10 +50,10 @@
 
   const fillForm = (venue) => {
     form.name = venue.name ?? '';
+    form.note = venue.note ?? '';
     form.city = venue.city ?? '';
     form.address = venue.address ?? '';
     form.capacity = venue.capacity ?? '';
-    form.description = venue.description ?? '';
     form.neighborhood = venue.neighborhood ?? '';
     form.google_maps_url = venue.google_maps_url ?? '';
     form.has_bar = Boolean(venue.has_bar);
@@ -70,10 +70,10 @@
   const getPayload = () => {
     return {
       name: form.name,
+      note: nullable(form.note),
       city: nullable(form.city),
       address: nullable(form.address),
       capacity: form.capacity === '' ? null : Number(form.capacity),
-      description: nullable(form.description),
       neighborhood: nullable(form.neighborhood),
       google_maps_url: nullable(form.google_maps_url),
       has_bar: form.has_bar,
@@ -282,16 +282,16 @@
           </div>
 
           <div class="mb-0">
-            <label class="form-label" for="venue-description">Descripción</label>
+            <label class="form-label" for="venue-note">Nota</label>
             <textarea
-              id="venue-description"
-              v-model.trim="form.description"
+              id="venue-note"
+              v-model.trim="form.note"
               class="form-control"
-              :class="{ 'is-invalid': getFieldError('description') }"
-              rows="4"
+              :class="{ 'is-invalid': getFieldError('note') }"
+              rows="3"
             ></textarea>
-            <div v-if="getFieldError('description')" class="invalid-feedback">
-              {{ getFieldError('description') }}
+            <div v-if="getFieldError('note')" class="invalid-feedback">
+              {{ getFieldError('note') }}
             </div>
           </div>
         </div>

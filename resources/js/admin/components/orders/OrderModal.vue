@@ -1,6 +1,7 @@
 <script setup>
   import { Modal } from 'bootstrap';
   import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+  import { formatDateTime } from '@/admin/helpers/DateTimeFormatHelper';
   import OrderItemService from '@/admin/services/OrderItemService';
   import OrderService from '@/admin/services/OrderService';
   import PresentationService from '@/admin/services/PresentationService';
@@ -22,8 +23,14 @@
   const isCalculatingAmounts = ref(false);
   const pricing = ref({
     unit_price: '0.000000',
+    unit_service_fee: '0.000000',
+    service_fee_type: null,
+    service_fee_fixed_amount: null,
+    service_fee_percentage: null,
+    service_fee_base_amount: '0.000000',
     subtotal_amount: '0.000000',
     discount_amount: '0.000000',
+    service_fee_total_amount: '0.000000',
     total_amount: '0.000000',
     promotion: null,
   });
@@ -39,6 +46,7 @@
     },
     presentation_id: '',
     presentation_ticket_type_id: '',
+    promo_code: '',
     quantity: 1,
     payment_method: 'CASH',
     notes: '',
@@ -89,27 +97,22 @@
   });
 
   const appliedPromotion = computed(() => pricing.value.promotion ?? null);
+  const selectedTicketTypeRequiresPromoCode = computed(() => {
+    return Boolean(
+      selectedTicketType.value?.promotion_is_active
+      && selectedTicketType.value?.promotion_type
+      && selectedTicketType.value?.promotion_access_code
+      && form.payment_method !== 'FREE'
+    );
+  });
   const subtotalAmount = computed(() => pricing.value.subtotal_amount);
   const discountAmount = computed(() => pricing.value.discount_amount);
+  const serviceFeeAmount = computed(() => pricing.value.service_fee_total_amount);
   const totalAmount = computed(() => pricing.value.total_amount);
 
   const submitLabel = computed(() => isSubmitting.value ? 'Creando entrada...' : 'Crear entrada');
 
   // methods
-  const formatDateTime = (date) => {
-    if (!date) {
-      return '-';
-    }
-
-    return new Intl.DateTimeFormat('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
-
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -121,23 +124,32 @@
   const resetPricing = () => {
     pricing.value = {
       unit_price: '0.000000',
+      unit_service_fee: '0.000000',
+      service_fee_type: null,
+      service_fee_fixed_amount: null,
+      service_fee_percentage: null,
+      service_fee_base_amount: '0.000000',
       subtotal_amount: '0.000000',
       discount_amount: '0.000000',
+      service_fee_total_amount: '0.000000',
       total_amount: '0.000000',
       promotion: null,
     };
   };
 
   const getPromotionLabel = (promotion) => {
-    if (promotion.type === 'percent_discount') {
-      return `${promotion.name} - ${Number(promotion.value)}%`;
+    const promotionName = promotion.promotion_name ?? promotion.name ?? 'Promoción';
+    const promotionType = promotion.promotion_type ?? promotion.type;
+
+    if (promotionType === 'percent_discount') {
+      return `${promotionName} - ${Number(promotion.promotion_value ?? promotion.value)}%`;
     }
 
-    if (promotion.type === 'fixed_discount') {
-      return `${promotion.name} - ${formatMoney(promotion.value)} por entrada`;
+    if (promotionType === 'fixed_discount') {
+      return `${promotionName} - ${formatMoney(promotion.promotion_value ?? promotion.value)} por entrada`;
     }
 
-    return `${promotion.name} - ${promotion.bundle_quantity}x${promotion.pay_quantity}`;
+    return `${promotionName} - ${promotion.promotion_bundle_quantity ?? promotion.bundle_quantity}x${promotion.promotion_pay_quantity ?? promotion.pay_quantity}`;
   };
 
   const calculateAmounts = async () => {
@@ -150,14 +162,21 @@
     isCalculatingAmounts.value = true;
 
     try {
-      const response = await OrderItemService.getInstance().calculateAmounts({
+      const payload = {
         presentation_ticket_type_id: Number(form.presentation_ticket_type_id),
         quantity: Number(form.quantity),
         payment_method: form.payment_method,
-      });
+      };
+
+      if (selectedTicketTypeRequiresPromoCode.value) {
+        payload.promo_code = nullable(form.promo_code.trim().toLowerCase());
+      }
+
+      const response = await OrderItemService.getInstance().calculateAmounts(payload);
 
       if (requestId === calculateAmountsRequestId) {
         pricing.value = response.data.data;
+        delete fieldErrors.value.promo_code;
       }
     } catch (error) {
       if (requestId === calculateAmountsRequestId) {
@@ -187,6 +206,7 @@
     form.buyer.last_name = '';
     form.presentation_id = '';
     form.presentation_ticket_type_id = '';
+    form.promo_code = '';
     form.quantity = 1;
     form.payment_method = 'CASH';
     form.notes = '';
@@ -210,6 +230,9 @@
         last_name: nullable(form.buyer.last_name),
       },
       presentation_ticket_type_id: Number(form.presentation_ticket_type_id),
+      promo_code: selectedTicketTypeRequiresPromoCode.value
+        ? nullable(form.promo_code.trim().toLowerCase())
+        : null,
       quantity: Number(form.quantity),
       payment_method: form.payment_method,
       notes: nullable(form.notes),
@@ -221,7 +244,7 @@
   };
 
   const getPresentationLabel = (presentation) => {
-    const showTitle = presentation.show?.title ?? `Show #${presentation.show_id}`;
+    const showTitle = presentation.season?.show?.title ?? `Temporada #${presentation.season_id}`;
     return `${showTitle} - ${formatDateTime(presentation.starts_at)}`;
   };
 
@@ -249,6 +272,7 @@
 
   const loadTicketTypes = async () => {
     form.presentation_ticket_type_id = '';
+    form.promo_code = '';
     ticketTypes.value = [];
     resetPricing();
 
@@ -290,6 +314,13 @@
   const submit = async () => {
     fieldErrors.value = {};
     errorMessage.value = '';
+
+    if (selectedTicketTypeRequiresPromoCode.value && !form.promo_code.trim()) {
+      fieldErrors.value = {
+        promo_code: ['El código de promoción es obligatorio.'],
+      };
+      return;
+    }
 
     if (maxAssignableTickets.value !== null && Number(form.quantity) > maxAssignableTickets.value) {
       fieldErrors.value = {
@@ -333,10 +364,15 @@
   watch(
     () => [
       form.presentation_ticket_type_id,
+      form.promo_code,
       form.quantity,
       form.payment_method,
     ],
     () => {
+      if (!selectedTicketTypeRequiresPromoCode.value) {
+        form.promo_code = '';
+      }
+
       scheduleAmountsCalculation();
     }
   );
@@ -492,6 +528,22 @@
             </div>
           </div>
 
+          <div v-if="selectedTicketTypeRequiresPromoCode" class="mb-3">
+            <label class="form-label" for="order-promo-code">Código de promoción</label>
+            <input
+              id="order-promo-code"
+              v-model.trim="form.promo_code"
+              class="form-control"
+              :class="{ 'is-invalid': getFieldError('promo_code') }"
+              type="text"
+              maxlength="80"
+              autocomplete="off"
+            >
+            <div v-if="getFieldError('promo_code')" class="invalid-feedback">
+              {{ getFieldError('promo_code') }}
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-md-6">
               <div class="mb-3">
@@ -574,6 +626,10 @@
             <div class="col-sm-3">
               <div class="text-secondary">Descuento</div>
               <div class="fw-semibold">{{ formatMoney(discountAmount) }}</div>
+            </div>
+            <div class="col-sm-3">
+              <div class="text-secondary">Fee plataforma</div>
+              <div class="fw-semibold">{{ formatMoney(serviceFeeAmount) }}</div>
             </div>
             <div class="col-sm-3">
               <div class="text-secondary">Total</div>

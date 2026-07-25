@@ -30,5 +30,14 @@ class AppServiceProvider extends ServiceProvider
                 Limit::perMinute(20)->by($request->ip()),
             ];
         });
+
+        RateLimiter::for('comment-request', function (Request $request) {
+            $email = mb_strtolower(trim((string) $request->input('email')));
+
+            return [
+                Limit::perMinutes(10, 3)->by(hash('sha256', $email).'|'.$request->ip()),
+                Limit::perHour(20)->by($request->ip()),
+            ];
+        });
     }
 }

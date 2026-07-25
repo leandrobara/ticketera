@@ -1,0 +1,1669 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stranger Things: The First Shadow - V2</title>
+    <meta name="description" content="Página demo responsive para venta de entradas.">
+    <style>
+        :root {
+            --ink: #17141f;
+            --muted: #68656d;
+            --line: #e4e2e6;
+            --paper: #fff;
+            --pink: #f53359;
+            --purple: #da26dc;
+            --hero: #14121e;
+            --card-radius: 16px;
+            font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+            color: var(--ink);
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; background: #f7f7f8; }
+        button, a { font: inherit; }
+        button { cursor: pointer; }
+        img { display: block; max-width: 100%; }
+        a { color: inherit; }
+
+        .hero {
+            position: relative;
+            min-height: 655px;
+            overflow: hidden;
+            color: white;
+            background: #17161F;
+        }
+
+        .hero-backdrop {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            z-index: 0;
+            width: min(100%, 1640px);
+            height: 528px;
+            background-image: var(--hero-bg);
+            background-size: cover;
+            background-position: center;
+            filter: blur(34px) saturate(1.45);
+            opacity: 0.6;
+            transform: translateX(-50%) scale(1.08);
+            mask-image:
+                linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%),
+                linear-gradient(180deg, #000 0%, #000 68%, transparent 100%);
+            mask-composite: intersect;
+            -webkit-mask-image:
+                linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%),
+                linear-gradient(180deg, #000 0%, #000 68%, transparent 100%);
+            -webkit-mask-composite: source-in;
+            pointer-events: none;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background:
+                linear-gradient(180deg, rgba(23,22,31,0) 72%, #17161F 100%),
+                rgba(23,22,31,.14);
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0;
+            z-index: 1;
+            height: 190px;
+            pointer-events: none;
+            background: linear-gradient(transparent, #17161F);
+        }
+
+        .nav,
+        .hero-grid,
+        .trust-strip,
+        .content {
+            width: min(1200px, calc(100% - 48px));
+            margin-inline: auto;
+        }
+
+        .nav {
+            position: relative;
+            z-index: 5;
+            height: 74px;
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 900;
+            letter-spacing: -1.8px;
+            color: #ff3b75;
+            text-decoration: none;
+        }
+
+        .location { color: #d8d5da; font-size: 17px; }
+        .nav-links { display: flex; gap: 28px; margin: auto; }
+        .nav-links a { color: #d7d4d8; text-decoration: none; font-size: 14px; }
+        .nav-actions { display: flex; align-items: center; gap: 20px; }
+
+        .app-button,
+        .primary-button {
+            border: 0;
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            box-shadow: none;
+        }
+
+        .app-button { padding: 9px 18px; border-radius: 22px; font-size: 14px; }
+        .icon-button {
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255,255,255,.72);
+            color: white;
+            background: rgba(20,18,30,.3);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+        }
+
+        .bare-icon { background: transparent; border: 0; color: white; padding: 2px; }
+        .menu-button { display: none; }
+
+        .hero-grid {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            align-items: center;
+            gap: 40px;
+            padding-top: 32px;
+        }
+
+        .eyebrow { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+        h1 {
+            margin: 15px 0 6px;
+            font-size: clamp(38px, 3.1vw, 48px);
+            line-height: 1.04;
+            letter-spacing: -1.5px;
+        }
+        .subtitle { margin: 0; color: #d6d2d5; font-size: 17px; line-height: 1.45; }
+
+        .cta-row { display: flex; align-items: center; gap: 10px; margin-top: 32px; }
+        .primary-button {
+            min-height: 49px;
+            border-radius: 28px;
+            padding: 0 30px;
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .social-proof {
+            width: max-content;
+            margin: 18px auto 0;
+            color: #e2dfe4;
+            border-bottom: 1px dashed rgba(255,255,255,.7);
+            padding-bottom: 3px;
+        }
+        .social-proof strong { color: white; }
+        .pulse {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            margin-right: 10px;
+            border-radius: 50%;
+            background: #5577f2;
+            box-shadow: 0 0 0 8px rgba(85,119,242,.2);
+        }
+
+        .hero-media {
+            width: 100%;
+        }
+        .hero-image {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 5 / 3;
+            width: 100%;
+            border-radius: 12px;
+            background: #09090c;
+        }
+        .hero-image img { width: 100%; height: 100%; object-fit: cover; }
+        .play {
+            position: absolute;
+            inset: 50% auto auto 50%;
+            transform: translate(-50%, -50%);
+            width: 66px;
+            height: 66px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(16,16,20,.72);
+            color: white;
+            font-size: 25px;
+        }
+        .mobile-arrows, .mobile-dots { display: none; }
+
+        .trust-strip {
+            position: relative;
+            z-index: 4;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            margin-top: 40px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #24222b;
+        }
+        .trust-item {
+            min-height: 47px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            color: #f0eef1;
+            border-right: 1px solid #34313b;
+            white-space: nowrap;
+        }
+        .trust-item:last-child { border-right: 0; }
+        .trust-green { color: #70d99c; font-weight: 800; }
+        .trust-gold { color: #e3bc71; font-weight: 800; }
+        .trust-pink { color: #ff3f76; font-style: italic; font-weight: 900; }
+
+        .content {
+            position: relative;
+            z-index: 6;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 370px;
+            gap: 48px;
+            margin-top: -38px;
+            padding-bottom: 90px;
+            align-items: start;
+        }
+        .main-card, .ticket-card {
+            background: var(--paper);
+            border: 1px solid #e2e0e3;
+            border-radius: var(--card-radius);
+            box-shadow: 0 2px 8px rgba(18,15,23,.03);
+        }
+        .main-card { padding: 32px; }
+        .about-head { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        .poster-small { width: 82px; height: 123px; object-fit: cover; border-radius: 9px; }
+        h2 { margin: 0 0 16px; font-size: 20px; line-height: 1.3; }
+        .copy { color: var(--muted); line-height: 1.65; margin: 0 0 14px; }
+        .fade-copy {
+            position: relative;
+            max-height: 136px;
+            overflow: hidden;
+        }
+        .fade-copy::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0;
+            height: 65px;
+            background: linear-gradient(transparent, white);
+        }
+        .read-more {
+            border: 0;
+            border-bottom: 1px solid currentColor;
+            background: none;
+            padding: 0 0 3px;
+            font-weight: 700;
+            color: #312d36;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 26px 38px;
+        }
+        .show-details {
+            margin-top: 38px;
+            padding-top: 28px;
+            border-top: 1px solid var(--line);
+        }
+        .detail h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 7px;
+            font-size: 16px;
+        }
+        .detail-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--muted);
+            stroke-width: 2;
+            flex: 0 0 auto;
+        }
+        .detail p { color: var(--muted); margin: 0; line-height: 1.5; }
+        .notice {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 11px;
+            background: #fff5e9;
+            color: #5b4630;
+            line-height: 1.5;
+        }
+        .notice-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 4px;
+        }
+        .notice-icon {
+            width: 22px;
+            height: 22px;
+            color: #aa6b19;
+            stroke-width: 2;
+        }
+
+        .ticket-card {
+            position: static;
+            padding: 0;
+            color: var(--ink);
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .ticket-card h2 { margin: 0; font-size: 20px; }
+        .ticket-panel {
+            padding: 22px;
+            border: 1px solid var(--line);
+            border-radius: var(--card-radius);
+            background: var(--paper);
+            box-shadow: 0 2px 8px rgba(18,15,23,.03);
+        }
+        .ticket-panel + .ticket-panel { margin-top: 16px; }
+        .ticket-options {
+            display: grid;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .performance-field {
+            display: grid;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .performance-field label,
+        .ticket-section-label {
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .ticket-section-label {
+            margin: 0;
+        }
+        .performance-field select {
+            width: 100%;
+            min-height: 46px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 0 42px 0 14px;
+            color: var(--ink);
+            background:
+                linear-gradient(45deg, transparent 50%, var(--muted) 50%) calc(100% - 20px) 50% / 7px 7px no-repeat,
+                linear-gradient(135deg, var(--muted) 50%, transparent 50%) calc(100% - 15px) 50% / 7px 7px no-repeat,
+                #fff;
+            appearance: none;
+            font: inherit;
+        }
+        .performance-field select:focus {
+            outline: 2px solid rgba(245,51,89,.18);
+            border-color: var(--pink);
+        }
+        .ticket-tier {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 14px;
+            min-height: 72px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fff;
+        }
+        .ticket-tier.is-selected {
+            border-color: var(--pink);
+            background: #fff8fb;
+            box-shadow: 0 0 0 1px rgba(245,51,89,.08);
+        }
+        .ticket-tier.is-sold-out {
+            color: #a8a4ad;
+            background: #fbfbfc;
+        }
+        .ticket-tier-name {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .ticket-tier-side {
+            display: grid;
+            justify-items: end;
+            gap: 8px;
+        }
+        .ticket-price-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 3px 11px;
+            border-radius: 999px;
+            color: var(--pink);
+            background: rgba(245,51,89,.1);
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .sold-out-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 22px;
+            padding: 3px 12px;
+            border-radius: 999px;
+            color: #b54b52;
+            background: #fff0f1;
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .ticket-stepper {
+            display: inline-grid;
+            grid-template-columns: 34px 36px 34px;
+            align-items: center;
+            min-height: 34px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: white;
+            text-align: center;
+        }
+        .ticket-stepper button {
+            height: 34px;
+            border: 0;
+            color: var(--ink);
+            background: transparent;
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .ticket-stepper button:disabled {
+            color: #c8c5cc;
+            cursor: not-allowed;
+        }
+        .ticket-quantity {
+            color: var(--ink);
+            font-weight: 800;
+        }
+        .summary-head,
+        .summary-row,
+        .summary-total {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .summary-row + .summary-row {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--line);
+        }
+        .summary-head {
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .summary-head strong { color: var(--ink); font-size: 16px; }
+        .summary-body {
+            margin-top: 14px;
+            padding: 14px 0;
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+        .summary-performance {
+            margin: 14px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .summary-performance strong {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--ink);
+            font-size: 14px;
+        }
+        .summary-item-title {
+            margin: 0 0 3px;
+            color: var(--ink);
+            font-weight: 800;
+        }
+        .summary-item-meta {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .summary-price {
+            color: var(--ink);
+            font-weight: 900;
+        }
+        .summary-remove {
+            display: grid;
+            place-items: center;
+            width: 33px;
+            height: 33px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--muted);
+            background: white;
+            font-size: 20px;
+        }
+        .summary-empty {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .summary-total {
+            margin-top: 16px;
+            font-weight: 900;
+        }
+        .summary-total-price {
+            color: var(--pink);
+            font-size: 22px;
+        }
+        .ticket-buy {
+            width: 100%;
+            min-height: 48px;
+            margin-top: 18px;
+            border: 0;
+            border-radius: 28px;
+            color: white;
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            font-weight: 900;
+        }
+        .ticket-buy:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            filter: grayscale(.2);
+        }
+        .checkout-modal {
+            position: fixed;
+            z-index: 80;
+            inset: 0;
+            display: none;
+            padding: 28px;
+            background: rgba(20,18,30,.72);
+            backdrop-filter: blur(8px);
+            overflow-y: auto;
+        }
+        .checkout-modal.is-open {
+            display: grid;
+            place-items: center;
+        }
+        body.modal-open { overflow: hidden; }
+        .checkout-dialog {
+            position: relative;
+            width: min(980px, 100%);
+            max-height: calc(100vh - 56px);
+            overflow: auto;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 24px 80px rgba(18,15,23,.22);
+        }
+        .checkout-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 22px 26px;
+            border-bottom: 1px solid var(--line);
+        }
+        .checkout-back,
+        .checkout-close {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            color: var(--ink);
+            background: white;
+            font-size: 22px;
+        }
+        .checkout-title {
+            min-width: 0;
+            flex: 1;
+        }
+        .checkout-title h2 {
+            margin: 0 0 4px;
+            font-size: 20px;
+        }
+        .checkout-title p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .checkout-body {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 28px;
+            padding: 26px;
+        }
+        .checkout-form h3,
+        .checkout-modal-summary h3 {
+            margin: 0 0 18px;
+            font-size: 18px;
+        }
+        .checkout-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 20px;
+        }
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+        .field.full { grid-column: 1 / -1; }
+        .field label {
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .field input {
+            width: 100%;
+            min-height: 46px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0 14px;
+            color: var(--ink);
+            background: #fbfbfc;
+            font: inherit;
+        }
+        .field input:focus {
+            outline: 2px solid rgba(245,51,89,.18);
+            border-color: var(--pink);
+            background: white;
+        }
+        .field-error {
+            min-height: 16px;
+            color: #b54b52;
+            font-size: 12px;
+        }
+        .checkout-continue {
+            width: 100%;
+            min-height: 50px;
+            margin-top: 24px;
+            border: 0;
+            border-radius: 28px;
+            color: white;
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            font-weight: 900;
+        }
+        .checkout-continue:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            filter: grayscale(.2);
+        }
+        .checkout-modal-summary {
+            align-self: start;
+            padding: 20px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fbfbfc;
+        }
+        .modal-summary-list {
+            display: grid;
+            gap: 14px;
+            padding: 14px 0;
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+        .modal-summary-performance {
+            margin: 0 0 14px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .modal-summary-performance strong {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--ink);
+            font-size: 14px;
+        }
+        .modal-summary-row,
+        .modal-summary-total {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .modal-summary-name {
+            margin: 0 0 3px;
+            font-weight: 800;
+        }
+        .modal-summary-meta {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .modal-summary-price {
+            white-space: nowrap;
+            font-weight: 900;
+        }
+        .modal-summary-total {
+            margin-top: 16px;
+            color: var(--ink);
+            font-weight: 900;
+        }
+        .modal-summary-total strong {
+            color: var(--pink);
+            font-size: 20px;
+        }
+
+        .reviews,
+        .venue-info,
+        .cast-section,
+        .creative-section { margin-top: 38px; }
+        .review {
+            margin-top: 16px;
+            padding: 22px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: #fff;
+        }
+        .venue-details {
+            margin-top: 16px;
+            padding: 22px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: #fff;
+        }
+        .review-head { display: flex; align-items: center; gap: 12px; }
+        .avatar { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: #2f2439; color: white; font-weight: 800; }
+        .stars { color: #ef315c; letter-spacing: 2px; }
+        .cast-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 26px 32px;
+            margin-top: 16px;
+            padding: 24px;
+            list-style: none;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: #fff;
+        }
+        .cast-item {
+            display: grid;
+            grid-template-columns: 92px 1fr;
+            align-items: center;
+            gap: 18px;
+        }
+        .cast-photo {
+            width: 92px;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 50%;
+            filter: grayscale(1);
+        }
+        .cast-name {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+        .cast-role {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .creative-list {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 22px 24px;
+            margin-top: 16px;
+            padding: 24px;
+            list-style: none;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: #fff;
+        }
+        .creative-item {
+            min-width: 0;
+            display: grid;
+            justify-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+        .creative-photo {
+            width: 64px;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 50%;
+            filter: grayscale(1);
+        }
+        .creative-role {
+            margin: 0 0 7px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .08em;
+            line-height: 1.35;
+            text-transform: uppercase;
+        }
+        .creative-name {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+        .mobile-ticket-bar {
+            position: fixed;
+            z-index: 30;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+            transform: translateY(110%);
+            padding: 14px 24px;
+            border-top: 1px solid var(--line);
+            background: white;
+            box-shadow: 0 -8px 30px rgba(18,15,23,.12);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform .22s ease, opacity .22s ease;
+        }
+        .mobile-ticket-bar.is-visible {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mobile-ticket-bar .price { font-size: 13px; color: var(--muted); }
+        .mobile-ticket-bar .price strong { display: block; color: var(--ink); font-size: 18px; }
+        .mobile-ticket-bar .primary-button {
+            width: min(260px, 34vw);
+            min-height: 46px;
+            flex: 0 0 auto;
+        }
+
+        @media (max-width: 900px) {
+            body { background: var(--hero); }
+            .hero { min-height: auto; padding-bottom: 35px; }
+            .hero-backdrop {
+                top: 0;
+                width: 100%;
+                height: 520px;
+                filter: blur(28px) saturate(1.45);
+                opacity: .78;
+                transform: translateX(-50%) scale(1.12);
+            }
+            .hero::before {
+                background:
+                    linear-gradient(180deg, rgba(23,22,31,.12), rgba(23,22,31,.66)),
+                    rgba(23,22,31,.12);
+            }
+            .hero::after { height: 340px; }
+            .nav, .hero-grid, .trust-strip, .content { width: min(100% - 48px, 640px); }
+            .nav { height: 65px; gap: 10px; border-bottom: 2px solid rgba(255,255,255,.24); }
+            .logo { font-size: 25px; }
+            .location { margin-right: auto; font-size: 15px; text-transform: uppercase; }
+            .nav-links, .app-button, .user-button { display: none; }
+            .menu-button { display: block; }
+            .hero-grid { display: flex; flex-direction: column; gap: 26px; padding-top: 45px; }
+            .hero-media { order: 1; width: 100%; }
+            .hero-image { border-radius: 10px; }
+            .hero-image .play { display: none; }
+            .hero-copy { order: 2; width: 100%; }
+            h1 { margin-top: 15px; font-size: 25px; letter-spacing: -.5px; }
+            .subtitle { font-size: 16px; }
+            .cta-row { margin-top: 31px; }
+            .primary-button { min-height: 48px; padding-inline: 14px; }
+            .social-proof { margin-top: 25px; }
+            .trust-strip {
+                display: flex;
+                overflow-x: auto;
+                margin-top: 39px;
+                border-radius: 10px 10px 0 0;
+                scrollbar-width: none;
+            }
+            .trust-item { flex: 0 0 195px; min-height: 47px; }
+            .content {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                width: 100%;
+                margin-top: 0;
+                padding: 0 16px 100px;
+                background: #f7f7f8;
+            }
+            .main-card { border: 0; border-radius: 0; margin-inline: -16px; padding: 28px 24px; }
+            .about-head { grid-template-columns: 1fr; gap: 17px; }
+            .poster-small { width: 70px; height: 105px; }
+            .details-grid { grid-template-columns: 1fr; }
+            .ticket-card {
+                position: relative;
+                top: auto;
+                order: -1;
+                display: block;
+                width: 100%;
+                margin: 24px 0 0;
+                border-radius: 14px;
+            }
+            .ticket-panel {
+                width: 100%;
+                border-radius: 14px;
+                border: 1px solid var(--line);
+                padding: 22px 16px;
+            }
+            .ticket-panel + .ticket-panel { margin-top: 14px; }
+            .ticket-options { margin-top: 18px; }
+            .ticket-tier {
+                min-height: 66px;
+                padding: 12px;
+            }
+            .ticket-stepper {
+                grid-template-columns: 31px 32px 31px;
+            }
+            .reviews,
+            .venue-info,
+            .cast-section,
+            .creative-section { background: #f7f7f8; }
+            .cast-list {
+                grid-template-columns: 1fr;
+                gap: 22px;
+                padding: 20px;
+            }
+            .cast-item {
+                grid-template-columns: 76px 1fr;
+                gap: 15px;
+            }
+            .cast-photo { width: 76px; }
+            .creative-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 20px;
+                padding: 20px;
+            }
+            .creative-photo { width: 58px; }
+            .mobile-ticket-bar {
+                padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+                box-shadow: 0 -3px 15px rgba(0,0,0,.12);
+                justify-content: flex-start;
+            }
+            .mobile-ticket-bar.is-visible {
+                transform: translateY(0);
+            }
+            .mobile-ticket-bar .primary-button {
+                width: auto;
+                flex: 1;
+            }
+            .checkout-modal {
+                padding: 0;
+                align-items: stretch;
+            }
+            .checkout-modal.is-open {
+                display: block;
+            }
+            .checkout-dialog {
+                width: 100%;
+                min-height: 100vh;
+                max-height: none;
+                border: 0;
+                border-radius: 0;
+            }
+            .checkout-header {
+                position: sticky;
+                top: 0;
+                z-index: 2;
+                padding: 16px;
+                background: white;
+            }
+            .checkout-title h2 { font-size: 17px; }
+            .checkout-title p { font-size: 13px; }
+            .checkout-body {
+                display: block;
+                padding: 22px 16px 110px;
+            }
+            .checkout-fields {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .field.full { grid-column: auto; }
+            .checkout-modal-summary {
+                margin-top: 24px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .nav, .hero-grid, .trust-strip { width: calc(100% - 48px); }
+            .hero-grid { padding-top: 44px; }
+            .hero-image { aspect-ratio: 5 / 3; }
+            .eyebrow { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero" style="--hero-bg: url('banner-web-1200x628.jpg')">
+        <div class="hero-backdrop" aria-hidden="true"></div>
+        <header class="nav">
+            <a href="#" class="logo">todaytix</a>
+            <nav class="nav-links" aria-label="Navegación principal">
+                <a href="#">Noticias</a>
+                <a href="#">Lorem</a>
+                <a href="#">impsum</a>
+            </nav>
+            <div class="nav-actions">
+                <button class="app-button">Publicá tu evento</button>
+            </div>
+        </header>
+
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <div class="eyebrow">Suspendo</div>
+                <h1>Stranger Things: La primera sombra</h1>
+                <p class="subtitle">Duis blandit fermentum felis, nec feugiat eros mollis in.</p>
+                <div class="cta-row">
+                    <button class="primary-button" data-scroll-tickets>Comprar entradas</button>
+                </div>
+            </div>
+
+            <div class="hero-media">
+                <div class="hero-image">
+                    <img src="banner-web-1200x628.jpg" alt="Banner de Promoción 98">
+                    <button class="play" aria-label="Reproducir video">▶</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="content">
+        <div>
+            <article class="main-card">
+                <div class="about-head">
+                    <div>
+                        <h2>Sobre Stranger Things: La primera sombra</h2>
+                        <div class="fade-copy" id="about-copy">
+                            <p class="copy">"Desde el Jardín" cuenta la historia de Chance Gardiner (Guillermo Francella); un hombre de inteligencia limitada, criado toda su vida dentro de la mansión de un rico benefactor.
+                                <br /><br />
+                                No sabe leer ni escribir; su único conocimiento proviene del cuidado del jardín y de lo que ve en la televisión, su único contacto con el mundo. Cuando el benefactor muere y Chance es expulsado de la casa, viéndose obligado a integrarse a la sociedad. El azar hace que conozca a Eva (Andrea Frigerio), una mujer de la alta sociedad que decide acogerlo en su casa junto a Ben, su marido, un empresario influyente, enfermo en fase terminal; para quien Chance pronto será su mejor medicina.
+                                <br /><br />
+                                Chance carece de malicia, ambición o deseo de poder. Sin embargo y sin proponérselo, se convierte en un sabio accidental. Su literalidad, simplicidad y forma de expresarse con metáforas sobre plantas y estaciones climáticas son interpretadas por las personas que lo rodean - incluido el presidente de Estados Unidos (Martín Seefeld) - como un discurso filosófico o político de gran relevancia intelectual, a tener muy en cuenta. Tanto que llega a ser considerado un consejero influyente e incluso un candidato presidencial, todo por malas interpretaciones de su lenguaje inocente.
+                                <br /><br />
+                                "Desde el Jardín" es una alegoría brillante de los particulares tiempos que corren en el mundo actual; que nos muestra cómo la apariencia y el contexto pueden crear prestigio sin que exista realmente conocimiento o mérito. Una sátira de cómo la sociedad y los medios valoran la forma sobre el contenido, mostrando que el poder puede recaer en alguien que literalmente "no sabe nada", pero que está en el lugar correcto y dice las palabras correctas.
+                                <br /><br />
+                                El mundo está ciego y Chance Gardiner es el único que lo ve con pureza? Estamos en presencia de un idiota o de un sabio?</p>
+                        </div>
+                        <button class="read-more" data-read-more>Ver más</button>
+                    </div>
+                </div>
+
+                <section class="details-grid show-details">
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="clock"></i>Duración</h3><p>55 minutos</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="map-pin"></i>Teatro</h3><p><u>Paseo La Plaza - Sala Cortázar</u></p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="tags"></i>Categoría</h3><p>Suspenso</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="badge-check"></i>Clasificación</h3><p>ATP</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="ticket"></i>Formato</h3><p>Teatro</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="calendar-days"></i>Días de función</h3><p>Viernes, 20 hs</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="calendar-plus"></i>Fecha de estreno</h3><p>Viernes 7 de Ago del 2026</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="calendar-x"></i>Última función</h3><p>Viernes 28 de Ago del 2026</p></div>
+                </section>
+
+                <section>
+                    <div class="notice">
+                        <div class="notice-title">
+                            <i class="notice-icon" data-lucide="triangle-alert"></i>
+                            <strong>Production note</strong>
+                        </div>
+                        <div>Please be advised that flashing lights and intense theatrical effects are used in this production.</div>
+                    </div>
+                </section>
+            </article>
+
+            <section class="venue-info">
+                <h2>Información sobre Paseo La Plaza - Sala Cortázar</h2>
+
+                <div class="details-grid venue-details">
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="building-2"></i>Teatro</h3><p>Paseo La Plaza - Sala Cortázar</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="map"></i>Dirección</h3><p><u>Av. Corrientes 4560</u> (ver en el mapa)</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="map-pinned"></i>Barrio</h3><p>San Nicolás, Ciudad de Bs. As.</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="car"></i>Estacionamiento</h3><p>Disponible en el edificio</p></div>
+                    <div class="detail"><h3><i class="detail-icon" data-lucide="accessibility"></i>Accesibilidad</h3><p>Apto para personas con movilidad reducida</p></div>
+                </div>
+            </section>
+
+            <section class="cast-section">
+                <h2>Elenco</h2>
+
+                <ul class="cast-list" aria-label="Listado de integrantes del elenco">
+                    <li class="cast-item">
+                        <img class="cast-photo" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Retrato de Martín Seefeld">
+                        <div>
+                            <h3 class="cast-name">Martín Seefeld</h3>
+                            <p class="cast-role">Chance Gardiner</p>
+                        </div>
+                    </li>
+
+                    <li class="cast-item">
+                        <img class="cast-photo" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Retrato de Andrea Frigerio">
+                        <div>
+                            <h3 class="cast-name">Andrea Frigerio</h3>
+                            <p class="cast-role">Eva</p>
+                        </div>
+                    </li>
+
+                    <li class="cast-item">
+                        <img class="cast-photo" src="https://randomuser.me/api/portraits/men/46.jpg" alt="Retrato de Luis Brandoni">
+                        <div>
+                            <h3 class="cast-name">Luis Brandoni</h3>
+                            <p class="cast-role">Ben</p>
+                        </div>
+                    </li>
+
+                    <li class="cast-item">
+                        <img class="cast-photo" src="https://randomuser.me/api/portraits/women/65.jpg" alt="Retrato de integrante del elenco">
+                        <div>
+                            <h3 class="cast-name">María Figueras</h3>
+                            <p class="cast-role">Louise</p>
+                        </div>
+                    </li>
+
+                    <li class="cast-item">
+                        <img class="cast-photo" src="https://randomuser.me/api/portraits/men/58.jpg" alt="Retrato de Pablo Novak">
+                        <div>
+                            <h3 class="cast-name">Pablo Novak</h3>
+                            <p class="cast-role">Presidente</p>
+                        </div>
+                    </li>
+
+                    <li class="cast-item">
+                        <img class="cast-photo" src="https://randomuser.me/api/portraits/women/71.jpg" alt="Retrato de Laura Oliva">
+                        <div>
+                            <h3 class="cast-name">Laura Oliva</h3>
+                            <p class="cast-role">Dra. Allenby</p>
+                        </div>
+                    </li>
+
+                    <li class="cast-item">
+                        <img class="cast-photo" src="https://randomuser.me/api/portraits/men/77.jpg" alt="Retrato de Federico D'Elía">
+                        <div>
+                            <h3 class="cast-name">Federico D'Elía</h3>
+                            <p class="cast-role">asesor presidencial</p>
+                        </div>
+                    </li>
+
+                    <li class="cast-item">
+                        <img class="cast-photo" src="https://randomuser.me/api/portraits/women/79.jpg" alt="Retrato de Paula Ransenberg">
+                        <div>
+                            <h3 class="cast-name">Paula Ransenberg</h3>
+                            <p class="cast-role">periodista</p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="creative-section">
+                <h2>Ficha técnica</h2>
+
+                <ul class="creative-list" aria-label="Listado de ficha técnica">
+                    <li class="creative-item">
+                        <img class="creative-photo" src="https://randomuser.me/api/portraits/men/15.jpg" alt="Retrato de Daniel Di Pace">
+                        <div>
+                            <p class="creative-name">Daniel Di Pace</p>
+                            <p class="creative-role">Música original</p>
+                        </div>
+                    </li>
+
+                    <li class="creative-item">
+                        <img class="creative-photo" src="https://randomuser.me/api/portraits/men/18.jpg" alt="Retrato de Gustavo Gorrini">
+                        <div>
+                            <p class="creative-name">Gustavo Gorrini</p>
+                            <p class="creative-role">Fotografía</p>
+                        </div>
+                    </li>
+
+                    <li class="creative-item">
+                        <img class="creative-photo" src="https://randomuser.me/api/portraits/men/21.jpg" alt="Retrato de Martín Papanicolau">
+                        <div>
+                            <p class="creative-name">Martín Papanicolau</p>
+                            <p class="creative-role">Diseño gráfico</p>
+                        </div>
+                    </li>
+
+                    <li class="creative-item">
+                        <img class="creative-photo" src="https://randomuser.me/api/portraits/women/24.jpg" alt="Retrato de Rosario Suban">
+                        <div>
+                            <p class="creative-name">Rosario Suban</p>
+                            <p class="creative-role">Asistencia de dirección</p>
+                        </div>
+                    </li>
+
+                    <li class="creative-item">
+                        <img class="creative-photo" src="https://randomuser.me/api/portraits/women/31.jpg" alt="Retrato de Ro Kreimer">
+                        <div>
+                            <p class="creative-name">Ro Kreimer</p>
+                            <p class="creative-role">Producción ejecutiva</p>
+                        </div>
+                    </li>
+
+                    <li class="creative-item">
+                        <img class="creative-photo" src="https://randomuser.me/api/portraits/men/35.jpg" alt="Retrato de Daniel Di Pace">
+                        <div>
+                            <p class="creative-name">Daniel Di Pace</p>
+                            <p class="creative-role">Dirección musical</p>
+                        </div>
+                    </li>
+
+                    <li class="creative-item">
+                        <img class="creative-photo" src="https://randomuser.me/api/portraits/men/41.jpg" alt="Retrato de Marcos Arano Forteza">
+                        <div>
+                            <p class="creative-name">Marcos Arano Forteza</p>
+                            <p class="creative-role">Dirección general</p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="reviews">
+                <h2>Audience reviews</h2>
+                <article class="review">
+                    <div class="review-head"><div class="avatar">EV</div><div><strong>Emma V</strong><div class="stars">★★★★★</div></div></div>
+                    <p class="copy">Incredible staging, acting and lighting. I was on the edge of my seat throughout the entire performance.</p>
+                </article>
+                <article class="review">
+                    <div class="review-head"><div class="avatar">ML</div><div><strong>Milly L</strong><div class="stars">★★★★★</div></div></div>
+                    <p class="copy">A clever, entertaining production with excellent acting, costumes and stage design.</p>
+                </article>
+            </section>
+        </div>
+
+        <aside class="ticket-card" id="tickets">
+            <div class="ticket-panel ticket-availability">
+                <h2>Comprar entradas</h2>
+
+                <div class="performance-field">
+                    <label for="performance-date">Fecha y hora</label>
+                    <select id="performance-date" data-performance-select>
+                        <option value="">Seleccionar...</option>
+                        <option value="Viernes 7 de agosto, 20:00">Viernes 7 de agosto, 20:00</option>
+                        <option value="Viernes 14 de agosto, 20:00">Viernes 14 de agosto, 20:00</option>
+                        <option value="Viernes 21 de agosto, 20:00">Viernes 21 de agosto, 20:00</option>
+                        <option value="Viernes 28 de agosto, 20:00">Viernes 28 de agosto, 20:00</option>
+                    </select>
+                </div>
+
+                <div class="ticket-options">
+                    <p class="ticket-section-label">Entradas disponibles</p>
+                    <article class="ticket-tier is-sold-out">
+                        <p class="ticket-tier-name">Tanda 1</p>
+                        <div class="ticket-tier-side">
+                            <span class="ticket-price-pill">$ 23500</span>
+                            <span class="sold-out-pill">Agotadas</span>
+                        </div>
+                    </article>
+
+                    <article class="ticket-tier is-sold-out">
+                        <p class="ticket-tier-name">Tanda 2</p>
+                        <div class="ticket-tier-side">
+                            <span class="ticket-price-pill">$ 25500</span>
+                            <span class="sold-out-pill">Agotadas</span>
+                        </div>
+                    </article>
+
+                    <article class="ticket-tier is-sold-out">
+                        <p class="ticket-tier-name">Tanda 3</p>
+                        <div class="ticket-tier-side">
+                            <span class="ticket-price-pill">$ 27500</span>
+                            <span class="sold-out-pill">Agotadas</span>
+                        </div>
+                    </article>
+
+                    <article class="ticket-tier is-selected" data-ticket-tier data-tier-name="Tanda 4" data-tier-price="29500">
+                        <p class="ticket-tier-name">Tanda 4</p>
+                        <div class="ticket-tier-side">
+                            <span class="ticket-price-pill">$ 29500</span>
+                            <div class="ticket-stepper" aria-label="Cantidad de entradas Tanda 4">
+                                <button data-ticket-step="-1" aria-label="Quitar entrada Tanda 4">−</button>
+                                <span class="ticket-quantity" data-ticket-quantity>1</span>
+                                <button data-ticket-step="1" aria-label="Agregar entrada Tanda 4">+</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="ticket-tier" data-ticket-tier data-tier-name="Tanda 5" data-tier-price="33000">
+                        <p class="ticket-tier-name">Tanda 5</p>
+                        <div class="ticket-tier-side">
+                            <span class="ticket-price-pill">$ 33000</span>
+                            <div class="ticket-stepper" aria-label="Cantidad de entradas Tanda 5">
+                                <button data-ticket-step="-1" aria-label="Quitar entrada Tanda 5">−</button>
+                                <span class="ticket-quantity" data-ticket-quantity>0</span>
+                                <button data-ticket-step="1" aria-label="Agregar entrada Tanda 5">+</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="ticket-panel order-summary">
+                <div class="summary-head">
+                    <strong>Resumen</strong>
+                    <span data-summary-count>1 entrada</span>
+                </div>
+
+                <div class="summary-body" data-summary-body></div>
+                <p class="summary-performance"><strong>Fecha y hora</strong><span data-summary-performance>Viernes 7 de agosto, 20:00</span></p>
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span class="summary-total-price" data-summary-total>$ 29500.00</span>
+                </div>
+
+                <button class="ticket-buy" data-checkout-button>Continuar con la compra</button>
+            </div>
+        </aside>
+    </main>
+
+    <div class="mobile-ticket-bar">
+        <div class="price">Entradas desde<strong data-mobile-total>$ 29500</strong></div>
+        <button class="primary-button" data-scroll-tickets>Comprar</button>
+    </div>
+
+    <div class="checkout-modal" data-checkout-modal aria-hidden="true">
+        <div class="checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+            <header class="checkout-header">
+                <div class="checkout-title">
+                    <h2 id="checkout-title">Stranger Things: La primera sombra</h2>
+                    <p>Completá tus datos para continuar con la compra.</p>
+                </div>
+                <button class="checkout-close" type="button" data-close-checkout aria-label="Cerrar">×</button>
+            </header>
+
+            <div class="checkout-body">
+                <form class="checkout-form" data-checkout-form novalidate>
+                    <h3>Completá tus datos</h3>
+
+                    <div class="checkout-fields">
+                        <div class="field">
+                            <label for="buyer-name">Nombre</label>
+                            <input id="buyer-name" name="name" autocomplete="given-name" required>
+                            <span class="field-error" data-error-for="name"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="buyer-lastname">Apellido</label>
+                            <input id="buyer-lastname" name="lastname" autocomplete="family-name" required>
+                            <span class="field-error" data-error-for="lastname"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="buyer-phone">Teléfono</label>
+                            <input id="buyer-phone" name="phone" autocomplete="tel" inputmode="tel" required>
+                            <span class="field-error" data-error-for="phone"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="buyer-dni">DNI</label>
+                            <input id="buyer-dni" name="dni" inputmode="numeric" required>
+                            <span class="field-error" data-error-for="dni"></span>
+                        </div>
+
+                        <div class="field full">
+                            <label for="buyer-email">Email</label>
+                            <input id="buyer-email" name="email" autocomplete="email" type="email" required>
+                            <span class="field-error" data-error-for="email"></span>
+                        </div>
+
+                        <div class="field full">
+                            <label for="buyer-email-repeat">Repetir email</label>
+                            <input id="buyer-email-repeat" name="emailRepeat" autocomplete="email" type="email" required>
+                            <span class="field-error" data-error-for="emailRepeat"></span>
+                        </div>
+                    </div>
+
+                    <button class="checkout-continue" type="submit" data-modal-continue disabled>Continuar</button>
+                </form>
+
+                <aside class="checkout-modal-summary">
+                    <h3>Resumen de la compra</h3>
+                    <p class="modal-summary-performance"><strong>Fecha y hora</strong><span data-modal-summary-performance>Viernes 7 de agosto, 20:00</span></p>
+                    <div class="modal-summary-list" data-modal-summary-list></div>
+                    <div class="modal-summary-total">
+                        <span>Total</span>
+                        <strong data-modal-summary-total>$ 0.00</strong>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        const formatPrice = (amount) => `$ ${Number(amount).toFixed(2)}`;
+
+        const summaryBody = document.querySelector('[data-summary-body]');
+        const summaryCount = document.querySelector('[data-summary-count]');
+        const summaryTotal = document.querySelector('[data-summary-total]');
+        const checkoutButton = document.querySelector('[data-checkout-button]');
+        const heroSection = document.querySelector('.hero');
+        const ticketAvailability = document.querySelector('.ticket-availability');
+        const orderSummary = document.querySelector('.order-summary');
+        const mobileTicketBar = document.querySelector('.mobile-ticket-bar');
+        const mobileTotal = document.querySelector('[data-mobile-total]');
+        const mobileQuery = window.matchMedia('(max-width: 900px)');
+        const checkoutModal = document.querySelector('[data-checkout-modal]');
+        const checkoutForm = document.querySelector('[data-checkout-form]');
+        const modalContinue = document.querySelector('[data-modal-continue]');
+        const modalSummaryList = document.querySelector('[data-modal-summary-list]');
+        const modalSummaryTotal = document.querySelector('[data-modal-summary-total]');
+        const performanceSelect = document.querySelector('[data-performance-select]');
+        const summaryPerformance = document.querySelector('[data-summary-performance]');
+        const modalSummaryPerformance = document.querySelector('[data-modal-summary-performance]');
+
+        const getTicketState = () => {
+            return [...document.querySelectorAll('[data-ticket-tier]')].map((tier) => {
+                const quantityLabel = tier.querySelector('[data-ticket-quantity]');
+                return {
+                    element: tier,
+                    name: tier.dataset.tierName,
+                    price: Number(tier.dataset.tierPrice),
+                    quantity: Number(quantityLabel.textContent),
+                    quantityLabel
+                };
+            });
+        };
+
+        const getSelectedTickets = () => getTicketState().filter((tier) => tier.quantity > 0);
+
+        const getSelectedTotal = () => {
+            return getSelectedTickets().reduce((sum, tier) => sum + tier.quantity * tier.price, 0);
+        };
+
+        const getSelectedPerformance = () => performanceSelect.value;
+
+        const updateSelectedPerformance = () => {
+            summaryPerformance.textContent = getSelectedPerformance();
+            modalSummaryPerformance.textContent = getSelectedPerformance();
+        };
+
+        const renderModalSummary = () => {
+            const selected = getSelectedTickets();
+            updateSelectedPerformance();
+
+            modalSummaryList.innerHTML = selected.length
+                ? selected.map((tier) => `
+                    <div class="modal-summary-row">
+                        <div>
+                            <p class="modal-summary-name">${tier.name}</p>
+                            <p class="modal-summary-meta">${tier.quantity} × ${formatPrice(tier.price)}</p>
+                        </div>
+                        <span class="modal-summary-price">${formatPrice(tier.quantity * tier.price)}</span>
+                    </div>
+                `).join('')
+                : '<p class="summary-empty">Seleccioná una entrada para continuar.</p>';
+
+            modalSummaryTotal.textContent = formatPrice(getSelectedTotal());
+        };
+
+        const openCheckoutModal = () => {
+            if (getSelectedTickets().length === 0) return;
+
+            renderModalSummary();
+            checkoutModal.classList.add('is-open');
+            checkoutModal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            checkoutForm.querySelector('input').focus();
+            validateCheckoutForm(false);
+        };
+
+        const closeCheckoutModal = () => {
+            checkoutModal.classList.remove('is-open');
+            checkoutModal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-open');
+        };
+
+        const getCheckoutFormValues = () => {
+            const formData = new FormData(checkoutForm);
+            return {
+                name: String(formData.get('name') || '').trim(),
+                lastname: String(formData.get('lastname') || '').trim(),
+                phone: String(formData.get('phone') || '').trim(),
+                dni: String(formData.get('dni') || '').trim(),
+                email: String(formData.get('email') || '').trim(),
+                emailRepeat: String(formData.get('emailRepeat') || '').trim()
+            };
+        };
+
+        const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        function validateCheckoutForm(showErrors = true) {
+            const values = getCheckoutFormValues();
+            const errors = {
+                name: values.name ? '' : 'Ingresá tu nombre.',
+                lastname: values.lastname ? '' : 'Ingresá tu apellido.',
+                phone: values.phone ? '' : 'Ingresá tu teléfono.',
+                dni: values.dni ? '' : 'Ingresá tu DNI.',
+                email: values.email && isValidEmail(values.email) ? '' : 'Ingresá un email válido.',
+                emailRepeat: values.emailRepeat === values.email && values.emailRepeat ? '' : 'Los emails tienen que coincidir.'
+            };
+
+            Object.entries(errors).forEach(([field, message]) => {
+                const errorNode = checkoutForm.querySelector(`[data-error-for="${field}"]`);
+                if (errorNode) errorNode.textContent = showErrors ? message : '';
+            });
+
+            const isValid = Object.values(errors).every((message) => message === '');
+            modalContinue.disabled = !isValid;
+            return isValid;
+        }
+
+        const updateTicketSummary = () => {
+            const selected = getSelectedTickets();
+            const totalQuantity = selected.reduce((sum, tier) => sum + tier.quantity, 0);
+            const totalPrice = selected.reduce((sum, tier) => sum + tier.quantity * tier.price, 0);
+
+            summaryCount.textContent = `${totalQuantity} ${totalQuantity === 1 ? 'entrada' : 'entradas'}`;
+            summaryTotal.textContent = formatPrice(totalPrice);
+            mobileTotal.textContent = totalPrice > 0 ? formatPrice(totalPrice) : '$ 29500';
+            checkoutButton.disabled = totalQuantity === 0;
+            checkoutButton.textContent = totalQuantity === 0 ? 'Seleccioná una entrada' : 'Continuar con la compra';
+
+            summaryBody.innerHTML = selected.length
+                ? selected.map((tier) => `
+                    <div class="summary-row">
+                        <div>
+                            <p class="summary-item-title">${tier.name}</p>
+                            <p class="summary-item-meta">${tier.quantity} × ${formatPrice(tier.price)}</p>
+                        </div>
+                        <strong class="summary-price">${formatPrice(tier.quantity * tier.price)}</strong>
+                        <button class="summary-remove" data-clear-tier="${tier.name}" aria-label="Quitar ${tier.name}">×</button>
+                    </div>
+                `).join('')
+                : '<p class="summary-empty">Seleccioná una entrada para continuar.</p>';
+
+            getTicketState().forEach((tier) => {
+                tier.element.classList.toggle('is-selected', tier.quantity > 0);
+                tier.element.querySelectorAll('[data-ticket-step="-1"]').forEach((button) => {
+                    button.disabled = tier.quantity === 0;
+                });
+            });
+
+            if (checkoutModal.classList.contains('is-open')) {
+                renderModalSummary();
+            }
+        };
+
+        document.querySelectorAll('[data-ticket-step]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const tier = button.closest('[data-ticket-tier]');
+                const quantityLabel = tier.querySelector('[data-ticket-quantity]');
+                const nextQuantity = Math.max(0, Math.min(10, Number(quantityLabel.textContent) + Number(button.dataset.ticketStep)));
+                quantityLabel.textContent = nextQuantity;
+                updateTicketSummary();
+            });
+        });
+
+        summaryBody.addEventListener('click', (event) => {
+            const clearButton = event.target.closest('[data-clear-tier]');
+            if (!clearButton) return;
+
+            const tier = [...document.querySelectorAll('[data-ticket-tier]')]
+                .find((item) => item.dataset.tierName === clearButton.dataset.clearTier);
+
+            if (!tier) return;
+
+            tier.querySelector('[data-ticket-quantity]').textContent = '0';
+            updateTicketSummary();
+        });
+
+        updateTicketSummary();
+        updateSelectedPerformance();
+
+        performanceSelect.addEventListener('change', () => {
+            updateSelectedPerformance();
+
+            if (checkoutModal.classList.contains('is-open')) {
+                renderModalSummary();
+            }
+        });
+
+        checkoutButton.addEventListener('click', openCheckoutModal);
+
+        checkoutForm.addEventListener('input', () => validateCheckoutForm());
+
+        checkoutForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            if (!validateCheckoutForm()) return;
+
+            alert('Demo: acá redirigimos al checkout de Mercado Pago.');
+            closeCheckoutModal();
+        });
+
+        document.querySelectorAll('[data-close-checkout]').forEach((button) => {
+            button.addEventListener('click', closeCheckoutModal);
+        });
+
+        checkoutModal.addEventListener('click', (event) => {
+            if (event.target === checkoutModal) {
+                closeCheckoutModal();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && checkoutModal.classList.contains('is-open')) {
+                closeCheckoutModal();
+            }
+        });
+
+        const stickyHiddenZones = {
+            hero: true,
+            availability: true,
+            summary: true
+        };
+
+        const updateMobileTicketBarVisibility = () => {
+            const anyHiddenZoneVisible = Object.values(stickyHiddenZones).some(Boolean);
+            mobileTicketBar.classList.toggle('is-visible', !anyHiddenZoneVisible);
+        };
+
+        if ('IntersectionObserver' in window) {
+            const visibilityObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    stickyHiddenZones[entry.target.dataset.stickyHiddenZone] = entry.isIntersecting;
+                });
+
+                updateMobileTicketBarVisibility();
+            }, {
+                threshold: 0.05
+            });
+
+            [
+                ['hero', heroSection],
+                ['availability', ticketAvailability],
+                ['summary', orderSummary]
+            ].forEach(([zone, element]) => {
+                if (!element) return;
+                element.dataset.stickyHiddenZone = zone;
+                visibilityObserver.observe(element);
+            });
+
+            mobileQuery.addEventListener('change', () => {
+                updateMobileTicketBarVisibility();
+            });
+        }
+
+        document.querySelector('[data-read-more]').addEventListener('click', (event) => {
+            const copy = document.querySelector('#about-copy');
+            const expanded = copy.style.maxHeight === 'none';
+            copy.style.maxHeight = expanded ? '136px' : 'none';
+            copy.style.overflow = expanded ? 'hidden' : 'visible';
+            copy.classList.toggle('fade-copy', expanded);
+            event.currentTarget.textContent = expanded ? 'Leer más' : 'Leer menos';
+        });
+
+        document.querySelectorAll('[data-scroll-tickets]').forEach((button) => {
+            button.addEventListener('click', () => {
+                document.querySelector('.ticket-availability').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>

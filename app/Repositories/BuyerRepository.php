@@ -19,6 +19,13 @@ class BuyerRepository
         return Buyer::withTrashed()->where('email', $email)->first();
     }
 
+    public function findByIdForUpdate(int $buyerId): ?Buyer
+    {
+        return Buyer::query()
+            ->lockForUpdate()
+            ->find($buyerId);
+    }
+
     public function listPaginated(?string $search, int $limit = 20): LengthAwarePaginator
     {
         return Buyer::query()

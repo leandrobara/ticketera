@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stranger Things: The First Shadow</title>
+    <meta name="description" content="Página demo responsive para venta de entradas.">
+    <style>
+        :root {
+            --ink: #17141f;
+            --muted: #68656d;
+            --line: #e4e2e6;
+            --paper: #fff;
+            --pink: #f53359;
+            --purple: #da26dc;
+            --hero: #14121e;
+            --card-radius: 16px;
+            font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+            color: var(--ink);
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; background: #f7f7f8; }
+        button, a { font: inherit; }
+        button { cursor: pointer; }
+        img { display: block; max-width: 100%; }
+        a { color: inherit; }
+
+        .hero {
+            position: relative;
+            min-height: 668px;
+            overflow: hidden;
+            color: white;
+            background:
+                radial-gradient(circle at 25% 30%, rgba(143, 47, 28, .72), transparent 31%),
+                radial-gradient(circle at 88% 10%, rgba(85, 12, 18, .45), transparent 30%),
+                linear-gradient(135deg, #2e171b 0%, #17151d 48%, #11101a 100%);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0;
+            height: 190px;
+            pointer-events: none;
+            background: linear-gradient(transparent, var(--hero));
+        }
+
+        .nav,
+        .hero-grid,
+        .trust-strip,
+        .content {
+            width: min(1200px, calc(100% - 48px));
+            margin-inline: auto;
+        }
+
+        .nav {
+            position: relative;
+            z-index: 5;
+            height: 74px;
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 900;
+            letter-spacing: -1.8px;
+            color: #ff3b75;
+            text-decoration: none;
+        }
+
+        .location { color: #d8d5da; font-size: 17px; }
+        .nav-links { display: flex; gap: 28px; margin: auto; }
+        .nav-links a { color: #d7d4d8; text-decoration: none; font-size: 14px; }
+        .nav-actions { display: flex; align-items: center; gap: 20px; }
+
+        .app-button,
+        .primary-button {
+            border: 0;
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            box-shadow: none;
+        }
+
+        .app-button { padding: 9px 18px; border-radius: 22px; font-size: 14px; }
+        .icon-button {
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255,255,255,.72);
+            color: white;
+            background: rgba(20,18,30,.3);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+        }
+
+        .bare-icon { background: transparent; border: 0; color: white; padding: 2px; }
+        .menu-button { display: none; }
+
+        .hero-grid {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            align-items: center;
+            gap: 40px;
+            padding-top: 32px;
+        }
+
+        .eyebrow { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+        h1 {
+            margin: 15px 0 6px;
+            font-size: clamp(38px, 3.1vw, 48px);
+            line-height: 1.04;
+            letter-spacing: -1.5px;
+        }
+        .subtitle { margin: 0; color: #d6d2d5; font-size: 17px; line-height: 1.45; }
+
+        .cta-row { display: flex; align-items: center; gap: 10px; margin-top: 32px; }
+        .primary-button {
+            min-height: 49px;
+            border-radius: 28px;
+            padding: 0 30px;
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .social-proof {
+            width: max-content;
+            margin: 18px auto 0;
+            color: #e2dfe4;
+            border-bottom: 1px dashed rgba(255,255,255,.7);
+            padding-bottom: 3px;
+        }
+        .social-proof strong { color: white; }
+        .pulse {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            margin-right: 10px;
+            border-radius: 50%;
+            background: #5577f2;
+            box-shadow: 0 0 0 8px rgba(85,119,242,.2);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: 190px 190px;
+            gap: 8px;
+        }
+        .gallery-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #09090c;
+        }
+        .gallery-card img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-card.main { grid-row: 1 / 3; }
+        .play {
+            position: absolute;
+            inset: 50% auto auto 50%;
+            transform: translate(-50%, -50%);
+            width: 66px;
+            height: 66px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(16,16,20,.72);
+            color: white;
+            font-size: 25px;
+        }
+        .view-all {
+            position: absolute;
+            right: 18px;
+            bottom: 16px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            text-shadow: 0 1px 4px black;
+        }
+        .mobile-arrows, .mobile-dots { display: none; }
+
+        .trust-strip {
+            position: relative;
+            z-index: 4;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            margin-top: 40px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #24222b;
+        }
+        .trust-item {
+            min-height: 47px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            color: #f0eef1;
+            border-right: 1px solid #34313b;
+            white-space: nowrap;
+        }
+        .trust-item:last-child { border-right: 0; }
+        .trust-green { color: #70d99c; font-weight: 800; }
+        .trust-gold { color: #e3bc71; font-weight: 800; }
+        .trust-pink { color: #ff3f76; font-style: italic; font-weight: 900; }
+
+        .content {
+            position: relative;
+            z-index: 6;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 370px;
+            gap: 48px;
+            margin-top: -38px;
+            padding-bottom: 90px;
+            align-items: start;
+        }
+        .main-card, .ticket-card {
+            background: var(--paper);
+            border: 1px solid #e2e0e3;
+            border-radius: var(--card-radius);
+            box-shadow: 0 2px 8px rgba(18,15,23,.03);
+        }
+        .main-card { padding: 32px; }
+        .about-head { display: grid; grid-template-columns: 82px 1fr; gap: 24px; }
+        .poster-small { width: 82px; height: 123px; object-fit: cover; border-radius: 9px; }
+        h2 { margin: 0 0 16px; font-size: 20px; line-height: 1.3; }
+        .copy { color: var(--muted); line-height: 1.65; margin: 0 0 14px; }
+        .fade-copy {
+            position: relative;
+            max-height: 136px;
+            overflow: hidden;
+        }
+        .fade-copy::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0;
+            height: 65px;
+            background: linear-gradient(transparent, white);
+        }
+        .read-more {
+            border: 0;
+            border-bottom: 1px solid currentColor;
+            background: none;
+            padding: 0 0 3px;
+            font-weight: 700;
+            color: #312d36;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 26px 38px;
+            margin-top: 38px;
+            padding-top: 28px;
+            border-top: 1px solid var(--line);
+        }
+        .detail h3 { margin: 0 0 7px; font-size: 16px; }
+        .detail p { color: var(--muted); margin: 0; line-height: 1.5; }
+        .notice {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 11px;
+            background: #fff5e9;
+            color: #5b4630;
+            line-height: 1.5;
+        }
+
+        .ticket-card {
+            position: sticky;
+            top: 18px;
+            padding: 18px;
+        }
+        .ticket-top { display: flex; align-items: center; justify-content: space-between; }
+        .ticket-top h2 { margin: 0; font-size: 17px; }
+        .counter { display: flex; align-items: center; gap: 17px; }
+        .counter button {
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: white;
+            font-size: 20px;
+        }
+        .calendar { margin-top: 18px; padding-top: 17px; border-top: 1px solid var(--line); }
+        .selling { display: inline-block; color: #aa6b19; background: #fff0dc; padding: 5px 9px; font-size: 12px; border-radius: 4px; }
+        .month-row { display: flex; align-items: center; margin: 19px 0; }
+        .month-row strong { margin-right: auto; }
+        .month-row button { border: 0; background: none; font-size: 25px; margin-left: 11px; }
+        .days, .dates { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 4px; }
+        .days { font-size: 12px; font-weight: 700; }
+        .dates { margin-top: 16px; row-gap: 12px; color: #26222b; }
+        .date { min-height: 47px; padding: 5px 2px; border: 1px solid transparent; border-radius: 7px; font-size: 16px; }
+        .date small { display: block; margin-top: 2px; font-size: 11px; }
+        .date.muted { color: #c8c5c9; }
+        .date.active { border: 2px solid #28212d; background: #fff9ef; }
+        .date.hot::after { content: ""; display: block; width: 6px; height: 6px; margin: -51px 0 43px auto; border-radius: 50%; background: #dca255; }
+        .ticket-buy { width: 100%; margin-top: 20px; padding: 14px; border: 0; border-radius: 25px; color: white; background: #211c28; font-weight: 800; }
+
+        .reviews { margin-top: 38px; }
+        .review {
+            margin-top: 16px;
+            padding: 22px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: #fff;
+        }
+        .review-head { display: flex; align-items: center; gap: 12px; }
+        .avatar { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: #2f2439; color: white; font-weight: 800; }
+        .stars { color: #ef315c; letter-spacing: 2px; }
+
+        .mobile-ticket-bar { display: none; }
+
+        @media (max-width: 900px) {
+            body { background: var(--hero); }
+            .hero { min-height: auto; padding-bottom: 0; }
+            .hero::after { height: 340px; }
+            .nav, .hero-grid, .trust-strip, .content { width: min(100% - 48px, 640px); }
+            .nav { height: 65px; gap: 10px; border-bottom: 2px solid rgba(255,255,255,.24); }
+            .logo { font-size: 25px; }
+            .location { margin-right: auto; font-size: 15px; text-transform: uppercase; }
+            .nav-links, .app-button, .user-button { display: none; }
+            .menu-button { display: block; }
+            .hero-grid { display: flex; flex-direction: column; gap: 26px; padding-top: 45px; }
+            .gallery { order: 1; display: block; width: 100%; }
+            .gallery-card { display: none; }
+            .gallery-card.main {
+                display: block;
+                width: min(222px, 68vw);
+                height: 333px;
+                margin: auto;
+                border-radius: 7px;
+            }
+            .gallery-card.main img { content: url("https://images.ctfassets.net/6pezt69ih962/1NcakND515b9QEZHLhoDWz/e378a2c29f5fb9ec4d3aebf11e085de0/PRJONE25_Q4_021_TTG_Minimum_480x720_AW.jpg?h=720&f=faces&fit=fill&fm=webp&q=90"); }
+            .gallery-card.main .play { display: none; }
+            .mobile-arrows { display: contents; }
+            .arrow {
+                position: absolute;
+                z-index: 3;
+                top: 210px;
+                display: grid;
+                place-items: center;
+                width: 42px;
+                height: 42px;
+                border: 0;
+                border-radius: 50%;
+                color: white;
+                background: rgba(255,255,255,.23);
+                font-size: 29px;
+            }
+            .arrow.left { left: 8px; }
+            .arrow.right { right: 8px; }
+            .hero-copy { order: 2; width: 100%; }
+            h1 { margin-top: 15px; font-size: 25px; letter-spacing: -.5px; }
+            .subtitle { font-size: 16px; }
+            .cta-row { margin-top: 31px; }
+            .primary-button { min-height: 48px; padding-inline: 14px; }
+            .social-proof { margin-top: 25px; }
+            .trust-strip {
+                display: flex;
+                overflow-x: auto;
+                margin-top: 39px;
+                border-radius: 10px 10px 0 0;
+                scrollbar-width: none;
+            }
+            .trust-item { flex: 0 0 195px; min-height: 47px; }
+            .content {
+                display: block;
+                width: 100%;
+                margin-top: 0;
+                padding: 0 16px 100px;
+                background: #f7f7f8;
+            }
+            .main-card { border: 0; border-radius: 0; margin-inline: -16px; padding: 28px 24px; }
+            .about-head { grid-template-columns: 70px 1fr; gap: 17px; }
+            .poster-small { width: 70px; height: 105px; }
+            .details-grid { grid-template-columns: 1fr; }
+            .ticket-card { display: none; }
+            .reviews { background: #f7f7f8; }
+            .mobile-ticket-bar {
+                position: fixed;
+                z-index: 30;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+                background: white;
+                box-shadow: 0 -3px 15px rgba(0,0,0,.12);
+            }
+            .mobile-ticket-bar .price { font-size: 13px; color: var(--muted); }
+            .mobile-ticket-bar .price strong { display: block; color: var(--ink); font-size: 18px; }
+            .mobile-ticket-bar .primary-button { min-height: 46px; }
+        }
+
+        @media (max-width: 420px) {
+            .nav, .hero-grid, .trust-strip { width: calc(100% - 48px); }
+            .hero-grid { padding-top: 44px; }
+            .gallery-card.main { width: 222px; height: 333px; }
+            .eyebrow { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <header class="nav">
+            <a href="#" class="logo">todaytix</a>
+            <span class="location">| London⌄</span>
+            <nav class="nav-links" aria-label="Navegación principal">
+                <a href="#">Musicals</a>
+                <a href="#">Plays</a>
+                <a href="#">Collections</a>
+                <a href="#">Rush &amp; Lottery</a>
+                <a href="#">Offers</a>
+                <a href="#">More shows⌄</a>
+            </nav>
+            <div class="nav-actions">
+                <button class="app-button">Get the app</button>
+                <button class="bare-icon" aria-label="Buscar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                </button>
+                <button class="bare-icon user-button" aria-label="Usuario">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                </button>
+                <button class="bare-icon menu-button" aria-label="Menú">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <div class="eyebrow">⌾ London</div>
+                <h1>Stranger Things: The First Shadow tickets</h1>
+                <p class="subtitle">See this incredible multi-award winning show based on the hit Netflix series.</p>
+                <div class="cta-row">
+                    <button class="primary-button" data-scroll-tickets>Get tickets from £33</button>
+                    <button class="icon-button" aria-label="Agregar a favoritos">
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h12v17l-6-4-6 4z"/></svg>
+                    </button>
+                </div>
+                <div class="social-proof"><span class="pulse"></span><strong>2098</strong> checked this out</div>
+            </div>
+
+            <div class="gallery">
+                <div class="gallery-card main">
+                    <img src="https://images.ctfassets.net/6pezt69ih962/7B7dmRdM32Jhga3gpBXvgF/7f63cdecdf9c9063ed22c82d982023e0/STTFS_new_1.png?h=720&amp;fm=webp&amp;q=90" alt="Escena de Stranger Things">
+                    <button class="play" aria-label="Reproducir video">▶</button>
+                </div>
+                <div class="gallery-card">
+                    <img src="https://images.ctfassets.net/6pezt69ih962/5GndfDnPQyad7ft4RBRRVQ/a73de152b15b39c1a4d91b3c2f571633/STTFS_new_2.png?h=360&amp;fm=webp&amp;q=90" alt="Escena teatral">
+                </div>
+                <div class="gallery-card">
+                    <img src="https://images.ctfassets.net/6pezt69ih962/3eHMse2ryLd4MIyhCmvVJU/ac16d957727997111526f3332b9319e1/STTFS_new_3.png?h=360&amp;fm=webp&amp;q=90" alt="Escena teatral">
+                    <span class="view-all">▦ &nbsp; View all</span>
+                </div>
+            </div>
+            <div class="mobile-arrows">
+                <button class="arrow left" aria-label="Imagen anterior">‹</button>
+                <button class="arrow right" aria-label="Imagen siguiente">›</button>
+            </div>
+        </div>
+
+        <div class="trust-strip">
+            <div class="trust-item"><span class="trust-green">🎟 &nbsp; 93%</span></div>
+            <div class="trust-item"><span class="trust-gold">rewards⁺</span><span>•</span><span>App only</span></div>
+            <div class="trust-item"><span class="trust-pink">RUSH</span><span>•</span><span>App only</span></div>
+            <div class="trust-item"><span>🔥</span><span>•</span><span>Selling out</span></div>
+        </div>
+    </section>
+
+    <main class="content">
+        <div>
+            <article class="main-card">
+                <div class="about-head">
+                    <img class="poster-small" src="https://images.ctfassets.net/6pezt69ih962/1NcakND515b9QEZHLhoDWz/e378a2c29f5fb9ec4d3aebf11e085de0/PRJONE25_Q4_021_TTG_Minimum_480x720_AW.jpg?h=450&amp;f=faces&amp;fit=fill&amp;fm=webp&amp;q=90" alt="Póster del espectáculo">
+                    <div>
+                        <h2>About Stranger Things: The First Shadow</h2>
+                        <div class="fade-copy" id="about-copy">
+                            <p class="copy">Experience the ultimate thrill of Stranger Things: The First Shadow, winner of major theatre awards for its entertainment and staging.</p>
+                            <p class="copy">The creative team takes audiences back to Hawkins in 1959, where everyday struggles collide with supernatural forces and the arrival of Henry Creel changes everything.</p>
+                        </div>
+                        <button class="read-more" data-read-more>Read more</button>
+                    </div>
+                </div>
+
+                <section class="details-grid">
+                    <div class="detail"><h3>◷ &nbsp; Run time</h3><p>3hr. Incl. 1 interval.</p></div>
+                    <div class="detail"><h3>⌾ &nbsp; Venue</h3><p><u>Phoenix Theatre</u></p></div>
+                    <div class="detail"><h3>Categories</h3><p>Plays, Sci Fi / Fantasy, West End, Drama and Adventure.</p></div>
+                    <div class="detail"><h3>Age</h3><p>Ages 12+ recommended. Under 16s must be accompanied by an adult.</p></div>
+                    <div class="detail"><h3>Start date</h3><p>17th November, 2023</p></div>
+                    <div class="detail"><h3>End date</h3><p>27th December, 2026</p></div>
+                </section>
+
+                <div class="notice"><strong>Production note</strong><br>Please be advised that flashing lights and intense theatrical effects are used in this production.</div>
+            </article>
+
+            <section class="reviews">
+                <h2>Audience reviews</h2>
+                <article class="review">
+                    <div class="review-head"><div class="avatar">EV</div><div><strong>Emma V</strong><div class="stars">★★★★★</div></div></div>
+                    <p class="copy">Incredible staging, acting and lighting. I was on the edge of my seat throughout the entire performance.</p>
+                </article>
+                <article class="review">
+                    <div class="review-head"><div class="avatar">ML</div><div><strong>Milly L</strong><div class="stars">★★★★★</div></div></div>
+                    <p class="copy">A clever, entertaining production with excellent acting, costumes and stage design.</p>
+                </article>
+            </section>
+        </div>
+
+        <aside class="ticket-card" id="tickets">
+            <div class="ticket-top">
+                <h2>Tickets</h2>
+                <div class="counter">
+                    <button data-counter="-1" aria-label="Quitar entrada">−</button>
+                    <span id="ticket-count">2</span>
+                    <button data-counter="1" aria-label="Agregar entrada">+</button>
+                </div>
+            </div>
+            <div class="calendar">
+                <span class="selling">🔥 Selling out</span>
+                <div class="month-row"><strong>June 2026</strong><button aria-label="Mes anterior">‹</button><button aria-label="Mes siguiente">›</button></div>
+                <div class="days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+                <div class="dates">
+                    <div class="date muted">22</div><div class="date muted">23</div><button class="date active hot">24<small>£50</small></button><button class="date hot">25<small>£50</small></button><button class="date">26<small>£33</small></button><button class="date">27<small>£38</small></button><button class="date">28<small>£38</small></button>
+                    <div class="date muted">29</div><button class="date">30<small>£33</small></button>
+                </div>
+                <button class="ticket-buy">Pick your seats</button>
+            </div>
+        </aside>
+    </main>
+
+    <div class="mobile-ticket-bar">
+        <div class="price">Tickets from<strong>£33</strong></div>
+        <button class="primary-button" data-scroll-tickets>Get tickets</button>
+    </div>
+
+    <script>
+        const countLabel = document.querySelector('#ticket-count');
+
+        document.querySelectorAll('[data-counter]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const next = Math.max(1, Math.min(10, Number(countLabel.textContent) + Number(button.dataset.counter)));
+                countLabel.textContent = next;
+            });
+        });
+
+        document.querySelector('[data-read-more]').addEventListener('click', (event) => {
+            const copy = document.querySelector('#about-copy');
+            const expanded = copy.style.maxHeight === 'none';
+            copy.style.maxHeight = expanded ? '136px' : 'none';
+            copy.style.overflow = expanded ? 'hidden' : 'visible';
+            copy.classList.toggle('fade-copy', expanded);
+            event.currentTarget.textContent = expanded ? 'Read more' : 'Read less';
+        });
+
+        document.querySelectorAll('[data-scroll-tickets]').forEach((button) => {
+            button.addEventListener('click', () => {
+                if (window.matchMedia('(max-width: 900px)').matches) {
+                    alert('Demo: acá comenzaría el flujo de selección de entradas.');
+                    return;
+                }
+                document.querySelector('#tickets').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>

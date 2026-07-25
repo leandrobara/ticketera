@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
-use App\Models\Promotion;
+use App\Models\PresentationTicketType;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -45,22 +45,50 @@ class CreateManualOrderRequest extends FormRequest
     {
         if (!$validator->failed()) {
             $validator->after(function ($validator) {
+                $ticketType = PresentationTicketType::query()
+                    ->with('presentation.season')
+                    ->find($this->input('presentation_ticket_type_id'));
+
+                if (!$ticketType?->presentation) {
+                    $validator->errors()->add(
+                        'presentation_ticket_type_id',
+                        'presentation_ticket_type_without_presentation'
+                    );
+                    return;
+                }
+
+                if (!$ticketType->presentation->season?->show_id) {
+                    $validator->errors()->add(
+                        'presentation_ticket_type_id',
+                        'presentation_ticket_type_without_season'
+                    );
+                }
+
+                if (!$ticketType->is_active) {
+                    $validator->errors()->add(
+                        'presentation_ticket_type_id',
+                        'presentation_ticket_type_not_active'
+                    );
+                }
+
                 $promoCode = $this->input('promo_code');
 
                 if (blank($promoCode)) {
                     return;
                 }
 
-                $promotion = Promotion::query()
-                    ->where('access_code', $promoCode)
+                $promotionTicketType = PresentationTicketType::query()
+                    ->where('promotion_access_code', $promoCode)
+                    ->where('promotion_is_active', true)
+                    ->whereNotNull('promotion_type')
                     ->first();
 
-                if (!$promotion) {
+                if (!$promotionTicketType) {
                     $validator->errors()->add('promo_code', 'invalid_promo_code');
                     return;
                 }
 
-                if ((int) $promotion->presentation_ticket_type_id !== (int) $this->input('presentation_ticket_type_id')) {
+                if ((int) $promotionTicketType->id !== (int) $this->input('presentation_ticket_type_id')) {
                     $validator->errors()->add('promo_code', 'promo_code_not_available_for_ticket_type');
                 }
             });
