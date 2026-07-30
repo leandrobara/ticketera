@@ -30,6 +30,10 @@
       type: Object,
       required: true,
     },
+    venue: {
+      type: Object,
+      default: null,
+    },
     primaryPresentation: {
       type: Object,
       default: null,
@@ -48,9 +52,8 @@
   const isExpanded = ref(false);
 
   // computed
-  const venue = computed(() => props.show.venue ?? null);
   const venueAddress = computed(() => {
-    return [venue.value?.address, venue.value?.neighborhood, venue.value?.city]
+    return [props.venue?.address, props.venue?.neighborhood, props.venue?.city]
       .filter(Boolean)
       .join(', ');
   });

@@ -2,33 +2,29 @@
 
 namespace App\Repositories\Site;
 
-use App\Models\Season;
+use App\Models\Show;
 
-class ShowRepository
+class ShowRepository implements SiteShowRepositoryInterface
 {
-    public function getPublicSeason(Season $season): Season
+    public function getPublicShow(Show $show): Show
     {
-        return Season::query()
-            ->whereIn('status', ['published', 'finished'])
+        return Show::query()
             ->with([
-                'venue',
-                'show.mainImage',
-                'show.images' => function ($query) {
-                    $query->orderBy('sort_order');
-                },
-                'show.credits.person',
-                'show.performanceHistories' => function ($query) {
+                'mainImage',
+                'credits.person',
+                'performanceHistories' => function ($query) {
                     $query
                         ->orderBy('sort_order')
                         ->orderByDesc('year')
                         ->orderBy('id');
                 },
-                'show.links' => function ($query) {
+                'links' => function ($query) {
                     $query
                         ->orderBy('sort_order')
                         ->orderBy('id');
                 },
             ])
-            ->findOrFail($season->id);
+            ->findOrFail($show->id)
+        ;
     }
 }

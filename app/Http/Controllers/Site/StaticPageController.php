@@ -17,7 +17,7 @@ class StaticPageController extends Controller
     public function homeLanding()
     {
         return view('site.app', [
-            'page' => 'home-landing',
+            'page' => 'home',
             'pageTitle' => 'Venta de entradas',
         ]);
     }

@@ -5,7 +5,7 @@
 <template>
   <StaticPageLayout title="Publicá tu obra">
     <p>
-      Ticketera está pensada para obras, productoras, salas y proyectos
+      <strong>Entrada Tix</strong> está pensada para obras de teatro, productoras, salas y proyectos
       culturales que quieren vender entradas de forma simple, cuidar la relación
       con su público y tener más control sobre su operación.
     </p>
@@ -25,8 +25,8 @@
 
     <h2>Cómo sumarte</h2>
     <p>
-      Por ahora estamos incorporando proyectos de forma manual para poder
-      acompañar bien cada caso. Si querés participar, escribinos por email con
+      Por ahora estamos incorporando proyectos puntuales de forma manual para poder
+      acompañar bien cada caso. Si querés participar, escribinos por email al <strong>hola.entradatix@gmail.com</strong> con
       estos datos:
     </p>
     <ul>
@@ -43,7 +43,7 @@
 
     <h2>Email</h2>
     <p>
-      <a href="mailto:hola@ticketera.test">hola@ticketera.test</a>
+      <a href="mailto:hola.entradatix@gmail.com">hola.entradatix@gmail.com</a>
     </p>
   </StaticPageLayout>
 </template>

@@ -8,10 +8,6 @@
       type: String,
       required: true,
     },
-    eyebrow: {
-      type: String,
-      default: 'Ticketera',
-    },
   });
 </script>
 
@@ -21,7 +17,6 @@
 
     <main class="static-page-shell">
       <section class="static-page-card">
-        <p class="static-page-eyebrow">{{ eyebrow }}</p>
         <h1>{{ title }}</h1>
         <div class="static-page-content">
           <slot></slot>

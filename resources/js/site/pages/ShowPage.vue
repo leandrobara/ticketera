@@ -17,9 +17,14 @@
   import CommentService from '@/site/services/CommentService';
   import PresentationService from '@/site/services/PresentationService';
   import ShowService from '@/site/services/ShowService';
+  import VenueService from '@/site/services/VenueService';
 
   // props
   const props = defineProps({
+    showId: {
+      type: [Number, String],
+      required: true,
+    },
     seasonId: {
       type: [Number, String],
       required: true,
@@ -28,8 +33,13 @@
 
   // data
   const show = ref(null);
+  const venue = ref(null);
   const presentationList = ref([]);
   const comments = ref([]);
+  const commentsSummary = ref({
+    count: 0,
+    average_rating: null,
+  });
   const commentsPagination = ref({
     page: 1,
     limit: 5,
@@ -67,7 +77,10 @@
     }) ?? null;
   });
   const hasShowPremiered = computed(() => {
-    return presentations.value.some((presentation) => presentation.is_finished);
+    const hasPublishedComments = Number(commentsSummary.value.count ?? 0) > 0;
+    const hasFinishedPresentation = presentations.value.some((presentation) => presentation.is_finished);
+
+    return hasPublishedComments || hasFinishedPresentation;
   });
   const lastPresentationStartsAt = computed(() => {
     const presentationDates = presentations.value
@@ -153,21 +166,35 @@
     promoCode.value = getPromoCodeFromUrl();
 
     try {
-      const [showResponse, presentationsResponse, commentsResponse] = await Promise.all([
-        ShowService.getInstance().getShow(props.seasonId),
+      const showResponse = await ShowService.getInstance().getShow({
+        showId: props.showId,
+      });
+      show.value = showResponse.data.data;
+
+      const [presentationsResult, venueResult, commentsResult] = await Promise.allSettled([
         PresentationService.getInstance().getPresentations(props.seasonId, promoCode.value),
-        CommentService.getInstance().getComments(props.seasonId, {
+        VenueService.getInstance().getVenueBySeason(props.seasonId),
+        CommentService.getInstance().getComments(show.value.id, {
           page: 1,
           limit: 5,
           sort: 'desc',
         }),
       ]);
 
-      show.value = showResponse.data.data;
-      presentationList.value = presentationsResponse.data.data;
-      comments.value = commentsResponse.data.data.items;
-      commentsPagination.value = commentsResponse.data.data.pagination;
-      applyPromoCodeSelection();
+      if (presentationsResult.status === 'fulfilled') {
+        presentationList.value = presentationsResult.value.data.data;
+        applyPromoCodeSelection();
+      }
+
+      if (venueResult.status === 'fulfilled') {
+        venue.value = venueResult.value.data.data;
+      }
+
+      if (commentsResult.status === 'fulfilled') {
+        comments.value = commentsResult.value.data.data.items;
+        commentsSummary.value = commentsResult.value.data.data.comments_summary;
+        commentsPagination.value = commentsResult.value.data.data.pagination;
+      }
     } catch (error) {
       errorMessage.value = 'No se pudo cargar la ficha de la obra.';
     } finally {
@@ -403,6 +430,7 @@
       :show="show"
       :image-url="imageUrl"
       :show-comments="hasShowPremiered"
+      :comments-summary="commentsSummary"
       :is-event-finished="isEventFinished"
       @buy="scrollToTickets"
     >
@@ -415,6 +443,7 @@
       <div>
         <ShowInfo
           :show="show"
+          :venue="venue"
           :presentations="presentations"
           :primary-presentation="selectedPresentation || presentations[0]"
           :selected-presentation="selectedPresentation"
@@ -424,6 +453,7 @@
               v-if="hasShowPremiered"
               :show="show"
               :initial-comments="comments"
+              :initial-comments-summary="commentsSummary"
               :initial-pagination="commentsPagination"
             />
           </template>

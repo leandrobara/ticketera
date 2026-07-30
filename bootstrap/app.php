@@ -48,7 +48,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (ThrottleRequestsException $exception, Request $request) {
-            $message = $request->is('api/site/shows/*/comment-requests')
+            $message = $request->is('api/site/shows/*/send-email-to-comment')
                 ? 'too_many_comment_requests'
                 : 'too_many_login_attempts';
 

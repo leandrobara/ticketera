@@ -5,7 +5,7 @@
 <template>
   <StaticPageLayout title="Medios de pago">
     <p>
-      Por ahora, las compras online en Ticketera se procesan a través de
+      Por ahora, las compras online en <strong>Entrada Tix</strong> se procesan a través de
       Mercado Pago.
     </p>
 

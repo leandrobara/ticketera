@@ -2,6 +2,13 @@
 
 namespace App\Providers;
 
+use App\Helpers\RedisHelper;
+use App\Repositories\Site\ShowRepository;
+use App\Repositories\Site\ShowRepositoryCache;
+use App\Repositories\Site\SiteShowRepositoryInterface;
+use App\Repositories\Site\SiteVenueRepositoryInterface;
+use App\Repositories\Site\VenueRepository;
+use App\Repositories\Site\VenueRepositoryCache;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -14,7 +21,31 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(SiteShowRepositoryInterface::class, function ($app): SiteShowRepositoryInterface {
+            $repository = $app->make(ShowRepository::class);
+
+            if (! config('app.enable_redis_cache')) {
+                return $repository;
+            }
+
+            return new ShowRepositoryCache(
+                $repository,
+                $app->make(RedisHelper::class),
+            );
+        });
+
+        $this->app->singleton(SiteVenueRepositoryInterface::class, function ($app): SiteVenueRepositoryInterface {
+            $repository = $app->make(VenueRepository::class);
+
+            if (! config('app.enable_redis_cache')) {
+                return $repository;
+            }
+
+            return new VenueRepositoryCache(
+                $repository,
+                $app->make(RedisHelper::class),
+            );
+        });
     }
 
     /**

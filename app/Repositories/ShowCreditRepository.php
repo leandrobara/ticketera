@@ -7,6 +7,15 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ShowCreditRepository
 {
+    public function getShowIdsByPersonId(int $personId): array
+    {
+        return ShowCredit::query()
+            ->where('person_id', $personId)
+            ->distinct()
+            ->pluck('show_id')
+            ->all();
+    }
+
     public function listPaginated(array $filters, int $limit = 20): LengthAwarePaginator
     {
         return ShowCredit::query()

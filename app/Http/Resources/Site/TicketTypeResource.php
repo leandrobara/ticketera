@@ -10,11 +10,11 @@ class TicketTypeResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->resource['id'],
-            'name' => $this->resource['name'],
-            'price' => $this->resource['price'],
-            'has_stock' => $this->resource['has_stock'],
-            'max_purchase_quantity' => $this->resource['max_purchase_quantity'],
+            'id' => $this->resource['ticket_type']->id,
+            'name' => $this->resource['ticket_type']->name,
+            'price' => $this->resource['ticket_type']->price,
+            'has_stock' => $this->resource['available_tickets_for_purchase_count'] > 0,
+            'max_purchase_quantity' => $this->resource['available_tickets_for_purchase_count'],
             'promotion' => $this->resource['promotion'],
         ];
     }

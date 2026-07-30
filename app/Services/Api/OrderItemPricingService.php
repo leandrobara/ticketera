@@ -11,15 +11,10 @@ class OrderItemPricingService
 {
     private const SCALE = 6;
 
-    public function resolvePromotion(
+    public function findApplicablePromotion(
         PresentationTicketType $ticketType,
-        bool $applyPromotion = true,
         ?string $promoCode = null,
     ): ?PresentationTicketType {
-        if (!$applyPromotion) {
-            return null;
-        }
-
         if (!$ticketType->promotion_is_active || blank($ticketType->promotion_type)) {
             return null;
         }
@@ -41,11 +36,12 @@ class OrderItemPricingService
             $data['presentation_ticket_type_id']
         );
 
-        $promotion = $this->resolvePromotion(
-            $ticketType,
-            $data['payment_method'] !== 'FREE',
-            $data['promo_code'] ?? null
-        );
+        $promotion = $data['payment_method'] === 'FREE'
+            ? null
+            : $this->findApplicablePromotion(
+                $ticketType,
+                $data['promo_code'] ?? null,
+            );
 
         $unitPriceOverride = $data['payment_method'] === 'FREE'
             ? '0.000000'
@@ -156,7 +152,7 @@ class OrderItemPricingService
         };
     }
 
-    public function calculatePromotionDisplay(PresentationTicketType $ticketType): array
+    public function calculatePromotionPricingForDisplay(PresentationTicketType $ticketType): array
     {
         $isBundlePromotion = $ticketType->promotion_type === 'buy_x_get_y';
         $displayQuantity = $isBundlePromotion

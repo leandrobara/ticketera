@@ -10,11 +10,11 @@ class PresentationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->resource['id'],
-            'notes' => $this->resource['notes'],
-            'starts_at' => $this->resource['starts_at'],
+            'id' => $this->resource['presentation']->id,
             'is_finished' => $this->resource['is_finished'],
-            'tickets' => new TicketTypeResourceCollection($this->resource['tickets']),
+            'notes' => $this->resource['presentation']->notes,
+            'starts_at' => $this->resource['presentation']->starts_at,
+            'tickets' => new TicketTypeResourceCollection($this->resource['ticket_types']),
         ];
     }
 }

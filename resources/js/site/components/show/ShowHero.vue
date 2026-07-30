@@ -17,6 +17,13 @@
       type: Boolean,
       default: false,
     },
+    commentsSummary: {
+      type: Object,
+      default: () => ({
+        count: 0,
+        average_rating: null,
+      }),
+    },
     isEventFinished: {
       type: Boolean,
       default: false,
@@ -38,12 +45,12 @@
 
     return 'Teatro';
   });
-  const commentCount = computed(() => Number(props.show.comments_summary?.count ?? 0));
+  const commentCount = computed(() => Number(props.commentsSummary?.count ?? 0));
   const hasRatingSummary = computed(() => {
     return props.showComments && commentCount.value >= 10;
   });
   const averageRating = computed(() => {
-    const average = props.show.comments_summary?.average_rating;
+    const average = props.commentsSummary?.average_rating;
 
     if (average === null || average === undefined) {
       return '0,0';

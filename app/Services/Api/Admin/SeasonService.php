@@ -2,6 +2,7 @@
 
 namespace App\Services\Api\Admin;
 
+use App\Helpers\RedisHelper;
 use App\Models\Season;
 use App\Repositories\SeasonRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -13,6 +14,7 @@ class SeasonService
 {
     public function __construct(
         private readonly SeasonRepository $seasonRepository,
+        private readonly RedisHelper $redisHelper,
     ) {
         //
     }
@@ -45,21 +47,25 @@ class SeasonService
 
     public function update(Season $season, array $data): Season
     {
-        return DB::transaction(function () use ($season, $data) {
+        $updatedSeason = DB::transaction(function () use ($season, $data) {
             $season = Season::query()->lockForUpdate()->findOrFail($season->id);
             $newStatus = $data['status'] ?? $season->status;
 
-            if ($newStatus === 'published' && !$season->published_at) {
+            if ($newStatus === 'published' && ! $season->published_at) {
                 $data['published_at'] = now();
             }
 
-            if (in_array($newStatus, ['finished', 'cancelled'], true) && !$season->closed_at) {
+            if (in_array($newStatus, ['finished', 'cancelled'], true) && ! $season->closed_at) {
                 $data['closed_at'] = now();
                 $data['closed_season_id'] = $season->id;
             }
 
             return $this->seasonRepository->update($season, $data);
         });
+
+        $this->redisHelper->deleteByPartialKey('site:season:'.$updatedSeason->id.':getVenue');
+
+        return $updatedSeason;
     }
 
     public function delete(Season $season): void
@@ -67,7 +73,7 @@ class SeasonService
         DB::transaction(function () use ($season) {
             $season = Season::query()->lockForUpdate()->findOrFail($season->id);
 
-            if (!$season->closed_at) {
+            if (! $season->closed_at) {
                 $season->update([
                     'status' => 'cancelled',
                     'closed_at' => now(),
@@ -77,11 +83,13 @@ class SeasonService
 
             $this->seasonRepository->delete($season);
         });
+
+        $this->redisHelper->deleteByPartialKey('site:season:'.$season->id.':getVenue');
     }
 
     private function throwFriendlyUniqueException(QueryException $exception): void
     {
-        if (!in_array((string) $exception->getCode(), ['23000', '23505'], true)) {
+        if (! in_array((string) $exception->getCode(), ['23000', '23505'], true)) {
             return;
         }
 

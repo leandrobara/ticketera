@@ -4,12 +4,6 @@
 
 <template>
   <StaticPageLayout title="Política de cookies">
-    <p>
-      Esta política describe el uso de cookies y tecnologías similares en
-      Ticketera para mejorar la experiencia de navegación y el funcionamiento de
-      la plataforma.
-    </p>
-
     <h2>Qué son las cookies</h2>
     <p>
       Las cookies son pequeños archivos que se guardan en el dispositivo de la

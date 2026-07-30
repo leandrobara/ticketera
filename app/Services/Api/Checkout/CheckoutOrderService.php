@@ -43,7 +43,10 @@ class CheckoutOrderService
             $this->validateAvailability($ticketType, $presentation->capacity, $data['quantity']);
 
             $buyer = $this->buyerService->create($data['buyer']);
-            $promotion = $this->orderItemPricingService->resolvePromotion($ticketType, true, $data['promo_code'] ?? null);
+            $promotion = $this->orderItemPricingService->findApplicablePromotion(
+                $ticketType,
+                $data['promo_code'] ?? null,
+            );
             $pricing = $this->orderItemPricingService->calculateAmountsForTicketType(
                 $ticketType,
                 $data['quantity'],

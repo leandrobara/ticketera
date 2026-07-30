@@ -5,7 +5,7 @@
 <template>
   <StaticPageLayout title="Sobre nosotros">
     <p>
-      Ticketera nace desde adentro del mundo del espectáculo. Somos actores,
+      <strong>Entrada Tix</strong> nace desde adentro del mundo del espectáculo. Somos actores,
       productores y personas que conocen de cerca lo que implica levantar una
       obra, sostener una temporada, llenar una sala y cuidar cada detalle para
       que el encuentro con el público suceda.
@@ -21,7 +21,7 @@
 
     <h2>Una plataforma pensada para producir mejor</h2>
     <p>
-      Creamos Ticketera para que las producciones puedan vender entradas,
+      Creamos <strong>Entrada Tix</strong> para que las producciones puedan vender entradas,
       gestionar funciones y construir una relación directa con su público sin
       depender de procesos dispersos o plataformas que no entienden la escala y
       la dinámica del teatro independiente.

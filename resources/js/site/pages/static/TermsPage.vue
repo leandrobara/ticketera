@@ -4,12 +4,6 @@
 
 <template>
   <StaticPageLayout title="Términos y condiciones">
-    <p>
-      Estos términos y condiciones regulan el uso de Ticketera, una plataforma
-      digital orientada a la publicación, venta y gestión de entradas para
-      proyectos culturales independientes.
-    </p>
-
     <h2>Uso de la plataforma</h2>
     <p>
       Al comprar una entrada o utilizar el sitio, la persona usuaria acepta
@@ -20,7 +14,7 @@
     <h2>Proceso de compra</h2>
     <p>
       La compra queda confirmada cuando el pago es aprobado por el medio de
-      pago correspondiente. Una vez aprobada, Ticketera enviará la confirmación
+      pago correspondiente. Una vez aprobada, <strong>Entrada Tix</strong> enviará la confirmación
       y las entradas al email informado durante el checkout.
     </p>
 
@@ -28,7 +22,7 @@
       Al comprar, es responsabilidad de la persona compradora verificar la obra,
       fecha, horario, cantidad de entradas, tipo de entrada y precio elegido
       antes de confirmar la operación. Los errores en la selección de estos
-      datos no serán imputables a Ticketera.
+      datos no serán imputables a <strong>Entrada Tix</strong>.
     </p>
 
     <h2>Datos del comprador</h2>
@@ -40,7 +34,7 @@
 
     <h2>Cargo por servicio</h2>
     <p>
-      Además del precio de la entrada, Ticketera podrá cobrar un cargo por
+      Además del precio de la entrada, <strong>Entrada Tix</strong> podrá cobrar un cargo por
       servicio por la gestión tecnológica, operativa y administrativa de la
       compra. Este cargo se informa antes de confirmar el pago.
     </p>
@@ -66,7 +60,7 @@
     </p>
 
     <p>
-      El reintegro deberá gestionarse a través de los canales de Ticketera o
+      El reintegro deberá gestionarse a través de los canales de <strong>Entrada Tix</strong> o
       del organizador correspondiente. El cargo por servicio, por regla general,
       no será reintegrado, salvo que corresponda por disposición legal.
     </p>
@@ -118,7 +112,7 @@
 
     <h2>Funciones reprogramadas o canceladas</h2>
     <p>
-      Si una función se reprograma o cancela, la producción o Ticketera
+      Si una función se reprograma o cancela, la producción o <strong>Entrada Tix</strong>
       informará los pasos a seguir a través de los canales disponibles. Las
       opciones podrán depender de las condiciones particulares de cada evento.
     </p>
@@ -133,14 +127,14 @@
 
     <h2>Datos personales</h2>
     <p>
-      Ticketera podrá almacenar los datos necesarios para procesar la compra,
+      <strong>Entrada Tix</strong> podrá almacenar los datos necesarios para procesar la compra,
       emitir entradas, brindar soporte y mejorar la comunicación entre la
       producción y su público.
     </p>
 
     <h2>Modificaciones</h2>
     <p>
-      Ticketera podrá actualizar estos términos y condiciones cuando sea
+      <strong>Entrada Tix</strong> podrá actualizar estos términos y condiciones cuando sea
       necesario. La versión vigente será la publicada en esta página.
     </p>
   </StaticPageLayout>

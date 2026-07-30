@@ -61,11 +61,12 @@ class OrderService
 
             $buyer = $this->buyerService->create($data['buyer']);
 
-            $promotion = $this->orderItemPricingService->resolvePromotion(
-                $ticketType,
-                $data['payment_method'] !== 'FREE',
-                $data['promo_code'] ?? null
-            );
+            $promotion = $data['payment_method'] === 'FREE'
+                ? null
+                : $this->orderItemPricingService->findApplicablePromotion(
+                    $ticketType,
+                    $data['promo_code'] ?? null,
+                );
             $pricing = $this->orderItemPricingService->calculateAmountsForTicketType(
                 $ticketType,
                 $data['quantity'],

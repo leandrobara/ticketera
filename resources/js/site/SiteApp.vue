@@ -33,6 +33,7 @@
   const isPaymentMethodsPage = computed(() => page === 'payment-methods');
   const isPrivacyPage = computed(() => page === 'privacy');
   const isPublishYourShowPage = computed(() => page === 'publish-your-show');
+  const isShowPage = computed(() => page === 'show');
   const isTermsPage = computed(() => page === 'terms');
 </script>
 
@@ -52,5 +53,10 @@
   <FrequentlyAskedQuestionsPage v-else-if="isFrequentlyAskedQuestionsPage" />
   <ManageMyTicketsPage v-else-if="isManageMyTicketsPage" />
   <PublishYourShowPage v-else-if="isPublishYourShowPage" />
-  <ShowPage v-else :season-id="seasonId" />
+  <ShowPage
+    v-else-if="isShowPage"
+    :show-id="showId"
+    :season-id="seasonId"
+  />
+  <HomePage v-else />
 </template>

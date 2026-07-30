@@ -17,6 +17,10 @@ return [
 
     'default' => env('CACHE_STORE', 'database'),
 
+    'show_ttl' => (int) env('CACHE_SHOW_TTL', 3600),
+
+    'venue_ttl' => (int) env('CACHE_VENUE_TTL', 86400),
+
     /*
     |--------------------------------------------------------------------------
     | Cache Stores

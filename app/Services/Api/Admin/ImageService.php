@@ -3,6 +3,7 @@
 namespace App\Services\Api\Admin;
 
 use App\Helpers\ImageHelper;
+use App\Helpers\RedisHelper;
 use App\Models\ShowImage;
 use App\Repositories\ShowImageRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -12,6 +13,7 @@ class ImageService
     public function __construct(
         private readonly ImageHelper $imageHelper,
         private readonly ShowImageRepository $showImageRepository,
+        private readonly RedisHelper $redisHelper,
     ) {
         //
     }
@@ -43,7 +45,10 @@ class ImageService
             $this->showImageRepository->unsetMainForShow($data['show_id']);
         }
 
-        return $this->showImageRepository->store($data);
+        $showImage = $this->showImageRepository->store($data);
+        $this->redisHelper->deleteByPartialKey('site:show:'.$showImage->show_id.':getPublicShow');
+
+        return $showImage;
     }
 
     public function update(ShowImage $showImage, array $data): ShowImage
@@ -62,12 +67,18 @@ class ImageService
             $this->showImageRepository->unsetMainForShow($showId, $showImage->id);
         }
 
-        return $this->showImageRepository->update($showImage, $data);
+        $previousShowId = $showImage->show_id;
+        $showImage = $this->showImageRepository->update($showImage, $data);
+        $this->redisHelper->deleteByPartialKey('site:show:'.$previousShowId.':getPublicShow');
+        $this->redisHelper->deleteByPartialKey('site:show:'.$showImage->show_id.':getPublicShow');
+
+        return $showImage;
     }
 
     public function delete(ShowImage $showImage): void
     {
         $this->showImageRepository->delete($showImage);
+        $this->redisHelper->deleteByPartialKey('site:show:'.$showImage->show_id.':getPublicShow');
     }
 
     private function getShowImageDirectory(int $showId): string

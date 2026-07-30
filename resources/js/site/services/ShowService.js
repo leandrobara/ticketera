@@ -12,8 +12,8 @@ export default class ShowService {
     return instance;
   }
 
-  getShow(seasonId) {
-    return ApiService.getInstance().get(`/api/site/seasons/${seasonId}`);
+  getShow({showId}) {
+    return ApiService.getInstance().get(`/api/site/show/${showId}`);
   }
 
 }

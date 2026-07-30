@@ -26,32 +26,32 @@ use App\Http\Controllers\Api\Notifications\MercadoPagoNotificationController;
 use App\Http\Controllers\Api\Checkout\OrderController as CheckoutOrderController;
 
 // SITE API ROUTES
+// use App\Http\Controllers\Api\Site\SeasonController as SiteSeasonController;
 use App\Http\Controllers\Api\Site\NewsletterSubscriptionController;
 use App\Http\Controllers\Api\Site\ShowController as SiteShowController;
 use App\Http\Controllers\Api\Site\CommentController as SiteCommentController;
 use App\Http\Controllers\Api\Site\PresentationController as SitePresentationController;
+use App\Http\Controllers\Api\Site\VenueController as SiteVenueController;
 
 
 Route::post('/checkout/create-order', [CheckoutOrderController::class, 'create']);
 Route::post('/checkout/price-preview', [OrderItemPricingController::class, 'calculateAmounts']);
 Route::post('/notifications/mercado-pago', [MercadoPagoNotificationController::class, 'handleNotification']);
 
-Route::post(
-    '/site/shows/{show}/comment-requests',
-    [SiteCommentController::class, 'requestToken']
-)->middleware('throttle:comment-request');
-Route::get('/site/comment-tokens/{token}', [SiteCommentController::class, 'validateToken']);
-Route::post('/site/comment-tokens/{token}/comments', [SiteCommentController::class, 'create']);
-Route::post('/site/newsletter-subscriptions', [NewsletterSubscriptionController::class, 'create']);
+Route::group(['prefix' => 'site'], function () {
+    Route::get('/show/{show}', [SiteShowController::class, 'getShowProfileData']);
+    Route::get('/season/{season}/presentations', [SitePresentationController::class, 'listBySeason']);
+    Route::get('/season/{season}/venue', [SiteVenueController::class, 'getBySeason']);
+    
+    Route::get('/comment-tokens/{token}', [SiteCommentController::class, 'validateToken']);
+    Route::get('/shows/{show}/comments', [SiteCommentController::class, 'listByShow']);
+    Route::post('/comment-tokens/{token}/comments', [SiteCommentController::class, 'create']);
+    Route::middleware('throttle:comment-request')->group(function () {
+        Route::post('/shows/{show}/send-email-to-comment', [SiteCommentController::class, 'sendUserEmailToComment']);
+    });
 
-// Season *pasar el controlador a Season en lugar de Show
-Route::get('/site/seasons/{season}', [SiteShowController::class, 'show']);
-
-// Presentation - ticket types
-Route::get('/shows/{season}/presentations', [SitePresentationController::class, 'list']);
-
-// Comments
-Route::get('/shows/{season}/comments', [SiteCommentController::class, 'list']);
+    Route::post('/newsletter-subscriptions', [NewsletterSubscriptionController::class, 'create']);
+});
 
 // ADMIN API ROUTES
 Route::group(['prefix' => 'admin'], function () {

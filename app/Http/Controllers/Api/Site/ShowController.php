@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Api\Site;
 
-use App\Http\Controllers\Api\BaseAPIController;
-use App\Models\Season;
+use App\Models\Show;
 use App\Services\Api\Site\ShowService;
+use App\Http\Resources\Site\ShowResource;
+use App\Http\Controllers\Api\BaseAPIController;
+
 
 class ShowController extends BaseAPIController
 {
-    public function show(Season $season): array
+    public function getShowProfileData(Show $show): array
     {
-        return $this->getSuccessResponse(
-            resolve(ShowService::class)->getPublicShow($season)
-        );
+        $showRs = new ShowResource(resolve(ShowService::class)->getShowProfileData($show));
+        return $this->getSuccessResponse($showRs);
     }
 }

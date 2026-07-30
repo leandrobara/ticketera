@@ -8,10 +8,12 @@ class PresentationResourceCollection extends ResourceCollection
 {
     public function toArray($request): array
     {
-        return $this->collection
-            ->map(fn ($presentation) => (new PresentationResource($presentation))->toArray($request))
-            ->values()
-            ->all()
-        ;
+        $presentations = [];
+
+        foreach ($this->collection as $presentationSalesData) {
+            $presentations[] = (new PresentationResource($presentationSalesData))->toArray($request);
+        }
+
+        return $presentations;
     }
 }

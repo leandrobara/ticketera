@@ -32,7 +32,7 @@
 
     <h2>Email</h2>
     <p>
-      <a href="mailto:hola@ticketera.test">hola@ticketera.test</a>
+      <a href="mailto:hola.entradatix@gmail.com">hola.entradatix@gmail.com</a>
     </p>
   </StaticPageLayout>
 </template>

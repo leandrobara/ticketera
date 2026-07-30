@@ -2,21 +2,20 @@
 
 namespace App\Services\Api\Admin;
 
+use App\Helpers\RedisHelper;
 use App\Models\Show;
-use Illuminate\Support\Str;
 use App\Repositories\ShowRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-
+use Illuminate\Support\Str;
 
 class ShowService
 {
-
     public function __construct(
         private readonly ShowRepository $showRepository,
+        private readonly RedisHelper $redisHelper,
     ) {
         //
     }
-
 
     public function list(array $filters): LengthAwarePaginator
     {
@@ -26,12 +25,10 @@ class ShowService
         );
     }
 
-
     public function getOne(Show $show): Show
     {
         return $show;
     }
-
 
     public function create(array $data): Show
     {
@@ -42,15 +39,17 @@ class ShowService
         return $this->showRepository->store($data);
     }
 
-
     public function update(Show $show, array $data): Show
     {
-        return $this->showRepository->update($show, $data);
-    }
+        $show = $this->showRepository->update($show, $data);
+        $this->redisHelper->deleteByPartialKey('site:show:'.$show->id.':getPublicShow');
 
+        return $show;
+    }
 
     public function delete(Show $show): void
     {
         $this->showRepository->delete($show);
+        $this->redisHelper->deleteByPartialKey('site:show:'.$show->id.':getPublicShow');
     }
 }

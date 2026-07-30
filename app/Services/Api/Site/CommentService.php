@@ -2,34 +2,42 @@
 
 namespace App\Services\Api\Site;
 
-use App\Jobs\SendCommentInvitationEmailJob;
-use App\Models\Comment;
-use App\Models\CommentToken;
 use App\Models\Show;
-use App\Models\Season;
-use App\Repositories\BuyerRepository;
-use App\Repositories\CommentRepository;
-use App\Repositories\CommentTokenRepository;
-use App\Repositories\OrderRepository;
-use App\Repositories\Site\CommentRepository as SiteCommentRepository;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
+use App\Models\Comment;
 use Illuminate\Support\Str;
+use App\Models\CommentToken;
+use Illuminate\Support\Facades\DB;
+use App\Repositories\BuyerRepository;
+use App\Repositories\OrderRepository;
+use App\Repositories\CommentRepository;
+use App\Jobs\SendCommentInvitationEmailJob;
+use App\Repositories\CommentTokenRepository;
 use Illuminate\Validation\ValidationException;
+use App\Repositories\Site\CommentRepository as SiteCommentRepository;
+
 
 class CommentService
 {
     public function __construct(
-        private readonly CommentRepository $commentRepository,
-        private readonly CommentTokenRepository $commentTokenRepository,
         private readonly OrderRepository $orderRepository,
         private readonly BuyerRepository $buyerRepository,
+        private readonly CommentRepository $commentRepository,
         private readonly SiteCommentRepository $siteCommentRepository,
+        private readonly CommentTokenRepository $commentTokenRepository,
     ) {
         //
     }
 
-    public function requestToken(Show $show, array $data): array
+    public function listByShow(Show $show, array $options = []): array
+    {
+        return [
+            'comments' => $this->siteCommentRepository->listByShow($show, $options),
+            'comments_summary' => $this->siteCommentRepository
+                ->getCommentsCountAndAverageRatingByShow($show),
+        ];
+    }
+
+    public function sendUserEmailToComment(Show $show, array $data): array
     {
         $genericResponse = [
             'message' => 'Si el email coincide con el email con que realizaste la compra, te enviaremos un enlace para que puedas comentar.',
@@ -99,7 +107,7 @@ class CommentService
             throw ValidationException::withMessages(['token' => ['invalid_comment_token']]);
         }
 
-        return DB::transaction(function () use ($rawToken, $data, $tokenSnapshot) {
+        $comment = DB::transaction(function () use ($rawToken, $data, $tokenSnapshot) {
             $buyer = $this->buyerRepository->findByIdForUpdate($tokenSnapshot->buyer_id);
             $commentToken = $this->commentTokenRepository->findByHash(
                 hash('sha256', $rawToken),
@@ -134,18 +142,8 @@ class CommentService
 
             return $comment;
         });
-    }
 
-    public function listPublic(Season $season, array $filters): LengthAwarePaginator
-    {
-        $season->loadMissing('show');
-
-        return $this->siteCommentRepository->listPublic(
-            $season->show->id,
-            (int) $filters['page'],
-            (int) $filters['limit'],
-            $filters['sort'],
-        );
+        return $comment;
     }
 
     private function assertTokenIsAvailable(?CommentToken $commentToken): void

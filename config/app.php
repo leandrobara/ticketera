@@ -41,6 +41,8 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
 
+    'enable_redis_cache' => (bool) env('ENABLE_REDIS_CACHE', true),
+
     /*
     |--------------------------------------------------------------------------
     | Application URL

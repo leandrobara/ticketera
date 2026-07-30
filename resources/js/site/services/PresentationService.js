@@ -17,7 +17,7 @@ export default class PresentationService {
       ? { params: { promo_code: promoCode } }
       : {};
 
-    return ApiService.getInstance().get(`/api/shows/${seasonId}/presentations`, config);
+    return ApiService.getInstance().get(`/api/site/season/${seasonId}/presentations`, config);
   }
 
 }

@@ -3,6 +3,7 @@
 namespace App\Services\Api\Admin;
 
 use App\Helpers\ImageHelper;
+use App\Helpers\RedisHelper;
 use App\Models\ShowCredit;
 use App\Repositories\ShowCreditRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -13,6 +14,7 @@ class ShowCreditService
     public function __construct(
         private readonly ImageHelper $imageHelper,
         private readonly ShowCreditRepository $showCreditRepository,
+        private readonly RedisHelper $redisHelper,
     ) {
         //
     }
@@ -33,7 +35,10 @@ class ShowCreditService
         $data['sort_order'] = $data['sort_order'] ?? 1;
         $this->validateDuplicateCredit($data);
 
-        return $this->showCreditRepository->store($data);
+        $showCredit = $this->showCreditRepository->store($data);
+        $this->redisHelper->deleteByPartialKey('site:show:'.$showCredit->show_id.':getPublicShow');
+
+        return $showCredit;
     }
 
     public function update(ShowCredit $showCredit, array $data): ShowCredit
@@ -55,17 +60,23 @@ class ShowCreditService
 
         $this->validateDuplicateCredit($mergedData, $showCredit->id);
 
-        return $this->showCreditRepository->update($showCredit, $data);
+        $previousShowId = $showCredit->show_id;
+        $showCredit = $this->showCreditRepository->update($showCredit, $data);
+        $this->redisHelper->deleteByPartialKey('site:show:'.$previousShowId.':getPublicShow');
+        $this->redisHelper->deleteByPartialKey('site:show:'.$showCredit->show_id.':getPublicShow');
+
+        return $showCredit;
     }
 
     public function delete(ShowCredit $showCredit): void
     {
         $this->showCreditRepository->delete($showCredit);
+        $this->redisHelper->deleteByPartialKey('site:show:'.$showCredit->show_id.':getPublicShow');
     }
 
     private function validateDuplicateCredit(array $data, ?int $ignoreShowCreditId = null): void
     {
-        if (!$this->showCreditRepository->findDuplicate($data, $ignoreShowCreditId)) {
+        if (! $this->showCreditRepository->findDuplicate($data, $ignoreShowCreditId)) {
             return;
         }
 
@@ -78,14 +89,14 @@ class ShowCreditService
 
     private function storePhotoIfPresent(array $data, int $showId): array
     {
-        if (!array_key_exists('photo', $data)) {
+        if (! array_key_exists('photo', $data)) {
             return $data;
         }
 
         $photo = $data['photo'];
         unset($data['photo']);
 
-        if (!$photo) {
+        if (! $photo) {
             return $data;
         }
 

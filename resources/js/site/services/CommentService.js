@@ -12,13 +12,13 @@ export default class CommentService {
     return instance;
   }
 
-  async getComments(seasonId, params = {}) {
-    return ApiService.getInstance().get(`/api/shows/${seasonId}/comments`, { params });
+  async getComments(showId, params = {}) {
+    return ApiService.getInstance().get(`/api/site/shows/${showId}/comments`, { params });
   }
 
   async requestCommentLink(showId, email) {
     return ApiService.getInstance().post(
-      `/api/site/shows/${showId}/comment-requests`,
+      `/api/site/shows/${showId}/send-email-to-comment`,
       { email }
     );
   }

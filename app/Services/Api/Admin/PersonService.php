@@ -2,8 +2,10 @@
 
 namespace App\Services\Api\Admin;
 
+use App\Helpers\RedisHelper;
 use App\Models\Person;
 use App\Repositories\PersonRepository;
+use App\Repositories\ShowCreditRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
@@ -13,6 +15,8 @@ class PersonService
 {
     public function __construct(
         private readonly PersonRepository $personRepository,
+        private readonly ShowCreditRepository $showCreditRepository,
+        private readonly RedisHelper $redisHelper,
     ) {
         //
     }
@@ -31,8 +35,8 @@ class PersonService
     {
         $filters = $this->candidateFilters($data);
 
-        if (!$filters) {
-            return new Collection();
+        if (! $filters) {
+            return new Collection;
         }
 
         return $this->personRepository->findCandidates($filters);
@@ -59,12 +63,23 @@ class PersonService
         $this->validateStrongIdentifiers($data, $person->id);
         $this->validatePossibleNameDuplicate($data, $person->id, $allowDuplicateName);
 
-        return $this->personRepository->update($person, $data);
+        $person = $this->personRepository->update($person, $data);
+
+        foreach ($this->showCreditRepository->getShowIdsByPersonId($person->id) as $showId) {
+            $this->redisHelper->deleteByPartialKey('site:show:'.$showId.':getPublicShow');
+        }
+
+        return $person;
     }
 
     public function delete(Person $person): void
     {
+        $showIds = $this->showCreditRepository->getShowIdsByPersonId($person->id);
         $this->personRepository->delete($person);
+
+        foreach ($showIds as $showId) {
+            $this->redisHelper->deleteByPartialKey('site:show:'.$showId.':getPublicShow');
+        }
     }
 
     private function normalizeData(array $data, ?Person $person = null): array
@@ -150,7 +165,7 @@ class PersonService
 
     private function validatePossibleNameDuplicate(array $data, ?int $ignorePersonId, bool $allowDuplicateName): void
     {
-        if ($allowDuplicateName || !($data['normalized_name'] ?? null)) {
+        if ($allowDuplicateName || ! ($data['normalized_name'] ?? null)) {
             return;
         }
 
@@ -175,6 +190,7 @@ class PersonService
         $name = Str::ascii($name);
         $name = mb_strtolower($name);
         $name = preg_replace('/[^a-z0-9]+/i', ' ', $name);
+
         return trim(preg_replace('/\s+/', ' ', $name));
     }
 }

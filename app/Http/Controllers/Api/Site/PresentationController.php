@@ -8,14 +8,13 @@ use App\Http\Controllers\Api\BaseAPIController;
 use App\Http\Requests\Site\ListPresentationsRequest;
 use App\Http\Resources\Site\PresentationResourceCollection;
 
+
 class PresentationController extends BaseAPIController
 {
-    public function list(Season $season, ListPresentationsRequest $request): array
+    public function listBySeason(Season $season, ListPresentationsRequest $request): array
     {
-        return $this->getSuccessResponse(
-            new PresentationResourceCollection(
-                resolve(PresentationService::class)->list($season, $request->validated())
-            )
-        );
+        $presentations = resolve(PresentationService::class)->listBySeason($season, $request->validated());
+        $presentationRs = new PresentationResourceCollection($presentations);
+        return $this->getSuccessResponse($presentationRs);
     }
 }

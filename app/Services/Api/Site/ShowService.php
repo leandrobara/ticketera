@@ -2,29 +2,26 @@
 
 namespace App\Services\Api\Site;
 
-use App\Models\Season;
-use App\Repositories\Site\CommentRepository;
-use App\Repositories\Site\ShowRepository;
+use App\Models\Show;
+use App\Repositories\Site\SiteShowRepositoryInterface;
 
 class ShowService
 {
     public function __construct(
-        private readonly ShowRepository $showRepository,
-        private readonly CommentRepository $commentRepository,
+        private readonly SiteShowRepositoryInterface $showRepository,
     ) {
         //
     }
 
-    public function getPublicShow(Season $season): array
+    public function getShowProfileData(Show $show): array
     {
-        $season = $this->showRepository->getPublicSeason($season);
-        $show = $season->show;
+        return $this->getPublicShow($this->showRepository->getPublicShow($show));
+    }
 
+    private function getPublicShow(Show $show): array
+    {
         return [
             'id' => $show->id,
-            'season_id' => $season->id,
-            'season_name' => $season->name,
-            'season_status' => $season->status,
             'title' => $show->title,
             'subtitle' => $show->subtitle,
             'slug' => $show->slug,
@@ -50,17 +47,7 @@ class ShowService
             'service_fee_percentage' => $show->service_fee_percentage,
             'service_fee_minimum_unit_amount' => $show->service_fee_minimum_unit_amount,
             'main_image_url' => $this->imageUrl($show->mainImage),
-            'venue' => $season->venue ? [
-                'id' => $season->venue->id,
-                'name' => $season->venue->name,
-                'address' => $season->venue->address,
-                'neighborhood' => $season->venue->neighborhood,
-                'city' => $season->venue->city,
-                'google_maps_url' => $season->venue->google_maps_url,
-                'has_bar' => $season->venue->has_bar,
-                'has_parking' => $season->venue->has_parking,
-                'is_accessible' => $season->venue->is_accessible,
-            ] : null,
+            'venue' => null,
             'credits' => $show->credits
                 ->sortBy([
                     ['section', 'asc'],
@@ -94,7 +81,6 @@ class ShowService
                     'sort_order' => $link->sort_order,
                 ])
                 ->values(),
-            'comments_summary' => $this->commentRepository->getPublicSummary($show->id),
         ];
     }
 
@@ -114,7 +100,7 @@ class ShowService
 
     private function imageUrl($image): ?string
     {
-        if (!$image || !$image->path) {
+        if (! $image || ! $image->path) {
             return null;
         }
 
@@ -123,7 +109,7 @@ class ShowService
 
     private function pathUrl(?string $path): ?string
     {
-        if (!$path) {
+        if (! $path) {
             return null;
         }
 

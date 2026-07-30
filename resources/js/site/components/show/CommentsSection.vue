@@ -15,6 +15,13 @@
       type: Array,
       default: () => [],
     },
+    initialCommentsSummary: {
+      type: Object,
+      default: () => ({
+        count: 0,
+        average_rating: null,
+      }),
+    },
     initialPagination: {
       type: Object,
       default: () => ({
@@ -31,17 +38,18 @@
   const commentsPerPage = 5;
   const isRequestModalOpen = ref(false);
   const comments = ref([...props.initialComments]);
+  const commentsSummary = ref({ ...props.initialCommentsSummary });
   const pagination = ref({ ...props.initialPagination });
   const isLoadingComments = ref(false);
   const commentsErrorMessage = ref('');
 
   // computed
   const commentCount = computed(() => {
-    return Number(props.show.comments_summary?.count ?? pagination.value.total);
+    return Number(commentsSummary.value.count ?? pagination.value.total);
   });
   const hasComments = computed(() => commentCount.value > 0);
   const averageRating = computed(() => {
-    const average = props.show.comments_summary?.average_rating;
+    const average = commentsSummary.value.average_rating;
 
     if (average !== null && average !== undefined) {
       return Number(average).toFixed(1).replace('.', ',');
@@ -69,7 +77,7 @@
     commentsErrorMessage.value = '';
 
     try {
-      const response = await CommentService.getInstance().getComments(props.show.season_id, {
+      const response = await CommentService.getInstance().getComments(props.show.id, {
         page,
         limit: commentsPerPage,
         sort: 'desc',
@@ -79,6 +87,7 @@
       comments.value = page === 1
         ? payload.items
         : [...comments.value, ...payload.items];
+      commentsSummary.value = payload.comments_summary;
       pagination.value = payload.pagination;
     } catch (error) {
       commentsErrorMessage.value = 'No se pudieron cargar los comentarios.';
@@ -98,6 +107,10 @@
   // lifecycle
   watch(() => props.initialComments, (initialComments) => {
     comments.value = [...initialComments];
+  });
+
+  watch(() => props.initialCommentsSummary, (initialCommentsSummary) => {
+    commentsSummary.value = { ...initialCommentsSummary };
   });
 
   watch(() => props.initialPagination, (initialPagination) => {

@@ -272,6 +272,7 @@
             <button class="checkout-continue" type="submit" :disabled="isSubmitting">
               {{ isSubmitting ? 'Iniciando pago...' : 'Guardar y continuar el pago' }}
             </button>
+            <p>Serás redirigido a MercadoPago para completar el pago de forma segura.</p>
           </footer>
         </form>
 

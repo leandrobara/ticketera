@@ -7,6 +7,39 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class SeasonRepository
 {
+    public function getIdsByShowId(int $showId): array
+    {
+        return Season::query()
+            ->where('show_id', $showId)
+            ->pluck('id')
+            ->all();
+    }
+
+    public function getIdsByVenueId(int $venueId): array
+    {
+        return Season::query()
+            ->where('venue_id', $venueId)
+            ->pluck('id')
+            ->all();
+    }
+
+    public function getShowIdById(int $seasonId): ?int
+    {
+        return Season::query()
+            ->whereKey($seasonId)
+            ->value('show_id');
+    }
+
+    public function getShowIdsByVenueId(int $venueId): array
+    {
+        return Season::query()
+            ->where('venue_id', $venueId)
+            ->pluck('show_id')
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     public function listPaginated(array $filters, int $limit = 20): LengthAwarePaginator
     {
         return Season::query()
