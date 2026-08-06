@@ -1,5 +1,5 @@
 # ---- Etapa 1: build de assets con Vite ----
-FROM node:20-alpine AS assets
+FROM node:20 AS assets
 
 WORKDIR /app
 COPY package*.json ./
