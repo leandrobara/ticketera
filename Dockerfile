@@ -1,3 +1,13 @@
+# ---- Etapa 1: build de assets con Vite ----
+FROM node:20-alpine AS assets
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# ---- Etapa 2: imagen final de PHP ----
 FROM php:8.2-apache
 
 ARG APP_ENV=production
@@ -27,25 +37,22 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copiar el código de la app
 COPY . .
 
-# Instalar dependencias de PHP según el ambiente
+COPY --from=assets /app/public/build ./public/build
+
 RUN if [ "$APP_ENV" = "production" ]; then \
         composer install --optimize-autoloader --no-dev --no-interaction; \
     else \
         composer install --no-interaction; \
     fi
 
-# Apuntar Apache a la carpeta public de Laravel
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' \
     /etc/apache2/sites-available/000-default.conf
 
-# Permitir que Laravel use .htaccess (necesario para las rutas)
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' \
     /etc/apache2/apache2.conf
 
-# Permisos correctos para que Laravel pueda escribir logs, cache, sesiones
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
