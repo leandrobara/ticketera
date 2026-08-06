@@ -4,7 +4,7 @@ set -e
 echo "Esperando a que MySQL esté disponible..."
 max_retries=30
 count=0
-until php artisan db:show > /dev/null 2>&1; do
+until php artisan migrate:status > /dev/null 2>&1; do
   count=$((count+1))
   if [ $count -ge $max_retries ]; then
     echo "ERROR: No se pudo conectar a la base de datos después de $max_retries intentos."
