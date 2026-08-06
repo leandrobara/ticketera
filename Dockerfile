@@ -2,8 +2,8 @@
 FROM node:20 AS assets
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+COPY package.json ./
+RUN rm -f package-lock.json && npm install
 COPY . .
 RUN npm run build
 
