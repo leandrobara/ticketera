@@ -53,6 +53,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (env('APP_ENV') === 'production') {
+            \URL::forceScheme('https');
+        }
+
         RateLimiter::for('admin-login', function (Request $request) {
             $email = strtolower((string) $request->input('email'));
 
