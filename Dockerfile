@@ -57,7 +57,6 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY entrypoint-worker.sh /usr/local/bin/entrypoint-worker.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 80

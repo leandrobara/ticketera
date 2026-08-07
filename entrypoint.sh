@@ -13,6 +13,11 @@ until php artisan migrate:status > /dev/null 2>&1; do
   sleep 2
 done
 
+if [ "$CONTAINER_ROLE" = "worker" ]; then
+  echo "Iniciando worker de colas..."
+  exec php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+fi
+
 echo "Corriendo migraciones..."
 php artisan migrate --force
 
