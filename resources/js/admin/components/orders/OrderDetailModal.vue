@@ -12,6 +12,35 @@
   const orderCode = computed(() => order.value?.code ?? '-');
   const orderItems = computed(() => order.value?.items ?? []);
   const payments = computed(() => order.value?.payments ?? []);
+  const attributionRows = computed(() => {
+    const attributionFields = [
+      ['Fuente', 'utm_source'],
+      ['Medio', 'utm_medium'],
+      ['Campaña', 'utm_campaign'],
+      ['Contenido', 'utm_content'],
+      ['Término', 'utm_term'],
+      ['Facebook Click ID', 'fbclid'],
+      ['Facebook Click Cookie', 'fbc'],
+      ['Facebook Browser Cookie', 'fbp'],
+    ];
+    const rows = [];
+
+    for (const [label, field] of attributionFields) {
+      const value = order.value?.[field];
+
+      if (!value) {
+        continue;
+      }
+
+      rows.push({
+        label,
+        value,
+      });
+    }
+
+    return rows;
+  });
+  const hasAttribution = computed(() => attributionRows.value.length > 0);
   const buyerName = computed(() => {
     const buyer = order.value?.buyer;
 
@@ -246,6 +275,21 @@
               </div>
             </div>
           </div>
+
+          <template v-if="hasAttribution">
+            <h3 class="card-title mb-3">Atribución de la compra</h3>
+
+            <div class="payment-list mb-4">
+              <div class="payment-item">
+                <div class="payment-grid">
+                  <div v-for="attributionRow in attributionRows" :key="attributionRow.label">
+                    <div class="payment-label">{{ attributionRow.label }}</div>
+                    <div class="payment-value">{{ attributionRow.value }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
 
           <h3 class="card-title mb-3">Pago</h3>
 
