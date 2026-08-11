@@ -115,6 +115,7 @@ class MercadoPagoService
             ],
             'auto_return' => 'approved',
             'external_reference' => $order->code,
+            'payment_methods' => config('mercadopago.payment_methods'),
             'metadata' => [
                 'order_id' => $order->id,
                 'order_code' => $order->code,

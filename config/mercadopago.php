@@ -5,6 +5,15 @@ return [
     'public_key' => env('MERCADO_PAGO_PUBLIC_KEY'),
     'notification_secret' => env('MERCADO_PAGO_NOTIFICATION_SECRET'),
 
+    'payment_methods' => [
+        'installments' => 1,
+        'excluded_payment_types' => [
+            ['id' => 'ticket'],
+            ['id' => 'bank_transfer'],
+            ['id' => 'atm'],
+        ],
+    ],
+
     'urls' => [
         'success' => env('MERCADO_PAGO_SUCCESS_URL', rtrim(env('APP_URL', 'http://localhost'), '/').'/checkout/success'),
         'failure' => env('MERCADO_PAGO_FAILURE_URL', rtrim(env('APP_URL', 'http://localhost'), '/').'/checkout/failure'),
