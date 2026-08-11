@@ -7,6 +7,10 @@
       type: Object,
       required: true,
     },
+    isLoggingOut: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   defineEmits(['logout']);
@@ -14,7 +18,7 @@
 
 <template>
   <div class="page">
-    <AppHeader :user="user" @logout="$emit('logout')" />
+    <AppHeader :user="user" :is-logging-out="isLoggingOut" @logout="$emit('logout')" />
 
     <main class="page-wrapper">
       <div class="page-body">

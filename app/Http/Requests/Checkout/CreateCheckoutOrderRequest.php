@@ -13,6 +13,15 @@ class CreateCheckoutOrderRequest extends FormRequest
         return [
             'notes' => ['nullable', 'string'],
             'quantity' => ['required', 'integer', 'min:1', 'max:10'],
+            'attribution' => ['nullable', 'array'],
+            'attribution.utm_source' => ['nullable', 'string', 'max:255'],
+            'attribution.utm_medium' => ['nullable', 'string', 'max:255'],
+            'attribution.utm_campaign' => ['nullable', 'string', 'max:255'],
+            'attribution.utm_content' => ['nullable', 'string', 'max:255'],
+            'attribution.utm_term' => ['nullable', 'string', 'max:255'],
+            'attribution.fbclid' => ['nullable', 'string', 'max:1024'],
+            'attribution.fbc' => ['nullable', 'string', 'max:255'],
+            'attribution.fbp' => ['nullable', 'string', 'max:255'],
             'promo_code' => [
                 'max:80',
                 'string',
@@ -38,6 +47,33 @@ class CreateCheckoutOrderRequest extends FormRequest
                 'promo_code' => $promoCode === '' ? null : mb_strtolower($promoCode),
             ]);
         }
+
+        if (!is_array($this->input('attribution'))) {
+            return;
+        }
+
+        $attribution = $this->input('attribution');
+        $attributionFields = [
+            'utm_source',
+            'utm_medium',
+            'utm_campaign',
+            'utm_content',
+            'utm_term',
+            'fbclid',
+            'fbc',
+            'fbp',
+        ];
+
+        foreach ($attributionFields as $attributionField) {
+            if (!array_key_exists($attributionField, $attribution)) {
+                continue;
+            }
+
+            $value = trim((string) $attribution[$attributionField]);
+            $attribution[$attributionField] = $value === '' ? null : $value;
+        }
+
+        $this->merge(['attribution' => $attribution]);
     }
 
 

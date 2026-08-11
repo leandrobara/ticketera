@@ -21,12 +21,8 @@ class MercadoPagoNotificationService
         //
     }
 
-    public function handleNotification(array $_payload, ?string $paymentId, ?string $notificationType): void
+    public function handleNotification(string $paymentId, string $notificationType): void
     {
-        if (blank($paymentId)) {
-            return;
-        }
-
         if ($notificationType === 'payment') {
             $this->processPayment($this->mercadoPagoService->getPayment($paymentId), $paymentId);
             return;

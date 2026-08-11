@@ -26,7 +26,7 @@ class AuthenticateAdminToken
             ->first()
         ;
 
-        if (!$accessToken || $accessToken->user->role !== 'admin') {
+        if (!$accessToken || !$accessToken->user || $accessToken->user->role !== 'admin') {
             return $this->unauthenticatedResponse();
         }
 

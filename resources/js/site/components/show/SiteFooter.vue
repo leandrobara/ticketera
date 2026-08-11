@@ -69,7 +69,7 @@
           <p>Infraestructura digital para proyectos culturales independientes.</p>
 
           <div class="footer-socials" aria-label="Redes sociales">
-            <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" aria-label="Instagram">
+            <a href="https://www.instagram.com/entradatix" target="_blank" rel="noreferrer" class="footer-socials-instagram" aria-label="Instagram">
               <BrandIcon name="instagram" />
             </a>
           </div>

@@ -65,6 +65,14 @@ class CheckoutOrderService
                 'total_amount' => $pricing['total_amount'],
                 'total_quantity' => $data['quantity'],
                 'presentation_id' => $ticketType->presentation_id,
+                'utm_source' => $data['attribution']['utm_source'] ?? null,
+                'utm_medium' => $data['attribution']['utm_medium'] ?? null,
+                'utm_campaign' => $data['attribution']['utm_campaign'] ?? null,
+                'utm_content' => $data['attribution']['utm_content'] ?? null,
+                'utm_term' => $data['attribution']['utm_term'] ?? null,
+                'fbclid' => $data['attribution']['fbclid'] ?? null,
+                'fbc' => $data['attribution']['fbc'] ?? null,
+                'fbp' => $data['attribution']['fbp'] ?? null,
             ]);
 
             $orderItem = OrderItem::create([

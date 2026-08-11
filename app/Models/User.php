@@ -13,6 +13,10 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes;
 
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_OPERATOR = 'operador';
+    public const ROLE_DOOR = 'puerta';
+
     protected $fillable = [
         'role',
         'name',
@@ -30,6 +34,15 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
             'email_verified_at' => 'datetime',
+        ];
+    }
+
+    public static function roles(): array
+    {
+        return [
+            self::ROLE_ADMIN,
+            self::ROLE_OPERATOR,
+            self::ROLE_DOOR,
         ];
     }
 }

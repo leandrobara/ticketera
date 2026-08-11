@@ -1,5 +1,6 @@
 <script setup>
   import { computed, reactive, ref, watch } from 'vue';
+  import { getStoredAttribution } from '@/site/helpers/AttributionHelper';
   import MercadoPagoNotice from '@/site/components/payment/MercadoPagoNotice.vue';
   import { formatDateTime } from '@/site/helpers/DateTimeFormatHelper';
   import CheckoutService from '@/site/services/CheckoutService';
@@ -173,6 +174,12 @@
         payload.promo_code = props.promoCode;
       }
 
+      const attribution = getStoredAttribution();
+
+      if (attribution) {
+        payload.attribution = attribution;
+      }
+
       const response = await CheckoutService.getInstance().createOrder(payload);
 
       const checkoutUrl = getCheckoutUrl(response.data.data.preference);
@@ -272,7 +279,7 @@
             <button class="checkout-continue" type="submit" :disabled="isSubmitting">
               {{ isSubmitting ? 'Iniciando pago...' : 'Guardar y continuar el pago' }}
             </button>
-            <p>Serás redirigido a MercadoPago para completar el pago de forma segura.</p>
+            <p>Serás redirigido a Mercado Pago para completar el pago de forma segura.</p>
           </footer>
         </form>
 

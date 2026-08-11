@@ -32,6 +32,7 @@ Route::get('/admin/shows', [ShowController::class, 'index']);
 Route::get('/admin/venues', [ShowController::class, 'index']);
 Route::get('/admin/people', [ShowController::class, 'index']);
 Route::get('/admin/orders', [ShowController::class, 'index']);
+Route::get('/admin/users', [ShowController::class, 'index']);
 Route::get('/admin/buyers', [ShowController::class, 'index']);
 Route::get('/admin/presentations', [ShowController::class, 'index']);
 Route::get('/admin/seasons', [ShowController::class, 'index']);

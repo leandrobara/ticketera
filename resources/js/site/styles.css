@@ -2759,14 +2759,20 @@ h2 {
 }
 
 .footer-socials a {
-  display: grid;
   width: 42px;
   height: 42px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: grid;
+  font-size: 22px;
   border-radius: 9px;
+  place-items: center;
   color: rgba(255, 255, 255, 0.82);
   background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.footer-socials a:hover {
+  border-color: var(--pink);
+  color: var(--pink);
 }
 
 .footer-socials svg {

@@ -1,5 +1,6 @@
 <script setup>
-  import { computed } from 'vue';
+  import { computed, onMounted } from 'vue';
+  import { captureAttributionFromCurrentUrl } from '@/site/helpers/AttributionHelper';
   import CheckoutResultPage from '@/site/pages/CheckoutResultPage.vue';
   import CommentPage from '@/site/pages/CommentPage.vue';
   import HomePage from '@/site/pages/HomePage.vue';
@@ -35,6 +36,11 @@
   const isPublishYourShowPage = computed(() => page === 'publish-your-show');
   const isShowPage = computed(() => page === 'show');
   const isTermsPage = computed(() => page === 'terms');
+
+  // lifecycle
+  onMounted(() => {
+    captureAttributionFromCurrentUrl();
+  });
 </script>
 
 <template>

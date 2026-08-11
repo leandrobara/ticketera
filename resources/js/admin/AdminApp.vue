@@ -10,6 +10,7 @@
   import PresentationTicketTypesIndex from './pages/PresentationTicketTypesIndex.vue';
   import SeasonsIndex from './pages/SeasonsIndex.vue';
   import ShowsIndex from './pages/ShowsIndex.vue';
+  import UsersIndex from './pages/UsersIndex.vue';
   import VenuesIndex from './pages/VenuesIndex.vue';
   import AppLayout from './layouts/AppLayout.vue';
   import ApiService from '@/admin/services/ApiService';
@@ -18,6 +19,7 @@
   // data
   const user = ref(null);
   const isLoadingSession = ref(true);
+  const isLoggingOut = ref(false);
   const tokenStorageKey = 'token_tickets';
   const token = ref(localStorage.getItem(tokenStorageKey));
   const currentPath = ref(window.location.pathname);
@@ -35,6 +37,10 @@
 
     if (currentPath.value === '/admin/orders') {
       return OrdersIndex;
+    }
+
+    if (currentPath.value === '/admin/users') {
+      return UsersIndex;
     }
 
     if (currentPath.value === '/admin/newsletter-subscribers') {
@@ -80,6 +86,7 @@
   const clearSession = () => {
     token.value = null;
     user.value = null;
+    isLoggingOut.value = false;
     localStorage.removeItem(tokenStorageKey);
     ApiService.getInstance().clearAccessToken();
     redirectToLogin();
@@ -114,6 +121,12 @@
   };
 
   const handleLogout = async () => {
+    if (isLoggingOut.value) {
+      return;
+    }
+
+    isLoggingOut.value = true;
+
     try {
       await LoginService.getInstance().logout();
     } catch (error) {
@@ -137,7 +150,7 @@
     </div>
   </div>
   <LoginPage v-else-if="!isAuthenticated" @login="handleLogin" />
-  <AppLayout v-else :user="user" @logout="handleLogout">
+  <AppLayout v-else :user="user" :is-logging-out="isLoggingOut" @logout="handleLogout">
     <component :is="currentPage" />
   </AppLayout>
 

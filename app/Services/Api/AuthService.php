@@ -39,7 +39,7 @@ class AuthService
         $this->adminAccessTokenRepository->delete($accessToken);
 
         return [
-            'message' => 'Logged out.',
+            'message' => 'Sesión cerrada.',
         ];
     }
 

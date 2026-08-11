@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\ShowController;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\BuyerController;
 use App\Http\Controllers\Api\Admin\OrderController;
+use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\VenueController;
 use App\Http\Controllers\Api\Admin\ImageController;
 use App\Http\Controllers\Api\Admin\PersonController;
@@ -65,6 +66,14 @@ Route::group(['prefix' => 'admin'], function () {
         // auth
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
+        Route::delete('/auth/logout', [AuthController::class, 'logout']);
+
+        // users
+        Route::get('/users', [UserController::class, 'list']);
+        Route::post('/users', [UserController::class, 'create']);
+        Route::get('/users/{user}', [UserController::class, 'show']);
+        Route::put('/users/{user}', [UserController::class, 'update']);
+        Route::delete('/users/{user}', [UserController::class, 'delete']);
 
         // shows
         Route::get('/shows', [ShowController::class, 'list']);

@@ -41,6 +41,14 @@ return new class extends Migration
             $table->string('tickets_email_message_id')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->text('notes')->nullable();
+            $table->string('utm_source')->nullable();
+            $table->string('utm_medium')->nullable();
+            $table->string('utm_campaign')->nullable();
+            $table->string('utm_content')->nullable();
+            $table->string('utm_term')->nullable();
+            $table->string('fbclid', 1024)->nullable();
+            $table->string('fbc')->nullable();
+            $table->string('fbp')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

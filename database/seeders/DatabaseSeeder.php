@@ -17,6 +17,7 @@ use App\Models\ShowPerformanceHistory;
 use App\Models\User;
 use App\Models\Venue;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -35,7 +36,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@ticketera.test',
         ], [
             'name' => 'Ticketera Admin',
-            'password' => 'password',
+            'password' => Hash::make('password'),
             'role' => 'admin',
         ]);
 

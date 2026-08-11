@@ -19,6 +19,31 @@
     width: auto;
 }
 
+.admin-user-menu {
+    position: relative;
+}
+
+.admin-user-menu-dropdown {
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+    left: auto;
+    margin-top: 0;
+    min-width: 12rem;
+    right: 0;
+    top: calc(100% + 0.5rem);
+}
+
+.admin-user-menu-dropdown .dropdown-item {
+    color: var(--tblr-body-color);
+}
+
+.admin-user-menu-dropdown .dropdown-item:hover,
+.admin-user-menu-dropdown .dropdown-item:focus {
+    background: var(--tblr-bg-surface-secondary);
+    color: var(--tblr-body-color);
+}
+
 .show-image-preview,
 .show-gallery-thumb {
     align-items: center;

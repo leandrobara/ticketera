@@ -1,8 +1,8 @@
 <script setup>
-  import { computed } from 'vue';
+  import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
   // emits
-  defineEmits(['logout']);
+  const emit = defineEmits(['logout']);
 
   // props
   defineProps({
@@ -10,15 +10,22 @@
       type: Object,
       required: true,
     },
+    isLoggingOut: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   // data
   const currentPath = window.location.pathname;
+  const isUserMenuOpen = ref(false);
+  const userMenuElement = ref(null);
 
   // computed
   const isShowsActive = computed(() => currentPath === '/admin/shows');
   const isSeasonsActive = computed(() => currentPath === '/admin/seasons');
   const isOrdersActive = computed(() => currentPath === '/admin/orders');
+  const isUsersActive = computed(() => currentPath === '/admin/users');
   const isPeopleActive = computed(() => currentPath === '/admin/people');
   const isVenuesActive = computed(() => currentPath === '/admin/venues');
   const isPresentationsActive = computed(() => currentPath === '/admin/presentations');
@@ -26,6 +33,43 @@
   const isBuyersActive = computed(() => currentPath === '/admin/buyers');
   const isCommentsActive = computed(() => currentPath === '/admin/comments');
   const isNewsletterSubscribersActive = computed(() => currentPath === '/admin/newsletter-subscribers');
+
+  // methods
+  const closeUserMenu = () => {
+    isUserMenuOpen.value = false;
+  };
+
+  const toggleUserMenu = () => {
+    isUserMenuOpen.value = !isUserMenuOpen.value;
+  };
+
+  const handleDocumentClick = (event) => {
+    if (!userMenuElement.value?.contains(event.target)) {
+      closeUserMenu();
+    }
+  };
+
+  const handleDocumentKeydown = (event) => {
+    if (event.key === 'Escape') {
+      closeUserMenu();
+    }
+  };
+
+  const handleLogout = () => {
+    closeUserMenu();
+    emit('logout');
+  };
+
+  // lifecycle
+  onMounted(() => {
+    document.addEventListener('click', handleDocumentClick);
+    document.addEventListener('keydown', handleDocumentKeydown);
+  });
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('click', handleDocumentClick);
+    document.removeEventListener('keydown', handleDocumentKeydown);
+  });
 </script>
 
 <template>
@@ -50,12 +94,13 @@
       </h1>
 
       <div class="navbar-nav flex-row order-md-last">
-        <div class="nav-item dropdown">
+        <div ref="userMenuElement" class="nav-item dropdown admin-user-menu" :class="{ show: isUserMenuOpen }">
           <button
             class="nav-link d-flex lh-1 text-reset p-0 border-0 bg-transparent"
             type="button"
-            data-bs-toggle="dropdown"
+            :aria-expanded="isUserMenuOpen"
             aria-label="Open user menu"
+            @click.stop="toggleUserMenu"
           >
             <span class="avatar avatar-sm">
               {{ user.name?.charAt(0) ?? 'A' }}
@@ -65,9 +110,14 @@
               <div class="mt-1 small text-secondary">{{ user.email }}</div>
             </div>
           </button>
-          <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <button class="dropdown-item" type="button" @click="$emit('logout')">
-              Logout
+          <div
+            class="dropdown-menu dropdown-menu-end dropdown-menu-arrow admin-user-menu-dropdown"
+            :class="{ show: isUserMenuOpen }"
+            @click.stop
+          >
+            <button class="dropdown-item" type="button" :disabled="isLoggingOut" @click="handleLogout">
+              <span v-if="isLoggingOut" class="spinner-border spinner-border-sm me-2" role="status"></span>
+              Cerrar sesión
             </button>
           </div>
         </div>
@@ -142,6 +192,14 @@
                 href="/admin/buyers"
               >
                 <span class="nav-link-title">Compradores</span>
+              </a>
+            </li>
+            <li class="nav-item" :class="{ active: isUsersActive }">
+              <a
+                class="nav-link"
+                href="/admin/users"
+              >
+                <span class="nav-link-title">Usuarios</span>
               </a>
             </li>
             <li class="nav-item" :class="{ active: isNewsletterSubscribersActive }">

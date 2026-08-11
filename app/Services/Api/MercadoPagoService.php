@@ -105,8 +105,8 @@ class MercadoPagoService
             'items' => $this->buildPreferenceItems($order),
             'payer' => [
                 'name' => $order->buyer?->name,
-                'surname' => $order->buyer?->last_name,
                 'email' => $order->buyer?->email,
+                'surname' => $order->buyer?->last_name,
             ],
             'back_urls' => [
                 'success' => $this->buildBackUrl(config('mercadopago.urls.success'), $order),
@@ -119,6 +119,7 @@ class MercadoPagoService
                 'order_id' => $order->id,
                 'order_code' => $order->code,
                 'show_id' => $order->show_id,
+                'season_id' => $order->presentation?->season_id,
                 'presentation_id' => $order->presentation_id,
             ],
         ];
