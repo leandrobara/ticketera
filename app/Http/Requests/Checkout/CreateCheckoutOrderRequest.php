@@ -13,6 +13,7 @@ class CreateCheckoutOrderRequest extends FormRequest
         return [
             'notes' => ['nullable', 'string'],
             'quantity' => ['required', 'integer', 'min:1', 'max:10'],
+            'mercado_pago_device_id' => ['nullable', 'string', 'max:255'],
             'attribution' => ['nullable', 'array'],
             'attribution.utm_source' => ['nullable', 'string', 'max:255'],
             'attribution.utm_medium' => ['nullable', 'string', 'max:255'],
@@ -41,6 +42,14 @@ class CreateCheckoutOrderRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        if ($this->has('mercado_pago_device_id')) {
+            $mercadoPagoDeviceId = trim((string) $this->input('mercado_pago_device_id'));
+
+            $this->merge([
+                'mercado_pago_device_id' => $mercadoPagoDeviceId === '' ? null : $mercadoPagoDeviceId,
+            ]);
+        }
+
         if ($this->has('promo_code')) {
             $promoCode = trim((string) $this->input('promo_code'));
             $this->merge([

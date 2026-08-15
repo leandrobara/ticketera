@@ -1,6 +1,7 @@
 <script setup>
   import { computed, reactive, ref, watch } from 'vue';
   import { getStoredAttribution } from '@/site/helpers/AttributionHelper';
+  import { getMercadoPagoDeviceId } from '@/site/helpers/MercadoPagoDeviceHelper';
   import MercadoPagoNotice from '@/site/components/payment/MercadoPagoNotice.vue';
   import { formatDateTime } from '@/site/helpers/DateTimeFormatHelper';
   import CheckoutService from '@/site/services/CheckoutService';
@@ -174,6 +175,12 @@
 
       if (attribution) {
         payload.attribution = attribution;
+      }
+
+      const mercadoPagoDeviceId = getMercadoPagoDeviceId();
+
+      if (mercadoPagoDeviceId) {
+        payload.mercado_pago_device_id = mercadoPagoDeviceId;
       }
 
       const response = await CheckoutService.getInstance().createOrder(payload);

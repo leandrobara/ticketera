@@ -65,7 +65,7 @@ class MercadoPagoService
         return $response->json();
     }
 
-    public function createPreference(Order $order): array
+    public function createPreference(Order $order, ?string $mercadoPagoDeviceId = null): array
     {
         $accessToken = config('mercadopago.access_token');
 
@@ -77,11 +77,18 @@ class MercadoPagoService
 
         $payload = $this->buildPreferencePayload($order);
 
-        $response = Http::withToken($accessToken)
+        $preferenceRequest = Http::withToken($accessToken)
             ->acceptJson()
             ->asJson()
-            ->post('https://api.mercadopago.com/checkout/preferences', $payload)
         ;
+
+        if (filled($mercadoPagoDeviceId)) {
+            $preferenceRequest = $preferenceRequest->withHeaders([
+                'X-meli-session-id' => $mercadoPagoDeviceId,
+            ]);
+        }
+
+        $response = $preferenceRequest->post('https://api.mercadopago.com/checkout/preferences', $payload);
 
         if ($response->failed()) {
             Log::error('Mercado Pago preference creation failed', [
@@ -89,6 +96,7 @@ class MercadoPagoService
                 'response' => $response->json() ?? $response->body(),
                 'order_id' => $order->id,
                 'order_code' => $order->code,
+                'has_mercado_pago_device_id' => filled($mercadoPagoDeviceId),
             ]);
 
             throw new RuntimeException(
@@ -103,11 +111,7 @@ class MercadoPagoService
     {
         $payload = [
             'items' => $this->buildPreferenceItems($order),
-            'payer' => [
-                'name' => $order->buyer?->name,
-                'email' => $order->buyer?->email,
-                'surname' => $order->buyer?->last_name,
-            ],
+            'payer' => $this->buildPreferencePayer($order),
             'back_urls' => [
                 'success' => $this->buildBackUrl(config('mercadopago.urls.success'), $order),
                 'failure' => $this->buildBackUrl(config('mercadopago.urls.failure'), $order),
@@ -130,6 +134,33 @@ class MercadoPagoService
         }
 
         return $payload;
+    }
+
+    private function buildPreferencePayer(Order $order): array
+    {
+        $buyer = $order->buyer;
+        $payer = [
+            'name' => $buyer?->name,
+            'email' => $buyer?->email,
+            'surname' => $buyer?->last_name,
+        ];
+
+        if (filled($buyer?->dni)) {
+            $payer['identification'] = [
+                'type' => 'DNI',
+                'number' => $buyer->dni,
+            ];
+        }
+
+        $normalizedPhone = preg_replace('/\D+/', '', (string) $buyer?->phone);
+
+        if (filled($normalizedPhone)) {
+            $payer['phone'] = [
+                'number' => $normalizedPhone,
+            ];
+        }
+
+        return $payer;
     }
 
     private function buildBackUrl(?string $url, Order $order): string

@@ -12,6 +12,7 @@
                 {{ config('app.name', 'Ticketera') }}
             @endisset
         </title>
+        <script src="https://www.mercadopago.com/v2/security.js" view="checkout"></script>
         @vite(['resources/js/site/app.js'])
         <script>
             window.ticketeraSite = {

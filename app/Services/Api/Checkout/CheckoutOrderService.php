@@ -75,7 +75,10 @@ class CheckoutOrderService
             ]);
         });
 
-        $preference = $this->mercadoPagoService->createPreference($order);
+        $preference = $this->mercadoPagoService->createPreference(
+            $order,
+            $data['mercado_pago_device_id'] ?? null,
+        );
 
         $this->paymentService->createPendingMercadoPagoPayment(
             $order,
