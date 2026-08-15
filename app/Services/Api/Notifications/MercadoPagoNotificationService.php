@@ -2,67 +2,43 @@
 
 namespace App\Services\Api\Notifications;
 
-use App\Jobs\SendOrderTicketsEmailJob;
 use App\Models\Order;
 use App\Models\Payment;
-use App\Models\Presentation;
 use App\Models\Ticket;
-use App\Services\Api\Admin\OrderService;
-use App\Services\Api\MercadoPagoService;
+use Illuminate\Support\Str;
+use App\Models\Presentation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use App\Services\Api\Admin\OrderService;
+use App\Services\Api\MercadoPagoService;
+
 
 class MercadoPagoNotificationService
 {
+
     public function __construct(
         private readonly MercadoPagoService $mercadoPagoService,
     ) {
         //
     }
 
-    public function handleNotification(string $paymentId, string $notificationType): void
+    public function handlePaymentNotification(string $paymentId): ?int
     {
-        if ($notificationType === 'payment') {
-            $this->processPayment($this->mercadoPagoService->getPayment($paymentId), $paymentId);
-            return;
-        }
+        $mercadoPagoPayment = $this->mercadoPagoService->getPayment($paymentId);
 
-        if ($notificationType === 'merchant_order') {
-            $this->processMerchantOrder($paymentId);
-            return;
-        }
+        return $this->processPayment($mercadoPagoPayment, $paymentId);
     }
 
-    private function processMerchantOrder(string $merchantOrderId): void
+    private function processPayment(array $mercadoPagoPayment, string $paymentId): ?int
     {
-        $merchantOrder = $this->mercadoPagoService->getMerchantOrder($merchantOrderId);
-        $payments = $merchantOrder['payments'] ?? [];
-
-        if (count($payments) === 0) {
-            return;
-        }
-
-        foreach ($payments as $payment) {
-            if (blank($payment['id'] ?? null)) {
-                continue;
-            }
-
-            $paymentId = (string) $payment['id'];
-            $this->processPayment($this->mercadoPagoService->getPayment($paymentId), $paymentId);
-        }
-    }
-
-    private function processPayment(array $mercadoPagoPayment, string $paymentId): void
-    {
-        $this->withPaymentLock($paymentId, function () use ($mercadoPagoPayment, $paymentId) {
-            $this->processPaymentWithLock($mercadoPagoPayment, $paymentId);
+        return $this->withPaymentLock($paymentId, function () use ($mercadoPagoPayment, $paymentId) {
+            return $this->processPaymentWithLock($mercadoPagoPayment, $paymentId);
         });
     }
 
-    private function processPaymentWithLock(array $mercadoPagoPayment, string $paymentId): void
+    private function processPaymentWithLock(array $mercadoPagoPayment, string $paymentId): ?int
     {
-        DB::transaction(function () use ($mercadoPagoPayment, $paymentId) {
+        return DB::transaction(function () use ($mercadoPagoPayment, $paymentId) {
             $order = $this->findOrder($mercadoPagoPayment);
 
             if (!$order) {
@@ -71,7 +47,7 @@ class MercadoPagoNotificationService
                     'external_reference' => $mercadoPagoPayment['external_reference'] ?? null,
                     'metadata' => $mercadoPagoPayment['metadata'] ?? null,
                 ]);
-                return;
+                return null;
             }
 
             $order = Order::query()
@@ -105,8 +81,7 @@ class MercadoPagoNotificationService
                 && $payment->provider_status === 'APPROVED'
                 && $order->tickets()->count() >= $order->total_quantity
             ) {
-                $this->dispatchOrderTicketsEmail($order);
-                return;
+                return $order->id;
             }
 
             $payment->fill([
@@ -130,15 +105,20 @@ class MercadoPagoNotificationService
                     : $order->approved_at,
             ]);
 
-            if ($paymentStatus === 'APPROVED') {
-                $this->createTicketsIfNeeded($order);
-                resolve(OrderService::class)->syncPresentationStatusFromCapacity(
-                    Presentation::query()
-                        ->lockForUpdate()
-                        ->findOrFail($order->presentation_id)
-                );
-                $this->dispatchOrderTicketsEmail($order);
+            if ($paymentStatus !== 'APPROVED') {
+                return null;
             }
+
+            $this->createTicketsIfNeeded($order);
+            resolve(OrderService::class)->syncPresentationStatusFromCapacity(
+                Presentation::query()
+                    ->lockForUpdate()
+                    ->findOrFail($order->presentation_id)
+            );
+
+            return $order->tickets()->count() >= $order->total_quantity
+                ? $order->id
+                : null;
         });
     }
 
@@ -222,7 +202,7 @@ class MercadoPagoNotificationService
         }
     }
 
-    private function withPaymentLock(string $paymentId, callable $callback): void
+    private function withPaymentLock(string $paymentId, callable $callback): ?int
     {
         $lockName = "mercado_pago_payment_{$paymentId}";
         $result = DB::selectOne('SELECT GET_LOCK(?, 10) as acquired', [$lockName]);
@@ -232,23 +212,14 @@ class MercadoPagoNotificationService
                 'payment_id' => $paymentId,
                 'lock_name' => $lockName,
             ]);
-            return;
+            return null;
         }
 
         try {
-            $callback();
+            return $callback();
         } finally {
             DB::selectOne('SELECT RELEASE_LOCK(?) as released', [$lockName]);
         }
-    }
-
-    private function dispatchOrderTicketsEmail(Order $order): void
-    {
-        if ($order->tickets_email_sent_at) {
-            return;
-        }
-
-        SendOrderTicketsEmailJob::dispatch($order->id)->afterCommit();
     }
 
     private function makeUniqueCode(string $prefix, string $modelClass): string

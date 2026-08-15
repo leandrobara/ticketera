@@ -14,8 +14,8 @@ until php artisan migrate:status > /dev/null 2>&1; do
 done
 
 if [ "$CONTAINER_ROLE" = "worker" ]; then
-  echo "Iniciando worker de colas..."
-  exec php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+  echo "Iniciando worker de colas con driver ${QUEUE_CONNECTION:-database}..."
+  exec php artisan queue:work "${QUEUE_CONNECTION:-database}" --sleep=3 --tries=3 --max-time=3600
 fi
 
 echo "Corriendo migraciones..."

@@ -145,10 +145,6 @@
     return Object.keys(nextErrors).length === 0;
   };
 
-  const getCheckoutUrl = (preference) => {
-    return preference.init_point || preference.sandbox_init_point;
-  };
-
   const submit = async () => {
     if (!validate()) {
       return;
@@ -182,7 +178,7 @@
 
       const response = await CheckoutService.getInstance().createOrder(payload);
 
-      const checkoutUrl = getCheckoutUrl(response.data.data.preference);
+      const checkoutUrl = response.data.data.preference?.init_point;
 
       if (checkoutUrl) {
         window.location.href = checkoutUrl;

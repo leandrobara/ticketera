@@ -23,24 +23,25 @@ class ProcessMercadoPagoNotificationJob implements ShouldQueue
 
     public function __construct(
         private readonly string $paymentId,
-        private readonly string $notificationType,
     ) {
         //
     }
 
     public function handle(MercadoPagoNotificationService $mercadoPagoNotificationService): void
     {
-        $mercadoPagoNotificationService->handleNotification(
-            $this->paymentId,
-            $this->notificationType,
-        );
+        $approvedOrderId = $mercadoPagoNotificationService->handlePaymentNotification($this->paymentId);
+
+        if (!$approvedOrderId) {
+            return;
+        }
+
+        SendOrderTicketsEmailJob::dispatch($approvedOrderId);
     }
 
     public function failed(\Throwable $exception): void
     {
         Log::error('Mercado Pago notification job failed', [
             'payment_id' => $this->paymentId,
-            'notification_type' => $this->notificationType,
             'exception' => $exception->getMessage(),
         ]);
     }

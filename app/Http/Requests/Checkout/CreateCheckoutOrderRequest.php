@@ -136,7 +136,8 @@ class CreateCheckoutOrderRequest extends FormRequest
                     ->where('promotion_access_code', $promoCode)
                     ->where('promotion_is_active', true)
                     ->whereNotNull('promotion_type')
-                    ->first();
+                    ->first()
+                ;
 
                 if (!$promotionTicketType) {
                     $validator->errors()->add('promo_code', 'invalid_promo_code');
