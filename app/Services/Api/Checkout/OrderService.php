@@ -50,6 +50,63 @@ class OrderService
         ]);
     }
 
+    public function findAndLockFromMercadoPagoPayment(array $mercadoPagoPayment): ?Order
+    {
+        $order = $this->findOrderFromMercadoPagoPayment($mercadoPagoPayment);
+
+        if (!$order) {
+            return null;
+        }
+
+        return $this->orderRepository->findLockedWithItemsAndTickets($order->id);
+    }
+
+    public function updateStatusFromPayment(Order $order, string $paymentStatus, mixed $dateApproved): Order
+    {
+        return $this->orderRepository->update($order, [
+            'status' => $this->orderStatusFromPaymentStatus($paymentStatus),
+            'approved_at' => $paymentStatus === 'APPROVED'
+                ? ($dateApproved ?? now())
+                : $order->approved_at,
+        ]);
+    }
+
+    private function findOrderFromMercadoPagoPayment(array $mercadoPagoPayment): ?Order
+    {
+        $orderId = $mercadoPagoPayment['metadata']['order_id'] ?? null;
+
+        if ($orderId) {
+            $order = $this->orderRepository->findById((int) $orderId);
+
+            if ($order) {
+                return $order;
+            }
+        }
+
+        $orderCode = $mercadoPagoPayment['external_reference']
+            ?? $mercadoPagoPayment['metadata']['order_code']
+            ?? null
+        ;
+
+        if (!$orderCode) {
+            return null;
+        }
+
+        return $this->orderRepository->findByCode((string) $orderCode);
+    }
+
+    private function orderStatusFromPaymentStatus(string $paymentStatus): string
+    {
+        return match ($paymentStatus) {
+            'APPROVED' => 'APPROVED',
+            'IN_PROCESS' => 'IN_PROCESS',
+            'REJECTED' => 'REJECTED',
+            'CANCELED' => 'CANCELED',
+            'REFUNDED' => 'REFUNDED',
+            default => 'PENDING',
+        };
+    }
+
     private function makeUniqueCode(): string
     {
         do {

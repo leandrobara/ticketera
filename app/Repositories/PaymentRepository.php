@@ -25,6 +25,15 @@ class PaymentRepository
             ->paginate($limit);
     }
 
+    public function findLockedMercadoPagoByOrderId(int $orderId): ?Payment
+    {
+        return Payment::query()
+            ->where('order_id', $orderId)
+            ->where('provider', 'MERCADO_PAGO')
+            ->lockForUpdate()
+            ->first();
+    }
+
     public function getOne(Payment $payment): Payment
     {
         return $payment->load('order.buyer');

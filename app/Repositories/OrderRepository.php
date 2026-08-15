@@ -7,6 +7,28 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OrderRepository
 {
+    public function findById(int $orderId): ?Order
+    {
+        return Order::query()->find($orderId);
+    }
+
+    public function findByCode(string $orderCode): ?Order
+    {
+        return Order::query()
+            ->where('code', $orderCode)
+            ->first()
+        ;
+    }
+
+    public function findLockedWithItemsAndTickets(int $orderId): Order
+    {
+        return Order::query()
+            ->with(['items', 'tickets'])
+            ->lockForUpdate()
+            ->findOrFail($orderId)
+        ;
+    }
+
     public function findApprovedForComment(
         int $showId,
         int $buyerId,
@@ -17,7 +39,8 @@ class OrderRepository
             ->where('buyer_id', $buyerId)
             ->where('status', 'APPROVED')
             ->latest('id')
-            ->first();
+            ->first()
+        ;
     }
 
     public function listPaginated(array $filters, int $limit = 20): LengthAwarePaginator
@@ -50,7 +73,8 @@ class OrderRepository
                 });
             })
             ->latest()
-            ->paginate($limit);
+            ->paginate($limit)
+        ;
     }
 
     public function getOne(Order $order): Order

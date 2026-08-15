@@ -42,6 +42,13 @@ class PresentationRepository
             ->paginate($limit);
     }
 
+    public function findLockedOrFail(int $presentationId): Presentation
+    {
+        return Presentation::query()
+            ->lockForUpdate()
+            ->findOrFail($presentationId);
+    }
+
     public function getOne(Presentation $presentation): Presentation
     {
         return $presentation->load(['season.show', 'season.venue', 'ticketTypes']);

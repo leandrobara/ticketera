@@ -20,6 +20,36 @@ class TicketRepository
             ->paginate($limit);
     }
 
+    public function countLockedByOrderItemId(int $orderItemId): int
+    {
+        return Ticket::query()
+            ->where('order_item_id', $orderItemId)
+            ->lockForUpdate()
+            ->count();
+    }
+
+    public function countByOrderId(int $orderId): int
+    {
+        return Ticket::query()
+            ->where('order_id', $orderId)
+            ->count();
+    }
+
+    public function countAssignedByPresentationId(int $presentationId): int
+    {
+        return Ticket::query()
+            ->where('presentation_id', $presentationId)
+            ->whereIn('status', ['VALID', 'USED'])
+            ->count();
+    }
+
+    public function existsByCode(string $code): bool
+    {
+        return Ticket::query()
+            ->where('code', $code)
+            ->exists();
+    }
+
     public function getOne(Ticket $ticket): Ticket
     {
         return $ticket->load(['order.buyer', 'orderItem', 'presentation', 'presentationTicketType']);

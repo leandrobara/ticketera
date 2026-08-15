@@ -27,4 +27,39 @@ class PaymentService
             'provider_preference_id' => $preference['id'] ?? null,
         ]);
     }
+
+    public function findLockedMercadoPagoPayment(Order $order): ?Payment
+    {
+        return $this->paymentRepository->findLockedMercadoPagoByOrderId($order->id);
+    }
+
+    public function saveFromMercadoPagoPayment(
+        Order $order,
+        ?Payment $payment,
+        array $mercadoPagoPayment,
+        string $paymentId,
+        string $paymentStatus,
+    ): Payment {
+        $attrs = [
+            'show_id' => $order->show_id,
+            'currency' => $mercadoPagoPayment['currency_id'] ?? $order->currency,
+            'amount' => $mercadoPagoPayment['transaction_amount'] ?? $order->total_amount,
+            'provider_status' => $paymentStatus,
+            'provider_payment_id' => (string) $paymentId,
+            'raw_response' => $mercadoPagoPayment,
+            'paid_at' => $paymentStatus === 'APPROVED'
+                ? ($mercadoPagoPayment['date_approved'] ?? now())
+                : $payment?->paid_at,
+        ];
+
+        if ($payment) {
+            return $this->paymentRepository->update($payment, $attrs);
+        }
+
+        return $this->paymentRepository->store([
+            'order_id' => $order->id,
+            'provider' => 'MERCADO_PAGO',
+            ...$attrs,
+        ]);
+    }
 }
