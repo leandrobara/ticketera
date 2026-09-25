@@ -49,6 +49,14 @@ class PresentationRepository
             ->findOrFail($presentationId);
     }
 
+    public function findAndLockWithSeasonOrFail(int $presentationId): Presentation
+    {
+        return Presentation::query()
+            ->with('season')
+            ->lockForUpdate()
+            ->findOrFail($presentationId);
+    }
+
     public function getOne(Presentation $presentation): Presentation
     {
         return $presentation->load(['season.show', 'season.venue', 'ticketTypes']);

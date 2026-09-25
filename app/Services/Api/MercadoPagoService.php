@@ -124,8 +124,8 @@ class MercadoPagoService
                 'order_id' => $order->id,
                 'order_code' => $order->code,
                 'show_id' => $order->show_id,
-                'season_id' => $order->presentation?->season_id,
                 'presentation_id' => $order->presentation_id,
+                'season_id' => $order->presentation?->season_id,
             ],
         ];
 

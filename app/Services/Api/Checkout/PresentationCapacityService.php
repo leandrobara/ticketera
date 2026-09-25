@@ -2,8 +2,11 @@
 
 namespace App\Services\Api\Checkout;
 
+use App\Models\Presentation;
+use App\Models\PresentationTicketType;
 use App\Repositories\PresentationRepository;
 use App\Repositories\TicketRepository;
+use Illuminate\Validation\ValidationException;
 
 class PresentationCapacityService
 {
@@ -12,6 +15,34 @@ class PresentationCapacityService
         private readonly TicketRepository $ticketRepository,
     ) {
         //
+    }
+
+    public function assertCanSellQuantity(
+        PresentationTicketType $ticketType,
+        Presentation $presentation,
+        int $quantity,
+    ): void {
+        $assignedPresentationTickets = $this->ticketRepository->countAssignedAndLockByPresentationId(
+            $ticketType->presentation_id
+        );
+
+        if (($assignedPresentationTickets + $quantity) > $presentation->capacity) {
+            throw ValidationException::withMessages([
+                'quantity' => ['presentation_capacity_exceeded'],
+            ]);
+        }
+
+        if ($ticketType->stock === null) {
+            return;
+        }
+
+        $assignedTicketTypeTickets = $this->ticketRepository->countAssignedAndLockByTicketTypeId($ticketType->id);
+
+        if (($assignedTicketTypeTickets + $quantity) > $ticketType->stock) {
+            throw ValidationException::withMessages([
+                'quantity' => ['presentation_ticket_type_stock_exceeded'],
+            ]);
+        }
     }
 
     public function syncFromAssignedTickets(int $presentationId): void

@@ -2,56 +2,77 @@
 
 namespace App\Services\Api\Checkout;
 
-use App\Models\Presentation;
-use App\Models\PresentationTicketType;
-use App\Models\Ticket;
-use App\Services\Api\Admin\BuyerService;
+use App\Models\Order;
+use App\Repositories\PresentationRepository;
+use App\Repositories\PresentationTicketTypeRepository;
 use App\Services\Api\MercadoPagoService;
 use App\Services\Api\OrderItemPricingService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class CheckoutOrderService
 {
     public function __construct(
         private readonly BuyerService $buyerService,
-        private readonly MercadoPagoService $mercadoPagoService,
-        private readonly OrderItemPricingService $orderItemPricingService,
         private readonly OrderService $orderService,
-        private readonly OrderItemService $orderItemService,
         private readonly PaymentService $paymentService,
+        private readonly OrderItemService $orderItemService,
+        private readonly MercadoPagoService $mercadoPagoService,
+        private readonly PresentationRepository $presentationRepository,
+        private readonly OrderItemPricingService $orderItemPricingService,
+        private readonly PresentationCapacityService $presentationCapacityService,
+        private readonly PresentationTicketTypeRepository $presentationTicketTypeRepository,
     ) {
         //
     }
 
-    public function create(array $data): array
+    public function create(array $data): ?string
     {
-        $order = DB::transaction(function () use ($data) {
-            $ticketType = PresentationTicketType::query()
-                ->lockForUpdate()
-                ->findOrFail($data['presentation_ticket_type_id'])
-            ;
+        $order = $this->createPendingOrder($data);
+        $preference = $this->createMercadoPagoPreference(
+            $order,
+            $data['mercado_pago_device_id'] ?? null,
+        );
 
-            $presentation = Presentation::query()
-                ->with('season')
-                ->lockForUpdate()
-                ->findOrFail($ticketType->presentation_id)
-            ;
+        return $preference['init_point'] ?? null;
+    }
 
-            $this->validateAvailability($ticketType, $presentation->capacity, $data['quantity']);
+    private function createPendingOrder(array $data): Order
+    {
+        return DB::transaction(function () use ($data) {
+            // Lock del tipo de ticket para no vender el mismo stock en paralelo.
+            $ticketType = $this->presentationTicketTypeRepository->findAndLockOrFail(
+                $data['presentation_ticket_type_id']
+            );
 
-            $buyer = $this->buyerService->create($data['buyer']);
+            // Lock de la función y su temporada.
+            $presentation = $this->presentationRepository->findAndLockWithSeasonOrFail(
+                $ticketType->presentation_id
+            );
+
+            // ¿Hay cupo en la función y stock en este tipo de ticket?
+            $this->presentationCapacityService->assertCanSellQuantity(
+                $ticketType,
+                $presentation,
+                $data['quantity']
+            );
+
+            // Reusa el comprador por email o lo crea.
+            $buyer = $this->buyerService->findOrCreate($data['buyer']);
+
+            // Promo válida para este tipo de ticket, si mandaron código.
             $promotion = $this->orderItemPricingService->findApplicablePromotion(
                 $ticketType,
                 $data['promo_code'] ?? null
             );
-            
+
+            // Totales de la orden (tickets, descuento, service fee).
             $pricing = $this->orderItemPricingService->calculateAmountsForTicketType(
                 $ticketType,
                 $data['quantity'],
                 $promotion
             );
 
+            // Orden PENDING; los tickets se crean cuando MP aprueba.
             $order = $this->orderService->createPendingOrder(
                 $buyer,
                 $presentation,
@@ -59,6 +80,7 @@ class CheckoutOrderService
                 $data
             );
 
+            // Ítem (y snapshot de promo si aplica).
             $this->orderItemService->createItem(
                 $order,
                 $presentation,
@@ -68,61 +90,20 @@ class CheckoutOrderService
                 $promotion,
             );
 
-            return $order->fresh([
-                'buyer',
-                'presentation.season.show',
-                'items',
-            ]);
+            // Relaciones que necesita createPreference.
+            return $this->orderService->loadForMercadoPagoPreference($order);
         });
+    }
 
+    private function createMercadoPagoPreference(Order $order, ?string $mercadoPagoDeviceId): array
+    {
         $preference = $this->mercadoPagoService->createPreference(
             $order,
-            $data['mercado_pago_device_id'] ?? null,
+            $mercadoPagoDeviceId,
         );
 
-        $this->paymentService->createPendingMercadoPagoPayment(
-            $order,
-            $preference,
-        );
+        $this->paymentService->createPendingMercadoPagoPayment($order, $preference);
 
-        return [
-            'preference' => [
-                'init_point' => $preference['init_point'] ?? null,
-            ],
-        ];
+        return $preference;
     }
-
-    private function validateAvailability(PresentationTicketType $ticketType, int $presentationCapacity, int $quantity): void
-    {
-        $assignedPresentationTickets = Ticket::query()
-            ->where('presentation_id', $ticketType->presentation_id)
-            ->whereIn('status', ['VALID', 'USED'])
-            ->lockForUpdate()
-            ->count()
-        ;
-
-        if (($assignedPresentationTickets + $quantity) > $presentationCapacity) {
-            throw ValidationException::withMessages([
-                'quantity' => ['presentation_capacity_exceeded'],
-            ]);
-        }
-
-        if ($ticketType->stock === null) {
-            return;
-        }
-
-        $assignedTicketTypeTickets = Ticket::query()
-            ->where('presentation_ticket_type_id', $ticketType->id)
-            ->whereIn('status', ['VALID', 'USED'])
-            ->lockForUpdate()
-            ->count()
-        ;
-
-        if (($assignedTicketTypeTickets + $quantity) > $ticketType->stock) {
-            throw ValidationException::withMessages([
-                'quantity' => ['presentation_ticket_type_stock_exceeded'],
-            ]);
-        }
-    }
-
 }

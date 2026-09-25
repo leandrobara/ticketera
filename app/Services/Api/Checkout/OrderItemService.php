@@ -4,9 +4,9 @@ namespace App\Services\Api\Checkout;
 
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\OrderItemPromotion;
 use App\Models\Presentation;
 use App\Models\PresentationTicketType;
+use App\Repositories\OrderItemPromotionRepository;
 use App\Repositories\OrderItemRepository;
 use App\Services\Api\OrderItemPricingService;
 
@@ -14,6 +14,7 @@ class OrderItemService
 {
     public function __construct(
         private readonly OrderItemRepository $orderItemRepository,
+        private readonly OrderItemPromotionRepository $orderItemPromotionRepository,
         private readonly OrderItemPricingService $orderItemPricingService,
     ) {
         //
@@ -49,7 +50,7 @@ class OrderItemService
         ]);
 
         if ($promotion) {
-            OrderItemPromotion::create([
+            $this->orderItemPromotionRepository->store([
                 'order_item_id' => $orderItem->id,
                 'promotion_name' => $this->orderItemPricingService->getPromotionName($promotion),
                 'promotion_type' => $promotion->promotion_type,

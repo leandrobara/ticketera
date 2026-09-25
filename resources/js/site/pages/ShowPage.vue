@@ -13,7 +13,7 @@
   import ShowSocialLinks from '@/site/components/show/ShowSocialLinks.vue';
   import SiteHeader from '@/site/components/layout/SiteHeader.vue';
   import TicketPanel from '@/site/components/show/TicketPanel.vue';
-  import CheckoutService from '@/site/services/CheckoutService';
+  import { calculatePricePreview } from '@/site/helpers/PricePreviewHelper';
   import CommentService from '@/site/services/CommentService';
   import PresentationService from '@/site/services/PresentationService';
   import ShowService from '@/site/services/ShowService';
@@ -54,7 +54,6 @@
   const quantity = ref(0);
   const promoCode = ref('');
   const pricePreview = ref(null);
-  const isLoadingPreview = ref(false);
   const isCheckoutOpen = ref(false);
   const isMobileTicketBarVisible = ref(false);
   const hiddenZones = {
@@ -303,95 +302,17 @@
     pricePreview.value = null;
   };
 
-  const buildFallbackPricePreview = (ticketType, requestedQuantity) => {
-    const unitPrice = Number(ticketType.price ?? 0);
-    const subtotalAmount = unitPrice * requestedQuantity;
-    let paidQuantity = requestedQuantity;
-    let discountAmount = 0;
-
-    if (ticketType.promotion) {
-      if (ticketType.promotion.type === 'percent_discount') {
-        discountAmount = subtotalAmount * Number(ticketType.promotion.value ?? 0) / 100;
-      }
-
-      if (ticketType.promotion.type === 'fixed_discount') {
-        discountAmount = Number(ticketType.promotion.value ?? 0) * requestedQuantity;
-      }
-
-      if (ticketType.promotion.type === 'buy_x_get_y') {
-        const bundleQuantity = Number(ticketType.promotion.bundle_quantity ?? 0);
-        const payQuantity = Number(ticketType.promotion.pay_quantity ?? 0);
-
-        if (bundleQuantity > 0 && payQuantity > 0) {
-          paidQuantity = (
-            Math.floor(requestedQuantity / bundleQuantity) * payQuantity
-          ) + (requestedQuantity % bundleQuantity);
-          discountAmount = subtotalAmount - (unitPrice * paidQuantity);
-        }
-      }
-    }
-
-    discountAmount = Math.min(subtotalAmount, discountAmount);
-    const serviceFeeBaseAmount = subtotalAmount - discountAmount;
-    let serviceFeeTotalAmount = show.value.service_fee_type === 'percentage'
-      ? serviceFeeBaseAmount * Number(show.value.service_fee_percentage ?? 0) / 100
-      : Number(show.value.service_fee_fixed_amount ?? 0) * paidQuantity;
-    const serviceFeeMinimumUnitAmount = Number(show.value.service_fee_minimum_unit_amount ?? 0);
-    const minimumServiceFeeTotalAmount = serviceFeeMinimumUnitAmount * paidQuantity;
-    const serviceFeeMinimumApplied = serviceFeeBaseAmount > 0
-      && serviceFeeMinimumUnitAmount > 0
-      && serviceFeeTotalAmount < minimumServiceFeeTotalAmount;
-
-    if (serviceFeeMinimumApplied) {
-      serviceFeeTotalAmount = minimumServiceFeeTotalAmount;
-    }
-
-    return {
-      paid_quantity: paidQuantity,
-      unit_price: unitPrice,
-      unit_service_fee: paidQuantity > 0 ? serviceFeeTotalAmount / paidQuantity : 0,
-      service_fee_type: show.value.service_fee_type,
-      service_fee_fixed_amount: show.value.service_fee_fixed_amount,
-      service_fee_percentage: show.value.service_fee_percentage,
-      service_fee_base_amount: serviceFeeBaseAmount,
-      service_fee_minimum_applied: serviceFeeMinimumApplied,
-      service_fee_minimum_unit_amount: show.value.service_fee_minimum_unit_amount,
-      subtotal_amount: subtotalAmount,
-      discount_amount: discountAmount,
-      service_fee_total_amount: serviceFeeTotalAmount,
-      total_amount: serviceFeeBaseAmount + serviceFeeTotalAmount,
-    };
-  };
-
-  const loadPricePreview = async () => {
-    if (!selectedTicketType.value || quantity.value <= 0) {
+  const loadPricePreview = () => {
+    if (!selectedTicketType.value || quantity.value <= 0 || !show.value) {
       pricePreview.value = null;
       return;
     }
 
-    isLoadingPreview.value = true;
-
-    try {
-      const payload = {
-        presentation_ticket_type_id: selectedTicketType.value.id,
-        quantity: quantity.value,
-        payment_method: 'MERCADO_PAGO',
-      };
-
-      if (selectedTicketType.value.promotion?.promo_code_applied && promoCode.value) {
-        payload.promo_code = promoCode.value;
-      }
-
-      const response = await CheckoutService.getInstance().pricePreview(payload);
-      pricePreview.value = response.data.data;
-    } catch (error) {
-      pricePreview.value = buildFallbackPricePreview(
-        selectedTicketType.value,
-        quantity.value
-      );
-    } finally {
-      isLoadingPreview.value = false;
-    }
+    pricePreview.value = calculatePricePreview(
+      selectedTicketType.value,
+      quantity.value,
+      show.value,
+    );
   };
 
   const openCheckout = () => {
@@ -481,7 +402,6 @@
         :selected-ticket-type-id="selectedTicketTypeId"
         :quantity="quantity"
         :price-preview="pricePreview"
-        :is-loading-preview="isLoadingPreview"
         @select-presentation="selectPresentation"
         @select-ticket-type="selectTicketType"
         @update-quantity="updateQuantity"

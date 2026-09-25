@@ -92,7 +92,7 @@ Todas las respuestas exitosas de API usan el formato:
 Rutas publicas:
 
 - `POST /api/checkout/create-order`: crea orden checkout, buyer, item, preference de Mercado Pago y payment pendiente.
-- `POST /api/checkout/price-preview`: calcula precio, descuentos y service fee sin crear orden.
+- `POST /api/checkout/price-preview`: calcula precio para el admin al armar una orden a mano. El site calcula el preview en el front.
 - `POST /api/notifications/mercado-pago`: procesa webhooks de Mercado Pago.
 
 Rutas admin:

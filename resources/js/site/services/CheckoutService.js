@@ -16,8 +16,4 @@ export default class CheckoutService {
     return ApiService.getInstance().post('/api/checkout/create-order', payload);
   }
 
-  pricePreview(payload) {
-    return ApiService.getInstance().post('/api/checkout/price-preview', payload);
-  }
-
 }

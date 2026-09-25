@@ -33,6 +33,13 @@ class PresentationTicketTypeRepository
             ->paginate($filters['per_page'] ?? $limit);
     }
 
+    public function findAndLockOrFail(int $ticketTypeId): PresentationTicketType
+    {
+        return PresentationTicketType::query()
+            ->lockForUpdate()
+            ->findOrFail($ticketTypeId);
+    }
+
     public function getOne(PresentationTicketType $presentationTicketType): PresentationTicketType
     {
         return $presentationTicketType->load(['presentation.season.show', 'presentation.season.venue']);

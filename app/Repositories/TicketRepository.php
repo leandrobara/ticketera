@@ -43,6 +43,24 @@ class TicketRepository
             ->count();
     }
 
+    public function countAssignedAndLockByPresentationId(int $presentationId): int
+    {
+        return Ticket::query()
+            ->where('presentation_id', $presentationId)
+            ->whereIn('status', ['VALID', 'USED'])
+            ->lockForUpdate()
+            ->count();
+    }
+
+    public function countAssignedAndLockByTicketTypeId(int $ticketTypeId): int
+    {
+        return Ticket::query()
+            ->where('presentation_ticket_type_id', $ticketTypeId)
+            ->whereIn('status', ['VALID', 'USED'])
+            ->lockForUpdate()
+            ->count();
+    }
+
     public function existsByCode(string $code): bool
     {
         return Ticket::query()

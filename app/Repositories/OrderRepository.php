@@ -20,6 +20,22 @@ class OrderRepository
         ;
     }
 
+    public function existsByCode(string $code): bool
+    {
+        return Order::query()
+            ->where('code', $code)
+            ->exists();
+    }
+
+    public function loadForMercadoPagoPreference(Order $order): Order
+    {
+        return $order->fresh([
+            'buyer',
+            'presentation.season.show',
+            'items',
+        ]);
+    }
+
     public function findLockedWithItemsAndTickets(int $orderId): Order
     {
         return Order::query()

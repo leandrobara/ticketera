@@ -30,9 +30,9 @@ use App\Http\Controllers\Api\Checkout\OrderController as CheckoutOrderController
 // use App\Http\Controllers\Api\Site\SeasonController as SiteSeasonController;
 use App\Http\Controllers\Api\Site\NewsletterSubscriptionController;
 use App\Http\Controllers\Api\Site\ShowController as SiteShowController;
+use App\Http\Controllers\Api\Site\VenueController as SiteVenueController;
 use App\Http\Controllers\Api\Site\CommentController as SiteCommentController;
 use App\Http\Controllers\Api\Site\PresentationController as SitePresentationController;
-use App\Http\Controllers\Api\Site\VenueController as SiteVenueController;
 
 
 Route::post('/checkout/create-order', [CheckoutOrderController::class, 'create']);

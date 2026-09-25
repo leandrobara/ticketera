@@ -50,6 +50,11 @@ class OrderService
         ]);
     }
 
+    public function loadForMercadoPagoPreference(Order $order): Order
+    {
+        return $this->orderRepository->loadForMercadoPagoPreference($order);
+    }
+
     public function findAndLockFromMercadoPagoPayment(array $mercadoPagoPayment): ?Order
     {
         $order = $this->findOrderFromMercadoPagoPayment($mercadoPagoPayment);
@@ -111,7 +116,7 @@ class OrderService
     {
         do {
             $code = 'ORD-'.Str::upper(Str::random(10));
-        } while (Order::query()->where('code', $code)->exists());
+        } while ($this->orderRepository->existsByCode($code));
 
         return $code;
     }
