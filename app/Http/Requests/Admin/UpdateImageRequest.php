@@ -10,7 +10,7 @@ class UpdateImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => ['nullable', 'file', 'mimes:jpg,jpeg', 'mimetypes:image/jpeg', 'extensions:jpg,jpeg', 'max:10240'],
+            'image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'mimetypes:image/jpeg,image/png,image/webp', 'extensions:jpg,jpeg,png,webp', 'max:3072'],
             'show_id' => ['nullable', 'integer', 'exists:shows,id'],
             'path' => ['prohibited'],
             'type' => ['nullable', Rule::in(['gallery', 'grid'])],

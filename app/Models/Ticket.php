@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ticket extends Model
 {
+    use BelongsToOrganization;
     use SoftDeletes;
 
     protected $fillable = [
@@ -19,7 +21,7 @@ class Ticket extends Model
         'canceled_at',
         'checked_in_at',
         'presentation_id',
-        'presentation_ticket_type_id',
+        'season_ticket_type_id',
     ];
 
     protected function casts(): array
@@ -45,8 +47,8 @@ class Ticket extends Model
         return $this->belongsTo(Presentation::class);
     }
 
-    public function presentationTicketType(): BelongsTo
+    public function seasonTicketType(): BelongsTo
     {
-        return $this->belongsTo(PresentationTicketType::class);
+        return $this->belongsTo(SeasonTicketType::class)->withTrashed();
     }
 }

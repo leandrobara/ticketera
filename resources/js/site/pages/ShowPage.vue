@@ -76,6 +76,7 @@
     }) ?? null;
   });
   const hasShowPremiered = computed(() => {
+    if (!show.value?.comments_enabled) return false;
     const hasPublishedComments = Number(commentsSummary.value.count ?? 0) > 0;
     const hasFinishedPresentation = presentations.value.some((presentation) => presentation.is_finished);
 
@@ -83,7 +84,7 @@
   });
   const lastPresentationStartsAt = computed(() => {
     const presentationDates = presentations.value
-      .map((presentation) => new Date(presentation.starts_at))
+      .map((presentation) => new Date(presentation.ends_at ?? presentation.starts_at))
       .filter((date) => !Number.isNaN(date.getTime()));
 
     if (!presentationDates.length) {
@@ -173,11 +174,11 @@
       const [presentationsResult, venueResult, commentsResult] = await Promise.allSettled([
         PresentationService.getInstance().getPresentations(props.seasonId, promoCode.value),
         VenueService.getInstance().getVenueBySeason(props.seasonId),
-        CommentService.getInstance().getComments(show.value.id, {
+        show.value.comments_enabled ? CommentService.getInstance().getComments(show.value.id, {
           page: 1,
           limit: 5,
           sort: 'desc',
-        }),
+        }) : Promise.resolve({data:{data:{items:[],comments_summary:{count:0,average_rating:null},pagination:{page:1,limit:5,total:0,last_page:1,has_more:false}}}}),
       ]);
 
       if (presentationsResult.status === 'fulfilled') {

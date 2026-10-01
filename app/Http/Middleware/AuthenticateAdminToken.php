@@ -16,17 +16,16 @@ class AuthenticateAdminToken
     {
         $plainToken = $request->bearerToken();
 
-        if (!$plainToken) {
+        if (! $plainToken) {
             return $this->unauthenticatedResponse();
         }
 
         $accessToken = AdminAccessToken::query()
             ->with('user')
             ->where('token_hash', hash('sha256', $plainToken))
-            ->first()
-        ;
+            ->first();
 
-        if (!$accessToken || !$accessToken->user || $accessToken->user->role !== 'admin') {
+        if (! $accessToken || ! $accessToken->user) {
             return $this->unauthenticatedResponse();
         }
 

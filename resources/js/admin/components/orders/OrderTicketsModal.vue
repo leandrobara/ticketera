@@ -74,8 +74,8 @@
   };
 
   const getTicketTypeName = (ticket) => {
-    return ticket.presentation_ticket_type?.name
-      ?? ticket.order_item?.name
+    return ticket.order_item?.name
+      ?? ticket.season_ticket_type?.name
       ?? '-';
   };
 

@@ -4,8 +4,8 @@ namespace App\Http\Requests\Admin;
 
 use App\Models\Presentation;
 use App\Models\Season;
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreatePresentationRequest extends FormRequest
 {
@@ -13,6 +13,7 @@ class CreatePresentationRequest extends FormRequest
     {
         return [
             'notes' => ['nullable', 'string'],
+            'ends_at' => ['required', 'date', 'after:starts_at'],
             'starts_at' => ['required', 'date'],
             'capacity' => ['required', 'integer', 'min:0'],
             'season_id' => ['required', 'integer', 'exists:seasons,id'],
@@ -22,7 +23,7 @@ class CreatePresentationRequest extends FormRequest
 
     public function withValidator($validator): void
     {
-        if (!$validator->failed()) {
+        if (! $validator->failed()) {
             $validator->after(function ($validator) {
 
                 $seasonId = $this->input('season_id');
@@ -31,8 +32,7 @@ class CreatePresentationRequest extends FormRequest
                 $exists = Presentation::query()
                     ->where('season_id', $seasonId)
                     ->where('starts_at', $starts_at)
-                    ->exists()
-                ;
+                    ->exists();
 
                 if ($exists) {
                     $validator->errors()->add(

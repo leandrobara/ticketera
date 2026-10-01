@@ -12,6 +12,8 @@ FROM php:8.2-apache
 
 ARG APP_ENV=production
 
+RUN printf '%s\n' 'upload_max_filesize=3M' 'post_max_size=4M' > /usr/local/etc/php/conf.d/uploads.ini
+
 RUN apt-get update && apt-get install -y \
     git \
     curl \

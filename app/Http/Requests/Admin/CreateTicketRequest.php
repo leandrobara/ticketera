@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Admin;
 
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateTicketRequest extends FormRequest
 {
@@ -18,7 +18,7 @@ class CreateTicketRequest extends FormRequest
             'status' => ['nullable', Rule::in(['VALID', 'USED', 'CANCELED'])],
             'code' => ['nullable', 'string', 'max:255', 'unique:tickets,code'],
             'presentation_id' => ['required', 'integer', 'exists:presentations,id'],
-            'presentation_ticket_type_id' => ['nullable', 'integer', 'exists:presentation_ticket_types,id'],
+            'season_ticket_type_id' => ['nullable', 'integer', 'exists:season_ticket_types,id'],
         ];
     }
 }

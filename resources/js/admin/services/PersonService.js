@@ -27,7 +27,8 @@ export default class PersonService {
   }
 
   async updatePerson(personId, payload) {
-    const person = await ApiService.getInstance().put(`/api/admin/people/${personId}`, payload);
+    const method = payload instanceof FormData ? 'post' : 'put';
+    const person = await ApiService.getInstance()[method](`/api/admin/people/${personId}`, payload);
     return person;
   }
 

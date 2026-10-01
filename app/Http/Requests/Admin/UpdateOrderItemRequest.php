@@ -10,7 +10,7 @@ class UpdateOrderItemRequest extends FormRequest
     {
         return [
             'order_id' => ['nullable', 'integer', 'exists:orders,id'],
-            'presentation_ticket_type_id' => ['nullable', 'integer', 'exists:presentation_ticket_types,id'],
+            'season_ticket_type_id' => ['nullable', 'integer', 'exists:season_ticket_types,id'],
             'name' => ['nullable', 'string', 'max:255'],
             'quantity' => ['nullable', 'integer', 'min:1'],
             'paid_quantity' => ['nullable', 'integer', 'min:0'],

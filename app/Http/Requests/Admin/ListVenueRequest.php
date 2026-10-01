@@ -8,7 +8,6 @@ class ListVenueRequest extends FormRequest
 {
     public function rules(): array
     {
-        return [];
+        return ['search' => 'nullable|string|max:160', 'per_page' => 'nullable|integer|min:1|max:1000'];
     }
 }
-

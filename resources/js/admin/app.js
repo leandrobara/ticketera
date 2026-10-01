@@ -1,7 +1,7 @@
 import '../bootstrap';
 import './styles.css';
-import '@tabler/core/dist/css/tabler.min.css';
 import '@tabler/core/dist/js/tabler.min.js';
+import '@tabler/core/dist/css/tabler.min.css';
 
 import { createApp } from 'vue';
 import AdminApp from './AdminApp.vue';

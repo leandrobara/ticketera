@@ -125,6 +125,7 @@
                 </td>
                 <td class="text-end">
                   <div class="btn-list justify-content-end flex-nowrap">
+                    <a v-if="!['finished','cancelled'].includes(season.status)" class="btn btn-sm btn-outline-primary" :href="`/admin/events/new?season_id=${season.id}`">Editar con wizard</a>
                     <a
                       v-if="['published', 'finished'].includes(season.status)"
                       class="btn btn-sm btn-outline-secondary"

@@ -9,6 +9,7 @@ use App\Repositories\Site\SiteShowRepositoryInterface;
 use App\Repositories\Site\SiteVenueRepositoryInterface;
 use App\Repositories\Site\VenueRepository;
 use App\Repositories\Site\VenueRepositoryCache;
+use App\Support\OrganizationContext;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -22,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->scoped(OrganizationContext::class);
         $this->app->singleton(SiteShowRepositoryInterface::class, function ($app): SiteShowRepositoryInterface {
             $repository = $app->make(ShowRepository::class);
 
@@ -54,7 +56,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (parse_url((string) config('app.url'), PHP_URL_SCHEME) === 'https') {
+        $localRequest = $this->app->environment(['local', 'testing'])
+            && in_array(request()->getHost(), ['localhost', '127.0.0.1', '::1'], true);
+        if (! $localRequest && parse_url((string) config('app.url'), PHP_URL_SCHEME) === 'https') {
             URL::forceScheme('https');
         }
 

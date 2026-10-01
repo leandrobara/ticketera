@@ -10,11 +10,12 @@ return new class extends Migration
     {
         Schema::create('people', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('organization_id')->constrained()->restrictOnDelete();
             $table->string('display_name');
             $table->string('normalized_name')->index();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
-            $table->string('email')->nullable()->unique();
+            $table->string('email')->nullable();
             $table->string('document_type', 30)->nullable();
             $table->string('document_number', 80)->nullable();
             $table->string('phone')->nullable();
@@ -26,7 +27,8 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['document_type', 'document_number']);
+            $table->unique(['organization_id', 'email']);
+            $table->unique(['organization_id', 'document_type', 'document_number'], 'people_org_document_unique');
             $table->index('display_name');
             $table->index('first_name');
             $table->index('last_name');

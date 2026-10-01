@@ -5,10 +5,11 @@ namespace Database\Seeders;
 use App\Models\Buyer;
 use App\Models\Comment;
 use App\Models\Order;
+use App\Models\Organization;
 use App\Models\Person;
 use App\Models\Presentation;
-use App\Models\PresentationTicketType;
 use App\Models\Season;
+use App\Models\SeasonTicketType;
 use App\Models\Show;
 use App\Models\ShowCredit;
 use App\Models\ShowImage;
@@ -16,14 +17,16 @@ use App\Models\ShowLink;
 use App\Models\ShowPerformanceHistory;
 use App\Models\User;
 use App\Models\Venue;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
+
+    private int $organizationId;
 
     /**
      * Seed the application's database.
@@ -32,14 +35,20 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::updateOrCreate([
+        $owner = User::updateOrCreate([
             'email' => 'admin@ticketera.test',
         ], [
             'name' => 'Ticketera Admin',
             'password' => Hash::make('password'),
-            'role' => 'admin',
         ]);
 
+        $organization = Organization::firstOrNew(['name' => 'Ticketera Demo', 'creator_user_id' => $owner->id]);
+        if (! $organization->exists) {
+            $organization->creator_user_id = $owner->id;
+        }
+        $organization->save();
+        $this->organizationId = $organization->id;
+        $organization->memberships()->updateOrCreate(['user_id' => $owner->id], ['roles' => ['leader'], 'is_active' => true, 'joined_at' => now()]);
         $this->seedBuyers();
         $this->seedVenues();
         $this->seedShows();
@@ -50,7 +59,7 @@ class DatabaseSeeder extends Seeder
         $this->seedPeople();
         $this->seedShowCredits();
         $this->seedPresentations();
-        $this->seedPresentationTicketTypes();
+        $this->seedSeasonTicketTypes();
         $this->seedComments();
     }
 
@@ -89,16 +98,18 @@ class DatabaseSeeder extends Seeder
 
         foreach ($buyers as $buyerData) {
             $buyer = Buyer::withTrashed()
+                ->where('organization_id', $this->organizationId)
                 ->where('email', $buyerData['email'])
                 ->first();
 
             if ($buyer) {
                 $buyer->restore();
                 $buyer->update($buyerData);
+
                 continue;
             }
 
-            Buyer::create($buyerData);
+            Buyer::create($buyerData + ['organization_id' => $this->organizationId]);
         }
     }
 
@@ -235,16 +246,18 @@ class DatabaseSeeder extends Seeder
 
         foreach ($people as $personData) {
             $person = Person::withTrashed()
+                ->where('organization_id', $this->organizationId)
                 ->where('email', $personData['email'])
                 ->first();
 
             if ($person) {
                 $person->restore();
                 $person->update($personData);
+
                 continue;
             }
 
-            Person::create($personData);
+            Person::create($personData + ['organization_id' => $this->organizationId]);
         }
     }
 
@@ -326,8 +339,8 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($credits as $creditData) {
-            $show = Show::where('title', $creditData['show_title'])->firstOrFail();
-            $person = Person::where('email', $creditData['person_email'])->firstOrFail();
+            $show = Show::where('organization_id', $this->organizationId)->where('title', $creditData['show_title'])->firstOrFail();
+            $person = Person::where('organization_id', $this->organizationId)->where('email', $creditData['person_email'])->firstOrFail();
 
             $attributes = [
                 'show_id' => $show->id,
@@ -352,6 +365,7 @@ class DatabaseSeeder extends Seeder
             if ($showCredit) {
                 $showCredit->restore();
                 $showCredit->update($attributes);
+
                 continue;
             }
 
@@ -402,8 +416,8 @@ class DatabaseSeeder extends Seeder
 
         foreach ($venues as $venueData) {
             Venue::updateOrCreate(
-                ['name' => $venueData['name']],
-                $venueData,
+                ['name' => $venueData['name'], 'organization_id' => $this->organizationId],
+                $venueData + ['organization_id' => $this->organizationId],
             );
         }
     }
@@ -436,9 +450,8 @@ class DatabaseSeeder extends Seeder
                         'sort_order' => 2,
                     ],
                 ],
-                'duration_minutes' => 75,
                 'genre' => 'Drama',
-                'format' => 'Theater',
+                'format' => 'theater',
                 'age_rating' => '+13',
                 'service_fee_type' => 'fixed_amount',
                 'service_fee_fixed_amount' => '2000.000000',
@@ -458,9 +471,8 @@ class DatabaseSeeder extends Seeder
                         'sort_order' => 1,
                     ],
                 ],
-                'duration_minutes' => 65,
                 'genre' => 'Comedy',
-                'format' => 'Theater',
+                'format' => 'theater',
                 'age_rating' => '+16',
                 'service_fee_type' => 'percentage',
                 'service_fee_fixed_amount' => null,
@@ -474,9 +486,8 @@ class DatabaseSeeder extends Seeder
                 'synopsis' => 'Proceso escenico abierto al publico.',
                 'production_note' => null,
                 'faqs' => [],
-                'duration_minutes' => 50,
                 'genre' => 'Experimental',
-                'format' => 'Performance',
+                'format' => 'theater',
                 'age_rating' => 'ATP',
                 'service_fee_type' => 'fixed_amount',
                 'service_fee_fixed_amount' => '0.000000',
@@ -487,8 +498,8 @@ class DatabaseSeeder extends Seeder
 
         foreach ($shows as $showData) {
             Show::updateOrCreate(
-                ['title' => $showData['title']],
-                $showData,
+                ['title' => $showData['title'], 'organization_id' => $this->organizationId],
+                $showData + ['organization_id' => $this->organizationId],
             );
         }
     }
@@ -517,8 +528,8 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($seasons as $seasonData) {
-            $show = Show::where('title', $seasonData['show_title'])->firstOrFail();
-            $venue = Venue::where('name', $seasonData['venue_name'])->firstOrFail();
+            $show = Show::where('organization_id', $this->organizationId)->where('title', $seasonData['show_title'])->firstOrFail();
+            $venue = Venue::where('organization_id', $this->organizationId)->where('name', $seasonData['venue_name'])->firstOrFail();
 
             $season = Season::withTrashed()
                 ->where('show_id', $show->id)
@@ -539,6 +550,7 @@ class DatabaseSeeder extends Seeder
             if ($season) {
                 $season->restore();
                 $season->update($attributes);
+
                 continue;
             }
 
@@ -560,7 +572,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($showImages as $showImageData) {
-            $show = Show::where('title', $showImageData['show_title'])->firstOrFail();
+            $show = Show::where('organization_id', $this->organizationId)->where('title', $showImageData['show_title'])->firstOrFail();
 
             ShowImage::withTrashed()
                 ->where('show_id', $show->id)
@@ -588,7 +600,7 @@ class DatabaseSeeder extends Seeder
 
     private function seedShowPerformanceHistories(): void
     {
-        $show = Show::where('title', 'La noche antes')->firstOrFail();
+        $show = Show::where('organization_id', $this->organizationId)->where('title', 'La noche antes')->firstOrFail();
         $histories = [
             ['year' => '2025', 'venue_name' => 'Teatro Metropolitan Sura', 'sort_order' => 1],
             ['year' => '2024', 'venue_name' => 'Teatro Maipú', 'sort_order' => 2],
@@ -616,7 +628,7 @@ class DatabaseSeeder extends Seeder
 
     private function seedShowLinks(): void
     {
-        $show = Show::where('title', 'La noche antes')->firstOrFail();
+        $show = Show::where('organization_id', $this->organizationId)->where('title', 'La noche antes')->firstOrFail();
         $links = [
             [
                 'text' => 'La noche antes: una obra sobre los vínculos y el paso del tiempo',
@@ -694,8 +706,8 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($presentations as $presentationData) {
-            $show = Show::where('title', $presentationData['show_title'])->firstOrFail();
-            $venue = Venue::where('name', $presentationData['venue_name'])->firstOrFail();
+            $show = Show::where('organization_id', $this->organizationId)->where('title', $presentationData['show_title'])->firstOrFail();
+            $venue = Venue::where('organization_id', $this->organizationId)->where('name', $presentationData['venue_name'])->firstOrFail();
             $season = Season::where('show_id', $show->id)
                 ->where('venue_id', $venue->id)
                 ->where('closed_season_id', 0)
@@ -710,6 +722,9 @@ class DatabaseSeeder extends Seeder
             $attributes = [
                 'season_id' => $season->id,
                 'starts_at' => $startsAt,
+                'ends_at' => $startsAt->copy()->addMinutes(match ($show->title) {
+                    'La noche antes' => 75, 'Manual para desaparecer' => 65, default => 50
+                }),
                 'capacity' => $presentationData['capacity'],
                 'status' => $presentationData['status'],
                 'notes' => $presentationData['notes'],
@@ -718,6 +733,7 @@ class DatabaseSeeder extends Seeder
             if ($presentation) {
                 $presentation->restore();
                 $presentation->update($attributes);
+
                 continue;
             }
 
@@ -725,138 +741,37 @@ class DatabaseSeeder extends Seeder
         }
     }
 
-    private function seedPresentationTicketTypes(): void
+    private function seedSeasonTicketTypes(): void
     {
-        $ticketTypes = [
-            [
-                'show_title' => 'La noche antes',
-                'starts_at' => '2026-07-10 21:00:00',
-                'name' => 'General',
-                'price' => '20000.000000',
-                'stock' => 60,
-                'sort_order' => 1,
-                'promotion_name' => '2x1 General',
-                'promotion_type' => 'buy_x_get_y',
-                'promotion_value' => null,
-                'promotion_bundle_quantity' => 2,
-                'promotion_pay_quantity' => 1,
-                'promotion_access_code' => null,
-                'promotion_is_active' => true,
-            ],
-            [
-                'show_title' => 'La noche antes',
-                'starts_at' => '2026-07-10 21:00:00',
-                'name' => 'Estudiantes',
-                'price' => '15000.000000',
-                'stock' => 20,
-                'sort_order' => 2,
-                'promotion_name' => 'Descuento estudiantes',
-                'promotion_type' => 'percent_discount',
-                'promotion_value' => '50.000000',
-                'promotion_bundle_quantity' => null,
-                'promotion_pay_quantity' => null,
-                'promotion_access_code' => null,
-                'promotion_is_active' => true,
-            ],
-            [
-                'show_title' => 'La noche antes',
-                'starts_at' => '2026-07-17 21:00:00',
-                'name' => 'General',
-                'price' => '20000.000000',
-                'stock' => 80,
-                'sort_order' => 1,
-            ],
-            [
-                'show_title' => 'Manual para desaparecer',
-                'starts_at' => '2026-07-11 20:30:00',
-                'name' => 'General',
-                'price' => '18000.000000',
-                'stock' => 100,
-                'sort_order' => 1,
-            ],
-            [
-                'show_title' => 'Manual para desaparecer',
-                'starts_at' => '2026-07-11 20:30:00',
-                'name' => 'Promocional',
-                'price' => '14000.000000',
-                'stock' => 20,
-                'sort_order' => 2,
-                'promotion_name' => 'Promocional lanzamiento',
-                'promotion_type' => 'fixed_discount',
-                'promotion_value' => '2000.000000',
-                'promotion_bundle_quantity' => null,
-                'promotion_pay_quantity' => null,
-                'promotion_access_code' => null,
-                'promotion_is_active' => true,
-            ],
-            [
-                'show_title' => 'Manual para desaparecer',
-                'starts_at' => '2026-07-18 20:30:00',
-                'name' => 'General',
-                'price' => '18000.000000',
-                'stock' => 120,
-                'sort_order' => 1,
-                'promotion_name' => '30% lanzamiento',
-                'promotion_type' => 'percent_discount',
-                'promotion_value' => '30.000000',
-                'promotion_bundle_quantity' => null,
-                'promotion_pay_quantity' => null,
-                'promotion_access_code' => null,
-                'promotion_is_active' => true,
-            ],
-            [
-                'show_title' => 'Ensayo abierto',
-                'starts_at' => '2026-07-25 19:00:00',
-                'name' => 'Entrada libre',
-                'price' => '0.000000',
-                'stock' => 60,
-                'sort_order' => 1,
-            ],
+        // One definition per season; these quotas apply independently to every function.
+        $rows = [
+            ['show' => 'La noche antes', 'name' => 'General', 'price' => 20000, 'stock' => 60, 'sort_order' => 1,
+                'promotion_name' => '2x1 General', 'promotion_type' => 'buy_x_get_y', 'promotion_bundle_quantity' => 2, 'promotion_pay_quantity' => 1, 'promotion_is_active' => true],
+            ['show' => 'La noche antes', 'name' => 'Estudiantes', 'price' => 15000, 'stock' => 20, 'sort_order' => 2,
+                'promotion_name' => 'Descuento estudiantes', 'promotion_type' => 'percent_discount', 'promotion_value' => 50, 'promotion_is_active' => true],
+            ['show' => 'Manual para desaparecer', 'name' => 'General', 'price' => 18000, 'stock' => 100, 'sort_order' => 1,
+                'promotion_name' => '30% lanzamiento', 'promotion_type' => 'percent_discount', 'promotion_value' => 30, 'promotion_is_active' => true],
+            ['show' => 'Manual para desaparecer', 'name' => 'Promocional', 'price' => 14000, 'stock' => 20, 'sort_order' => 2,
+                'promotion_name' => 'Promocional lanzamiento', 'promotion_type' => 'fixed_discount', 'promotion_value' => 2000, 'promotion_is_active' => true],
+            ['show' => 'Ensayo abierto', 'name' => 'Entrada libre', 'price' => 0, 'stock' => null, 'sort_order' => 1],
         ];
-
-        foreach ($ticketTypes as $ticketTypeData) {
-            $show = Show::where('title', $ticketTypeData['show_title'])->firstOrFail();
-            $presentation = Presentation::whereHas(
-                'season',
-                fn ($query) => $query->where('show_id', $show->id)
-            )
-                ->where('starts_at', Carbon::parse($ticketTypeData['starts_at']))
-                ->firstOrFail();
-
-            $ticketType = PresentationTicketType::withTrashed()
-                ->where('presentation_id', $presentation->id)
-                ->where('name', $ticketTypeData['name'])
-                ->first();
-
-            $attributes = [
-                'presentation_id' => $presentation->id,
-                'name' => $ticketTypeData['name'],
-                'price' => $ticketTypeData['price'],
-                'stock' => $ticketTypeData['stock'],
-                'is_active' => true,
-                'sort_order' => $ticketTypeData['sort_order'],
-                'promotion_name' => $ticketTypeData['promotion_name'] ?? null,
-                'promotion_type' => $ticketTypeData['promotion_type'] ?? null,
-                'promotion_value' => $ticketTypeData['promotion_value'] ?? null,
-                'promotion_bundle_quantity' => $ticketTypeData['promotion_bundle_quantity'] ?? null,
-                'promotion_pay_quantity' => $ticketTypeData['promotion_pay_quantity'] ?? null,
-                'promotion_access_code' => $ticketTypeData['promotion_access_code'] ?? null,
-                'promotion_is_active' => $ticketTypeData['promotion_is_active'] ?? false,
-            ];
-
-            if ($ticketType) {
-                $ticketType->restore();
-                $ticketType->update($attributes);
-                continue;
+        foreach ($rows as $row) {
+            $show = Show::where('organization_id', $this->organizationId)->where('title', $row['show'])->firstOrFail();
+            $season = $show->seasons()->where('closed_season_id', 0)->firstOrFail();
+            unset($row['show']);
+            $type = SeasonTicketType::withTrashed()->updateOrCreate(
+                ['season_id' => $season->id, 'name' => $row['name']],
+                $row + ['is_active' => true]
+            );
+            if ($type->trashed()) {
+                $type->restore();
             }
-
-            PresentationTicketType::create($attributes);
         }
     }
 
     private function seedComments(): void
     {
-        $show = Show::where('title', 'La noche antes')->firstOrFail();
+        $show = Show::where('organization_id', $this->organizationId)->where('title', 'La noche antes')->firstOrFail();
         $presentation = Presentation::whereHas(
             'season',
             fn ($query) => $query->where('show_id', $show->id)
@@ -928,7 +843,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($comments as $index => $commentData) {
-            $buyer = Buyer::where('email', $commentData['buyer_email'])->firstOrFail();
+            $buyer = Buyer::where('organization_id', $this->organizationId)->where('email', $commentData['buyer_email'])->firstOrFail();
             $orderCode = sprintf('ORD-SEED-COMMENT-%02d', $index + 1);
 
             $order = Order::withTrashed()->updateOrCreate([

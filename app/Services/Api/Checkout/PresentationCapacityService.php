@@ -3,7 +3,7 @@
 namespace App\Services\Api\Checkout;
 
 use App\Models\Presentation;
-use App\Models\PresentationTicketType;
+use App\Models\SeasonTicketType;
 use App\Repositories\PresentationRepository;
 use App\Repositories\TicketRepository;
 use Illuminate\Validation\ValidationException;
@@ -18,12 +18,15 @@ class PresentationCapacityService
     }
 
     public function assertCanSellQuantity(
-        PresentationTicketType $ticketType,
+        SeasonTicketType $ticketType,
         Presentation $presentation,
         int $quantity,
     ): void {
+        if ((int) $ticketType->season_id !== (int) $presentation->season_id || ! $ticketType->is_active || $presentation->status !== 'published' || $presentation->season?->status !== 'published' || ! $presentation->starts_at->isFuture()) {
+            throw ValidationException::withMessages(['presentation_id' => 'La entrada no está disponible para esta función.']);
+        }
         $assignedPresentationTickets = $this->ticketRepository->countAssignedAndLockByPresentationId(
-            $ticketType->presentation_id
+            $presentation->id
         );
 
         if (($assignedPresentationTickets + $quantity) > $presentation->capacity) {
@@ -36,11 +39,11 @@ class PresentationCapacityService
             return;
         }
 
-        $assignedTicketTypeTickets = $this->ticketRepository->countAssignedAndLockByTicketTypeId($ticketType->id);
+        $assignedTicketTypeTickets = $this->ticketRepository->countAssignedAndLockByTicketTypeId($ticketType->id, $presentation->id);
 
         if (($assignedTicketTypeTickets + $quantity) > $ticketType->stock) {
             throw ValidationException::withMessages([
-                'quantity' => ['presentation_ticket_type_stock_exceeded'],
+                'quantity' => ['season_ticket_type_stock_exceeded'],
             ]);
         }
     }
@@ -55,6 +58,7 @@ class PresentationCapacityService
             $this->presentationRepository->update($presentation, [
                 'status' => 'sold_out',
             ]);
+
             return;
         }
 

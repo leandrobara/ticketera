@@ -3,22 +3,21 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
+    public function memberships()
+    {
+        return $this->hasMany(OrganizationMembership::class);
+    }
+
     use HasFactory, Notifiable, SoftDeletes;
 
-    public const ROLE_ADMIN = 'admin';
-    public const ROLE_OPERATOR = 'operador';
-    public const ROLE_DOOR = 'puerta';
-
     protected $fillable = [
-        'role',
         'name',
         'email',
         'password',
@@ -34,15 +33,6 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
             'email_verified_at' => 'datetime',
-        ];
-    }
-
-    public static function roles(): array
-    {
-        return [
-            self::ROLE_ADMIN,
-            self::ROLE_OPERATOR,
-            self::ROLE_DOOR,
         ];
     }
 }

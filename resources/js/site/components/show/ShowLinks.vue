@@ -25,7 +25,6 @@
     <div class="comments-heading">
       <div>
         <h2>Links de interés</h2>
-        <p>Notas, entrevistas, videos y contenidos relacionados con la obra.</p>
       </div>
     </div>
 

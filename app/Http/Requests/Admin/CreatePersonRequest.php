@@ -14,6 +14,7 @@ class CreatePersonRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:80'],
             'last_name' => ['nullable', 'string', 'max:120'],
             'photo_path' => ['nullable', 'string', 'max:255'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
             'first_name' => ['nullable', 'string', 'max:120'],
             'website_url' => ['nullable', 'url', 'max:255'],
             'display_name' => ['required', 'string', 'max:160'],

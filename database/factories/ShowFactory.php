@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Organization;
 use App\Models\Show;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -16,6 +18,13 @@ class ShowFactory extends Factory
         $title = fake()->sentence(3);
 
         return [
+            'organization_id' => function () {
+                $organization = new Organization(['name' => fake()->company()]);
+                $organization->creator_user_id = User::factory()->create()->id;
+                $organization->save();
+
+                return $organization->id;
+            },
             'title' => $title,
             'slug' => Str::slug($title).'-'.Str::lower(Str::random(6)),
             'subtitle' => fake()->optional()->sentence(),

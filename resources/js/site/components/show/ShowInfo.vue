@@ -144,7 +144,7 @@
       </div>
       <div class="detail">
         <h3><Clock class="detail-icon" />Duración</h3>
-        <p>{{ show.duration_minutes ? `${show.duration_minutes} minutos` : '-' }}</p>
+        <p>{{ primaryPresentation?.duration_minutes ? `${primaryPresentation.duration_minutes} minutos` : '-' }}</p>
       </div>
       <div class="detail">
         <h3><Tags class="detail-icon" />Categoría</h3>
@@ -168,7 +168,7 @@
       </div>
       <div class="detail">
         <h3><Ticket class="detail-icon" />Formato</h3>
-        <p>{{ show.format || 'Teatro' }}</p>
+        <p>{{ show.format === 'theater' ? 'Teatro' : (show.format || 'Teatro') }}</p>
       </div>
     </section>
 

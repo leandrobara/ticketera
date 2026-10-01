@@ -4,18 +4,18 @@ namespace App\Services\Api\Admin;
 
 use App\Jobs\SendOrderTicketsEmailJob;
 use App\Models\Order;
-use App\Models\Ticket;
-use App\Models\Payment;
 use App\Models\OrderItem;
 use App\Models\OrderItemPromotion;
+use App\Models\Payment;
 use App\Models\Presentation;
+use App\Models\SeasonTicketType;
+use App\Models\Ticket;
 use App\Repositories\OrderRepository;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use App\Models\PresentationTicketType;
+use App\Services\Api\Checkout\PresentationCapacityService;
 use App\Services\Api\OrderItemPricingService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
@@ -48,16 +48,16 @@ class OrderService
     public function createManual(array $data, ?int $createdByUserId = null): Order
     {
         $order = DB::transaction(function () use ($data, $createdByUserId) {
-            $ticketType = PresentationTicketType::query()
+            $ticketType = SeasonTicketType::query()
                 ->lockForUpdate()
-                ->findOrFail($data['presentation_ticket_type_id']);
+                ->findOrFail($data['season_ticket_type_id']);
 
             $presentation = Presentation::query()
                 ->with('season')
                 ->lockForUpdate()
-                ->findOrFail($ticketType->presentation_id);
+                ->findOrFail($data['presentation_id']);
 
-            $this->validateManualAvailability($ticketType, $presentation->capacity, $data['quantity']);
+            app(PresentationCapacityService::class)->assertCanSellQuantity($ticketType, $presentation, $data['quantity']);
 
             $buyer = $this->buyerService->create($data['buyer']);
 
@@ -87,7 +87,7 @@ class OrderService
                 'payment_method' => $data['payment_method'],
                 'total_amount' => $pricing['total_amount'],
                 'total_quantity' => $data['quantity'],
-                'presentation_id' => $ticketType->presentation_id,
+                'presentation_id' => $presentation->id,
                 'created_by_user_id' => $createdByUserId,
             ]);
 
@@ -109,7 +109,7 @@ class OrderService
                 'discount_amount' => $pricing['discount_amount'],
                 'service_fee_total_amount' => $pricing['service_fee_total_amount'],
                 'total_amount' => $pricing['total_amount'],
-                'presentation_ticket_type_id' => $ticketType->id,
+                'season_ticket_type_id' => $ticketType->id,
             ]);
 
             if ($promotion) {
@@ -143,8 +143,8 @@ class OrderService
                     'show_id' => $presentation->season->show_id,
                     'order_item_id' => $orderItem->id,
                     'code' => $this->makeUniqueCode('TCK', Ticket::class),
-                    'presentation_id' => $ticketType->presentation_id,
-                    'presentation_ticket_type_id' => $ticketType->id,
+                    'presentation_id' => $presentation->id,
+                    'season_ticket_type_id' => $ticketType->id,
                 ]);
             }
 
@@ -205,7 +205,7 @@ class OrderService
             ->whereIn('status', ['VALID', 'USED'])
             ->exists();
 
-        if (!$hasActiveTickets) {
+        if (! $hasActiveTickets) {
             $order->update([
                 'status' => 'CANCELED',
             ]);
@@ -219,52 +219,19 @@ class OrderService
         $this->orderRepository->delete($order);
     }
 
-    private function validateManualAvailability(PresentationTicketType $ticketType, int $presentationCapacity, int $quantity): void
-    {
-        $assignedPresentationTickets = Ticket::query()
-            ->where('presentation_id', $ticketType->presentation_id)
-            ->whereIn('status', ['VALID', 'USED'])
-            ->lockForUpdate()
-            ->count()
-        ;
-
-        if (($assignedPresentationTickets + $quantity) > $presentationCapacity) {
-            throw ValidationException::withMessages([
-                'quantity' => ['presentation_capacity_exceeded'],
-            ]);
-        }
-
-        if ($ticketType->stock === null) {
-            return;
-        }
-
-        $assignedTicketTypeTickets = Ticket::query()
-            ->where('presentation_ticket_type_id', $ticketType->id)
-            ->whereIn('status', ['VALID', 'USED'])
-            ->lockForUpdate()
-            ->count()
-        ;
-
-        if (($assignedTicketTypeTickets + $quantity) > $ticketType->stock) {
-            throw ValidationException::withMessages([
-                'quantity' => ['presentation_ticket_type_stock_exceeded'],
-            ]);
-        }
-    }
-
     public function syncPresentationStatusFromCapacity(Presentation $presentation): void
     {
         $assignedTickets = Ticket::query()
             ->where('presentation_id', $presentation->id)
             ->whereIn('status', ['VALID', 'USED'])
-            ->count()
-        ;
+            ->count();
         $remainingTickets = max(0, $presentation->capacity - $assignedTickets);
 
         if ($presentation->status === 'published' && $remainingTickets === 0) {
             $presentation->update([
                 'status' => 'sold_out',
             ]);
+
             return;
         }
 
@@ -283,5 +250,4 @@ class OrderService
 
         return $code;
     }
-
 }

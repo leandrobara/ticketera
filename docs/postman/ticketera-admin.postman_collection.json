@@ -12,6 +12,10 @@
         {
             "key": "token_tickets",
             "value": ""
+        },
+        {
+            "key": "organization_id",
+            "value": "1"
         }
     ],
     "auth": {
@@ -140,6 +144,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -167,6 +175,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -194,6 +206,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -222,6 +238,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -250,6 +270,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -279,6 +303,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -312,6 +340,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -339,6 +371,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -367,6 +403,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -395,6 +435,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -424,6 +468,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -469,6 +517,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -496,6 +548,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -524,6 +580,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -552,6 +612,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -581,6 +645,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -630,11 +698,15 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"season_id\": 1,\n    \"status\": \"published\",\n    \"starts_at\": \"2026-06-15 20:30:00\",\n    \"capacity\": 80,\n    \"notes\": \"Primera funcion\"\n}"
+                            "raw": "{\n    \"season_id\": 1,\n    \"status\": \"published\",\n    \"starts_at\": \"2026-06-15 20:30:00\",\n    \"capacity\": 80,\n    \"notes\": \"Primera funcion\",\n    \"ends_at\": \"2026-06-15 22:00:00\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/admin/presentations",
@@ -657,6 +729,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -685,6 +761,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -713,6 +793,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -732,27 +816,31 @@
             ]
         },
         {
-            "name": "Presentation Ticket Types",
+            "name": "Season Ticket Types",
             "item": [
                 {
-                    "name": "List Presentation Ticket Types",
+                    "name": "List Season Ticket Types",
                     "request": {
                         "method": "GET",
                         "header": [
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/admin/presentation-ticket-types?presentation_id=&is_active=&search=",
+                            "raw": "{{base_url}}/api/admin/season-ticket-types?presentation_id=&is_active=&search=",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "admin",
-                                "presentation-ticket-types"
+                                "season-ticket-types"
                             ],
                             "query": [
                                 {
@@ -772,7 +860,7 @@
                     }
                 },
                 {
-                    "name": "Create Presentation Ticket Type",
+                    "name": "Create Season Ticket Type",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -783,51 +871,59 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"presentation_id\": 1,\n    \"name\": \"General\",\n    \"price\": 12000,\n    \"stock\": 80,\n    \"is_active\": true,\n    \"sort_order\": 1\n}"
+                            "raw": "{\n    \"name\": \"General\",\n    \"price\": 12000,\n    \"stock\": 80,\n    \"is_active\": true,\n    \"sort_order\": 1,\n    \"season_id\": 1\n}"
                         },
                         "url": {
-                            "raw": "{{base_url}}/api/admin/presentation-ticket-types",
+                            "raw": "{{base_url}}/api/admin/season-ticket-types",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "admin",
-                                "presentation-ticket-types"
+                                "season-ticket-types"
                             ]
                         }
                     }
                 },
                 {
-                    "name": "Get Presentation Ticket Type",
+                    "name": "Get Season Ticket Type",
                     "request": {
                         "method": "GET",
                         "header": [
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/admin/presentation-ticket-types/1",
+                            "raw": "{{base_url}}/api/admin/season-ticket-types/1",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "admin",
-                                "presentation-ticket-types",
+                                "season-ticket-types",
                                 "1"
                             ]
                         }
                     }
                 },
                 {
-                    "name": "Update Presentation Ticket Type",
+                    "name": "Update Season Ticket Type",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -838,6 +934,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -845,38 +945,42 @@
                             "raw": "{\n    \"price\": 15000,\n    \"stock\": 70,\n    \"is_active\": true\n}"
                         },
                         "url": {
-                            "raw": "{{base_url}}/api/admin/presentation-ticket-types/1",
+                            "raw": "{{base_url}}/api/admin/season-ticket-types/1",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "admin",
-                                "presentation-ticket-types",
+                                "season-ticket-types",
                                 "1"
                             ]
                         }
                     }
                 },
                 {
-                    "name": "Delete Presentation Ticket Type",
+                    "name": "Delete Season Ticket Type",
                     "request": {
                         "method": "DELETE",
                         "header": [
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/admin/presentation-ticket-types/1",
+                            "raw": "{{base_url}}/api/admin/season-ticket-types/1",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "admin",
-                                "presentation-ticket-types",
+                                "season-ticket-types",
                                 "1"
                             ]
                         }
@@ -895,6 +999,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -928,6 +1036,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -955,6 +1067,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -983,6 +1099,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -1011,6 +1131,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1040,6 +1164,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1093,6 +1221,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -1120,6 +1252,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1148,6 +1284,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -1176,6 +1316,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1205,10 +1349,14 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/admin/order-items?order_id=&presentation_ticket_type_id=&search=",
+                            "raw": "{{base_url}}/api/admin/order-items?order_id=&season_ticket_type_id=&search=",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -1223,7 +1371,7 @@
                                     "value": ""
                                 },
                                 {
-                                    "key": "presentation_ticket_type_id",
+                                    "key": "season_ticket_type_id",
                                     "value": ""
                                 },
                                 {
@@ -1246,11 +1394,15 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"order_id\": 1,\n    \"presentation_ticket_type_id\": 1,\n    \"name\": \"General\",\n    \"quantity\": 2,\n    \"unit_price\": 10000\n}"
+                            "raw": "{\n    \"order_id\": 1,\n    \"season_ticket_type_id\": 1,\n    \"name\": \"General\",\n    \"quantity\": 2,\n    \"unit_price\": 10000\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/admin/order-items",
@@ -1273,6 +1425,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1301,6 +1457,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -1329,6 +1489,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1358,10 +1522,14 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/admin/tickets?order_id=&presentation_id=&presentation_ticket_type_id=&status=&search=",
+                            "raw": "{{base_url}}/api/admin/tickets?order_id=&presentation_id=&season_ticket_type_id=&status=&search=",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -1380,7 +1548,7 @@
                                     "value": ""
                                 },
                                 {
-                                    "key": "presentation_ticket_type_id",
+                                    "key": "season_ticket_type_id",
                                     "value": ""
                                 },
                                 {
@@ -1407,11 +1575,15 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"order_id\": 1,\n    \"presentation_id\": 1,\n    \"presentation_ticket_type_id\": 1,\n    \"status\": \"VALID\"\n}"
+                            "raw": "{\n    \"order_id\": 1,\n    \"presentation_id\": 1,\n    \"season_ticket_type_id\": 1,\n    \"status\": \"VALID\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/admin/tickets",
@@ -1434,6 +1606,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1462,6 +1638,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -1494,6 +1674,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -1522,6 +1706,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1551,6 +1739,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1596,6 +1788,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -1623,6 +1819,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1651,6 +1851,10 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "body": {
@@ -1679,6 +1883,10 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
                             }
                         ],
                         "url": {
@@ -1690,6 +1898,311 @@
                                 "api",
                                 "admin",
                                 "payments",
+                                "1"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Organizations and team",
+            "item": [
+                {
+                    "name": "My organizations",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/organizations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "organizations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create organization",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Productora\",\n    \"contact_email\": \"contacto@example.test\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/organizations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "organizations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Team",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/team",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "team"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Invitation links",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/invitations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "invitations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create invitation",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"roles\": [\n        \"collaborator\",\n        \"door\"\n    ],\n    \"max_uses\": 2,\n    \"show_ids\": null,\n    \"expires_at\": null\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/invitations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "invitations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Revoke invitation",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/invitations/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "invitations",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Accept invitation",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/invitations/{{invitation_token}}/accept",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "invitations",
+                                "{{invitation_token}}",
+                                "accept"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Event wizard",
+            "item": [
+                {
+                    "name": "Preview dates",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"configuration\": {\n        \"groups\": [\n            {\n                \"frequency\": \"weekly\",\n                \"weekdays\": [\n                    3,\n                    4,\n                    5\n                ],\n                \"starts_on\": \"2026-10-01\",\n                \"ends_on\": \"2026-10-31\",\n                \"start_time\": \"21:00\",\n                \"end_time\": \"23:00\"\n            }\n        ],\n        \"individual_dates\": [],\n        \"excluded_starts_at\": []\n    }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/event-wizard/preview-dates",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "event-wizard",
+                                "preview-dates"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create draft",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"show\": {\n        \"title\": \"Obra de prueba\",\n        \"age_rating\": \"ATP\",\n        \"comments_enabled\": true,\n        \"format\": \"theater\",\n        \"service_fee_type\": \"fixed_amount\",\n        \"service_fee_fixed_amount\": 0\n    },\n    \"venue\": {\n        \"name\": \"Sala de prueba\",\n        \"capacity\": 50\n    },\n    \"capacity\": 50,\n    \"configuration\": {\n        \"groups\": [],\n        \"individual_dates\": [],\n        \"excluded_starts_at\": []\n    },\n    \"credits\": [],\n    \"links\": [],\n    \"ticket_types\": [],\n    \"action\": \"draft\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/event-wizard",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "event-wizard"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Resume wizard",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Organization-Id",
+                                "value": "{{organization_id}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/event-wizard/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "event-wizard",
                                 "1"
                             ]
                         }

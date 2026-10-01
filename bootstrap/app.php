@@ -2,11 +2,13 @@
 
 use App\Exceptions\Services\AuthService\AuthorizationException;
 use App\Http\Middleware\AuthenticateAdminToken;
+use App\Http\Middleware\UseOrganization;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Validation\ValidationException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,8 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prependToPriorityList(SubstituteBindings::class, UseOrganization::class);
+        $middleware->prependToPriorityList(UseOrganization::class, AuthenticateAdminToken::class);
         $middleware->alias([
             'admin.token' => AuthenticateAdminToken::class,
+            'organization' => UseOrganization::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

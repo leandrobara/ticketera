@@ -41,7 +41,9 @@ class ShowService
                 'website' => $show->website_url,
             ],
             'faqs' => $this->showFaqs($show->faqs),
-            'duration_minutes' => $show->duration_minutes,
+            'contact_email' => $show->contact_email,
+            'whatsapp_phone' => $show->whatsapp_phone,
+            'comments_enabled' => $show->comments_enabled,
             'service_fee_type' => $show->service_fee_type,
             'service_fee_fixed_amount' => $show->service_fee_fixed_amount,
             'service_fee_percentage' => $show->service_fee_percentage,
@@ -62,7 +64,7 @@ class ShowService
                         ?: trim(($credit->person?->first_name ?? '').' '.($credit->person?->last_name ?? '')),
                     'role' => $credit->role_label,
                     'character_name' => $credit->character_name,
-                    'photo_url' => $credit->photo_url ?: $this->pathUrl($credit->person?->photo_path),
+                    'photo_url' => $credit->photo_url ?: $credit->person?->photo_url,
                 ])
                 ->values(),
             'performance_history' => $show->performanceHistories
@@ -105,20 +107,5 @@ class ShowService
         }
 
         return $image->url ?: (str_starts_with($image->path, '/') ? $image->path : '/'.$image->path);
-    }
-
-    private function pathUrl(?string $path): ?string
-    {
-        if (! $path) {
-            return null;
-        }
-
-        $cloudfrontDomain = config('filesystems.cloudfront_domain');
-
-        if ($cloudfrontDomain) {
-            return 'https://'.rtrim($cloudfrontDomain, '/').'/'.ltrim($path, '/');
-        }
-
-        return str_starts_with($path, '/') ? $path : '/'.$path;
     }
 }

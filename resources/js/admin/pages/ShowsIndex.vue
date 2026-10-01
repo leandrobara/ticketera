@@ -121,6 +121,7 @@
         </p>
       </div>
       <div class="col-auto ms-auto">
+        <a class="btn btn-primary me-2" href="/admin/events/new">Crear evento paso a paso</a>
         <button class="btn btn-success" type="button" @click="openShowModal">
           Crear un nuevo show
         </button>
@@ -177,6 +178,7 @@
                 <td class="text-secondary">{{ show.seasons_count ?? 0 }}</td>
                 <td class="text-end">
                   <div class="btn-list justify-content-end flex-nowrap">
+                    <a class="btn btn-sm btn-outline-primary" :href="`/admin/events/new?show_id=${show.id}`">Nueva temporada · Wizard</a>
                     <a
                       class="btn btn-sm btn-outline-secondary"
                       :href="`/admin/seasons?show_id=${show.id}`"

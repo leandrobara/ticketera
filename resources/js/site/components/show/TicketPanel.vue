@@ -168,7 +168,7 @@
             :value="presentation.id"
             :disabled="isPresentationFinished(presentation)"
           >
-            {{ formatDateTime(presentation.starts_at) }}
+            {{ formatDateTime(presentation.starts_at) }}{{ presentation.is_sold_out ? ' · Agotada' : '' }}
           </option>
         </select>
       </div>
@@ -217,7 +217,7 @@
         </article>
 
         <p v-if="selectedPresentation && ticketTypes.length === 0" class="summary-empty">
-          Esta función todavía no tiene entradas disponibles.
+          {{ selectedPresentation.is_sold_out ? 'Esta función está agotada.' : 'Esta función no tiene entradas disponibles para la venta.' }}
         </p>
       </div>
     </div>

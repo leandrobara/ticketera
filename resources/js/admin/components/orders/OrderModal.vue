@@ -5,7 +5,7 @@
   import OrderItemService from '@/admin/services/OrderItemService';
   import OrderService from '@/admin/services/OrderService';
   import PresentationService from '@/admin/services/PresentationService';
-  import PresentationTicketTypeService from '@/admin/services/PresentationTicketTypeService';
+  import SeasonTicketTypeService from '@/admin/services/SeasonTicketTypeService';
 
   // emits
   const emit = defineEmits(['saved']);
@@ -45,7 +45,7 @@
       last_name: '',
     },
     presentation_id: '',
-    presentation_ticket_type_id: '',
+    season_ticket_type_id: '',
     promo_code: '',
     quantity: 1,
     payment_method: 'CASH',
@@ -54,7 +54,7 @@
 
   // computed
   const selectedTicketType = computed(() => {
-    return ticketTypes.value.find((ticketType) => Number(ticketType.id) === Number(form.presentation_ticket_type_id));
+    return ticketTypes.value.find((ticketType) => Number(ticketType.id) === Number(form.season_ticket_type_id));
   });
 
   const selectedPresentation = computed(() => {
@@ -153,7 +153,7 @@
   };
 
   const calculateAmounts = async () => {
-    if (!form.presentation_ticket_type_id || Number(form.quantity) < 1) {
+    if (!form.season_ticket_type_id || Number(form.quantity) < 1) {
       resetPricing();
       return;
     }
@@ -163,7 +163,8 @@
 
     try {
       const payload = {
-        presentation_ticket_type_id: Number(form.presentation_ticket_type_id),
+        presentation_id: Number(form.presentation_id),
+      season_ticket_type_id: Number(form.season_ticket_type_id),
         quantity: Number(form.quantity),
         payment_method: form.payment_method,
       };
@@ -205,7 +206,7 @@
     form.buyer.phone = '';
     form.buyer.last_name = '';
     form.presentation_id = '';
-    form.presentation_ticket_type_id = '';
+    form.season_ticket_type_id = '';
     form.promo_code = '';
     form.quantity = 1;
     form.payment_method = 'CASH';
@@ -229,7 +230,8 @@
         phone: nullable(form.buyer.phone),
         last_name: nullable(form.buyer.last_name),
       },
-      presentation_ticket_type_id: Number(form.presentation_ticket_type_id),
+      presentation_id: Number(form.presentation_id),
+      season_ticket_type_id: Number(form.season_ticket_type_id),
       promo_code: selectedTicketTypeRequiresPromoCode.value
         ? nullable(form.promo_code.trim().toLowerCase())
         : null,
@@ -271,7 +273,7 @@
   };
 
   const loadTicketTypes = async () => {
-    form.presentation_ticket_type_id = '';
+    form.season_ticket_type_id = '';
     form.promo_code = '';
     ticketTypes.value = [];
     resetPricing();
@@ -283,7 +285,7 @@
     isLoadingTicketTypes.value = true;
 
     try {
-      const response = await PresentationTicketTypeService.getInstance().getPresentationTicketTypes({
+      const response = await SeasonTicketTypeService.getInstance().getSeasonTicketTypes({
         presentation_id: form.presentation_id,
         is_active: 1,
       });
@@ -363,7 +365,7 @@
 
   watch(
     () => [
-      form.presentation_ticket_type_id,
+      form.season_ticket_type_id,
       form.promo_code,
       form.quantity,
       form.payment_method,
@@ -510,9 +512,9 @@
             <label class="form-label" for="order-ticket-type-id">Tipo de entrada</label>
             <select
               id="order-ticket-type-id"
-              v-model="form.presentation_ticket_type_id"
+              v-model="form.season_ticket_type_id"
               class="form-select"
-              :class="{ 'is-invalid': getFieldError('presentation_ticket_type_id') }"
+              :class="{ 'is-invalid': getFieldError('season_ticket_type_id') }"
               :disabled="!form.presentation_id || isLoadingTicketTypes"
               required
             >
@@ -523,8 +525,8 @@
                 {{ getTicketTypeLabel(ticketType) }}
               </option>
             </select>
-            <div v-if="getFieldError('presentation_ticket_type_id')" class="invalid-feedback">
-              {{ getFieldError('presentation_ticket_type_id') }}
+            <div v-if="getFieldError('season_ticket_type_id')" class="invalid-feedback">
+              {{ getFieldError('season_ticket_type_id') }}
             </div>
           </div>
 

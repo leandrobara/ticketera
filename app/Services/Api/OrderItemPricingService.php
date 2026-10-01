@@ -2,7 +2,7 @@
 
 namespace App\Services\Api;
 
-use App\Models\PresentationTicketType;
+use App\Models\SeasonTicketType;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Illuminate\Validation\ValidationException;
@@ -12,10 +12,10 @@ class OrderItemPricingService
     private const SCALE = 6;
 
     public function findApplicablePromotion(
-        PresentationTicketType $ticketType,
+        SeasonTicketType $ticketType,
         ?string $promoCode = null,
-    ): ?PresentationTicketType {
-        if (!$ticketType->promotion_is_active || blank($ticketType->promotion_type)) {
+    ): ?SeasonTicketType {
+        if (! $ticketType->promotion_is_active || blank($ticketType->promotion_type)) {
             return null;
         }
 
@@ -32,8 +32,8 @@ class OrderItemPricingService
 
     public function calculateAmounts(array $data): array
     {
-        $ticketType = PresentationTicketType::findOrFail(
-            $data['presentation_ticket_type_id']
+        $ticketType = SeasonTicketType::findOrFail(
+            $data['season_ticket_type_id']
         );
 
         $promotion = $data['payment_method'] === 'FREE'
@@ -60,14 +60,14 @@ class OrderItemPricingService
     }
 
     public function calculateAmountsForTicketType(
-        PresentationTicketType $ticketType,
+        SeasonTicketType $ticketType,
         int $quantity,
-        ?PresentationTicketType $promotion = null,
+        ?SeasonTicketType $promotion = null,
         ?string $unitPriceOverride = null,
         bool $chargeServiceFee = true,
     ): array {
-        $ticketType->loadMissing('presentation.season.show');
-        $show = $ticketType->presentation?->season?->show;
+        $ticketType->loadMissing('season.show');
+        $show = $ticketType->season?->show;
 
         $unitPrice = $this->decimal($unitPriceOverride ?? $ticketType->price);
         $subtotal = $unitPrice->multipliedBy($quantity);
@@ -138,7 +138,7 @@ class OrderItemPricingService
         ];
     }
 
-    public function getPromotionName(PresentationTicketType $ticketType): string
+    public function getPromotionName(SeasonTicketType $ticketType): string
     {
         if (filled($ticketType->promotion_name)) {
             return $ticketType->promotion_name;
@@ -152,7 +152,7 @@ class OrderItemPricingService
         };
     }
 
-    public function calculatePromotionPricingForDisplay(PresentationTicketType $ticketType): array
+    public function calculatePromotionPricingForDisplay(SeasonTicketType $ticketType): array
     {
         $isBundlePromotion = $ticketType->promotion_type === 'buy_x_get_y';
         $displayQuantity = $isBundlePromotion
@@ -184,7 +184,7 @@ class OrderItemPricingService
         ];
     }
 
-    private function calculatePercentDiscount(BigDecimal $subtotal, PresentationTicketType $promotion): BigDecimal
+    private function calculatePercentDiscount(BigDecimal $subtotal, SeasonTicketType $promotion): BigDecimal
     {
         return $subtotal
             ->multipliedBy($promotion->promotion_value)
@@ -194,7 +194,7 @@ class OrderItemPricingService
     private function calculateFixedDiscount(
         BigDecimal $unitPrice,
         int $quantity,
-        PresentationTicketType $promotion,
+        SeasonTicketType $promotion,
     ): BigDecimal {
         $discountPerTicket = $this->decimal($promotion->promotion_value);
 
@@ -211,12 +211,12 @@ class OrderItemPricingService
         BigDecimal $unitPrice,
         BigDecimal $subtotal,
         int $quantity,
-        PresentationTicketType $promotion,
+        SeasonTicketType $promotion,
     ): BigDecimal {
         $bundleQuantity = $promotion->promotion_bundle_quantity;
         $payQuantity = $promotion->promotion_pay_quantity;
 
-        if (!$bundleQuantity || !$payQuantity || $payQuantity >= $bundleQuantity) {
+        if (! $bundleQuantity || ! $payQuantity || $payQuantity >= $bundleQuantity) {
             throw ValidationException::withMessages([
                 'promotion' => ['invalid_buy_x_get_y_configuration'],
             ]);
@@ -230,12 +230,12 @@ class OrderItemPricingService
         return $subtotal->minus($total);
     }
 
-    private function calculateBuyXGetYPaidQuantity(int $quantity, PresentationTicketType $promotion): int
+    private function calculateBuyXGetYPaidQuantity(int $quantity, SeasonTicketType $promotion): int
     {
         $bundleQuantity = $promotion->promotion_bundle_quantity;
         $payQuantity = $promotion->promotion_pay_quantity;
 
-        if (!$bundleQuantity || !$payQuantity || $payQuantity >= $bundleQuantity) {
+        if (! $bundleQuantity || ! $payQuantity || $payQuantity >= $bundleQuantity) {
             throw ValidationException::withMessages([
                 'promotion' => ['invalid_buy_x_get_y_configuration'],
             ]);
@@ -273,7 +273,7 @@ class OrderItemPricingService
         string|int|float|null $minimumUnitAmount,
         bool $chargeServiceFee,
     ): array {
-        if (!$chargeServiceFee || $paidQuantity === 0 || !$baseAmount->isPositive()) {
+        if (! $chargeServiceFee || $paidQuantity === 0 || ! $baseAmount->isPositive()) {
             return [
                 'service_fee' => $serviceFee,
                 'minimum_applied' => false,
@@ -282,7 +282,7 @@ class OrderItemPricingService
 
         $minimumFeePerUnit = $this->decimal((string) ($minimumUnitAmount ?? 0));
 
-        if (!$minimumFeePerUnit->isPositive()) {
+        if (! $minimumFeePerUnit->isPositive()) {
             return [
                 'service_fee' => $serviceFee,
                 'minimum_applied' => false,

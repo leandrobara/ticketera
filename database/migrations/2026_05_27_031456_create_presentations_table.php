@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('season_id')->constrained('seasons')->cascadeOnDelete();
             $table->enum('status', ['draft', 'published', 'sold_out', 'cancelled'])->default('published');
             $table->dateTime('starts_at');
+            $table->dateTime('ends_at');
             $table->unsignedInteger('capacity');
             $table->text('notes')->nullable();
 

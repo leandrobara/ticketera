@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('venues', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('organization_id')->constrained()->restrictOnDelete();
             $table->string('name');
             $table->unsignedInteger('capacity')->nullable();
             $table->text('note')->nullable();

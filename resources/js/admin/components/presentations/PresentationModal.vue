@@ -22,6 +22,7 @@
     season_id: '',
     capacity: '',
     starts_at: '',
+    ends_at: '',
     status: 'published',
   });
 
@@ -36,6 +37,7 @@
     form.season_id = '';
     form.capacity = '';
     form.starts_at = '';
+    form.ends_at = '';
     form.status = 'published';
 
     fieldErrors.value = {};
@@ -59,6 +61,7 @@
     form.capacity = presentation.capacity ?? '';
     form.status = presentation.status ?? 'published';
     form.starts_at = toDateTimeLocal(presentation.starts_at);
+    form.ends_at = toDateTimeLocal(presentation.ends_at);
     form.season_id = presentation.season_id ?? presentation.season?.id ?? '';
   
     fieldErrors.value = {};
@@ -73,6 +76,7 @@
     return {
       status: form.status,
       starts_at: form.starts_at,
+      ends_at: form.ends_at,
       notes: nullable(form.notes),
       season_id: Number(form.season_id),
       capacity: Number(form.capacity),
@@ -270,6 +274,11 @@
             </div>
           </div>
 
+          <div class="mb-3">
+            <label class="form-label" for="presentation-ends-at">Fecha y hora de finalización</label>
+            <input id="presentation-ends-at" v-model="form.ends_at" class="form-control" type="datetime-local" required :class="{ 'is-invalid': getFieldError('ends_at') }">
+            <div v-if="getFieldError('ends_at')" class="invalid-feedback">{{ getFieldError('ends_at') }}</div>
+          </div>
           <div class="mb-0">
             <label class="form-label" for="presentation-notes">Notas</label>
             <textarea

@@ -27,11 +27,12 @@ class ShowService
 
     public function getOne(Show $show): Show
     {
-        return $show;
+        return $show->load('mainImage');
     }
 
     public function create(array $data): Show
     {
+        $data['format'] = 'theater';
         if (blank($data['slug'] ?? null)) {
             $data['slug'] = Str::slug($data['title']);
         }
@@ -41,6 +42,7 @@ class ShowService
 
     public function update(Show $show, array $data): Show
     {
+        $data['format'] = 'theater';
         $show = $this->showRepository->update($show, $data);
         $this->redisHelper->deleteByPartialKey('site:show:'.$show->id.':getPublicShow');
 

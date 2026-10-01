@@ -100,16 +100,22 @@ Rutas admin:
 - `POST /api/admin/auth/login`
 - `GET /api/admin/auth/me`
 - `POST /api/admin/auth/logout`
-- CRUD de shows, venues, presentations, presentation ticket types, buyers, orders, order items, tickets y payments bajo `/api/admin`.
+- Organizaciones, equipo, invitaciones y wizard bajo `/api/admin`.
+- CRUD de shows, venues, seasons, presentations, season ticket types, buyers, orders, order items, tickets y payments bajo `/api/admin`.
 
-Las rutas admin protegidas requieren `Authorization: Bearer <token>`. El token se emite en login, se guarda hasheado en `admin_access_tokens` y expira segun `ADMIN_ACCESS_TOKEN_TTL_MINUTES`.
+Las rutas admin protegidas requieren `Authorization: Bearer <token>`. Los recursos de una organización requieren además `X-Organization-Id: <id>` y una membresía activa. El token se emite en login, se guarda hasheado en `admin_access_tokens` y expira según `ADMIN_ACCESS_TOKEN_TTL_MINUTES`.
+
+El nuevo flujo está en `/admin/events/new`. Ver [organizaciones y wizard](EVENT_WIZARD.md) para permisos, fechas, stock, contrato de API y verificación. Se conservan los CRUD anteriores; `/admin/users` abre ahora el equipo de la organización.
 
 ## Dominio principal
 
-- `Show`: obra/evento. Define datos comerciales, estado de publicacion y un service fee fijo o porcentual.
+- `Organization`: productora con creador permanente y equipo de usuarios globales.
+- `Show`: identidad reutilizable de la obra, sin estado propio. Conserva contenido, contacto, comentarios y cargo fijo o porcentual.
 - `Venue`: sala o espacio.
-- `Presentation`: funcion de un show en una fecha, venue y capacidad.
-- `PresentationTicketType`: tipo de entrada para una funcion. Define precio, stock, estado y una regla promocional opcional embebida.
+- `Season`: temporada del show en un lugar; agrupa funciones y definiciones de entradas.
+- `Presentation`: función de una temporada, con inicio, fin y capacidad.
+- `SeasonTicketType`: entrada definida una vez por temporada. Precio y activación son comunes; su stock es un máximo independiente para cada función. Conserva una promoción opcional embebida.
+- `SeasonSchedule`: configuración JSON editable que genera las funciones de una temporada.
 - `Buyer`: comprador.
 - `Order`: compra o reserva, de origen `CHECKOUT` o `ADMIN`.
 - `OrderItem`: linea de orden asociada a un tipo de entrada.
@@ -122,13 +128,13 @@ Estados importantes:
 - Orden: `PENDING`, `APPROVED`, `REJECTED`, `IN_PROCESS`, `CANCELED`, `EXPIRED`, `REFUNDED`.
 - Ticket: `VALID`, `USED`, `CANCELED` segun servicios actuales.
 - Presentacion: `draft`, `published`, `sold_out`, `cancelled`.
-- Show: `draft`, `published`, `archived`.
+- Temporada: `draft`, `published`, `finished`, `cancelled`. Show no tiene estado.
 
 ## Flujos principales
 
 ### Checkout publico
 
-1. El cliente envia buyer, cantidad, tipo de entrada y promo code opcional.
+1. El cliente envía buyer, cantidad, `presentation_id`, `season_ticket_type_id` y código promocional opcional.
 2. El backend valida tipo activo, consistencia show/presentacion y token de Mercado Pago.
 3. En transaccion se bloquea el tipo de entrada y la presentacion, se valida capacidad y stock, se crea buyer, order, item y snapshot de promocion si aplica.
 4. Fuera de la transaccion se crea la preference en Mercado Pago.

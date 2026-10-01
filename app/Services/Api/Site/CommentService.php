@@ -2,19 +2,19 @@
 
 namespace App\Services\Api\Site;
 
-use App\Models\Show;
-use App\Models\Comment;
-use Illuminate\Support\Str;
-use App\Models\CommentToken;
-use Illuminate\Support\Facades\DB;
-use App\Repositories\BuyerRepository;
-use App\Repositories\OrderRepository;
-use App\Repositories\CommentRepository;
 use App\Jobs\SendCommentInvitationEmailJob;
+use App\Models\Buyer;
+use App\Models\Comment;
+use App\Models\CommentToken;
+use App\Models\Show;
+use App\Repositories\BuyerRepository;
+use App\Repositories\CommentRepository;
 use App\Repositories\CommentTokenRepository;
-use Illuminate\Validation\ValidationException;
+use App\Repositories\OrderRepository;
 use App\Repositories\Site\CommentRepository as SiteCommentRepository;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class CommentService
 {
@@ -30,6 +30,8 @@ class CommentService
 
     public function listByShow(Show $show, array $options = []): array
     {
+        abort_unless($show->comments_enabled, 403, 'comments_disabled');
+
         return [
             'comments' => $this->siteCommentRepository->listByShow($show, $options),
             'comments_summary' => $this->siteCommentRepository
@@ -39,27 +41,28 @@ class CommentService
 
     public function sendUserEmailToComment(Show $show, array $data): array
     {
+        abort_unless($show->comments_enabled, 403, 'comments_disabled');
         $genericResponse = [
             'message' => 'Si el email coincide con el email con que realizaste la compra, te enviaremos un enlace para que puedas comentar.',
         ];
 
         $email = mb_strtolower(trim($data['email']));
-        $buyer = $this->buyerRepository->findByEmail($email);
+        $buyer = Buyer::where('organization_id', $show->organization_id)->where('email', $email)->first();
 
-        if (!$buyer) {
+        if (! $buyer) {
             return $genericResponse;
         }
 
         $tokenData = DB::transaction(function () use ($show, $buyer) {
             $lockedBuyer = $this->buyerRepository->findByIdForUpdate($buyer->id);
 
-            if (!$lockedBuyer) {
+            if (! $lockedBuyer) {
                 return null;
             }
 
             $order = $this->orderRepository->findApprovedForComment($show->id, $lockedBuyer->id);
 
-            if (!$order || $this->hasReachedCommentLimit($lockedBuyer->id, $show->id)) {
+            if (! $order || $this->hasReachedCommentLimit($lockedBuyer->id, $show->id)) {
                 return null;
             }
 
@@ -103,7 +106,7 @@ class CommentService
     {
         $tokenSnapshot = $this->commentTokenRepository->findByHash(hash('sha256', $rawToken));
 
-        if (!$tokenSnapshot) {
+        if (! $tokenSnapshot) {
             throw ValidationException::withMessages(['token' => ['invalid_comment_token']]);
         }
 
@@ -115,7 +118,7 @@ class CommentService
             );
             $this->assertTokenIsAvailable($commentToken);
 
-            if (!$buyer) {
+            if (! $buyer) {
                 throw ValidationException::withMessages(['token' => ['comment_buyer_not_available']]);
             }
 
@@ -124,7 +127,7 @@ class CommentService
                 $commentToken->buyer_id,
             );
 
-            if (!$order) {
+            if (! $order) {
                 throw ValidationException::withMessages(['token' => ['comment_order_not_approved']]);
             }
 
@@ -148,9 +151,11 @@ class CommentService
 
     private function assertTokenIsAvailable(?CommentToken $commentToken): void
     {
-        if (!$commentToken) {
+        if (! $commentToken) {
             throw ValidationException::withMessages(['token' => ['invalid_comment_token']]);
         }
+
+        abort_unless($commentToken->show?->comments_enabled, 403, 'comments_disabled');
 
         if ($commentToken->used_at || $commentToken->revoked_at) {
             throw ValidationException::withMessages(['token' => ['comment_token_not_available']]);
@@ -160,7 +165,7 @@ class CommentService
             throw ValidationException::withMessages(['token' => ['comment_token_expired']]);
         }
 
-        if (!$this->orderRepository->findApprovedForComment(
+        if (! $this->orderRepository->findApprovedForComment(
             $commentToken->show_id,
             $commentToken->buyer_id,
         )) {

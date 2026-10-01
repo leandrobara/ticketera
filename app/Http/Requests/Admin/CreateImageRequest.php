@@ -10,7 +10,7 @@ class CreateImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => ['required', 'file', 'mimes:jpg,jpeg', 'mimetypes:image/jpeg', 'extensions:jpg,jpeg', 'max:10240'],
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
             'show_id' => ['required', 'integer', 'exists:shows,id'],
             'path' => ['prohibited'],
             'type' => ['required', Rule::in(['gallery', 'grid'])],

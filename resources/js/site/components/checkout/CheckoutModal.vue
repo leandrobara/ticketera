@@ -156,7 +156,8 @@
 
     try {
       const payload = {
-        presentation_ticket_type_id: props.ticketType.id,
+        presentation_id: props.presentation.id,
+        season_ticket_type_id: props.ticketType.id,
         quantity: props.quantity,
         buyer: {
           name: form.name.trim(),

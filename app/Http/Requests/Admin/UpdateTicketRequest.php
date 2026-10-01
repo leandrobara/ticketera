@@ -15,7 +15,7 @@ class UpdateTicketRequest extends FormRequest
             'order_id' => ['nullable', 'integer', 'exists:orders,id'],
             'order_item_id' => ['nullable', 'integer', 'exists:order_items,id'],
             'presentation_id' => ['nullable', 'integer', 'exists:presentations,id'],
-            'presentation_ticket_type_id' => ['nullable', 'integer', 'exists:presentation_ticket_types,id'],
+            'season_ticket_type_id' => ['nullable', 'integer', 'exists:season_ticket_types,id'],
             'code' => ['nullable', 'string', 'max:255', Rule::unique('tickets', 'code')->ignore($ticket)],
             'status' => ['nullable', Rule::in(['VALID', 'USED', 'CANCELED'])],
             'checked_in_at' => ['nullable', 'date'],

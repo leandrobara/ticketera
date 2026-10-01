@@ -9,7 +9,6 @@ erDiagram
         string name
         string email UK
         string password
-        string role
         timestamp email_verified_at
         timestamp deleted_at
     }
@@ -25,13 +24,16 @@ erDiagram
 
     SHOWS {
         bigint id PK
+        bigint organization_id FK
         string title
         string subtitle
         string slug
         text synopsis
         text production_note
+        string contact_email
+        string whatsapp_phone
+        boolean comments_enabled
         json faqs
-        int duration_minutes
         string genre
         string format
         enum age_rating
@@ -45,6 +47,7 @@ erDiagram
 
     VENUES {
         bigint id PK
+        bigint organization_id FK
         string name
         int capacity
         text note
@@ -75,14 +78,15 @@ erDiagram
         bigint season_id FK
         enum status
         datetime starts_at
+        datetime ends_at
         int capacity
         text notes
         timestamp deleted_at
     }
 
-    PRESENTATION_TICKET_TYPES {
+    SEASON_TICKET_TYPES {
         bigint id PK
-        bigint presentation_id FK
+        bigint season_id FK
         string name
         decimal price
         int stock
@@ -100,11 +104,12 @@ erDiagram
 
     PEOPLE {
         bigint id PK
+        bigint organization_id FK
         string display_name
         string normalized_name
         string first_name
         string last_name
-        string email UK
+        string email
         string document_type
         string document_number
         string phone
@@ -131,9 +136,10 @@ erDiagram
 
     BUYERS {
         bigint id PK
+        bigint organization_id FK
         string name
         string last_name
-        string email UK
+        string email
         string phone
         string dni
         timestamp deleted_at
@@ -165,7 +171,7 @@ erDiagram
         bigint id PK
         bigint show_id FK
         bigint order_id FK
-        bigint presentation_ticket_type_id FK
+        bigint season_ticket_type_id FK
         string name
         int quantity
         int paid_quantity
@@ -203,7 +209,7 @@ erDiagram
         bigint order_id FK
         bigint order_item_id FK
         bigint presentation_id FK
-        bigint presentation_ticket_type_id FK
+        bigint season_ticket_type_id FK
         string code UK
         enum status
         timestamp checked_in_at
@@ -225,6 +231,51 @@ erDiagram
         timestamp paid_at
         timestamp deleted_at
     }
+
+    ORGANIZATIONS {
+        bigint id PK
+        bigint creator_user_id FK
+        string name
+        string contact_email
+        timestamp deleted_at
+    }
+    ORGANIZATION_MEMBERSHIPS {
+        bigint id PK
+        bigint organization_id FK
+        bigint user_id FK
+        bigint invitation_id FK
+        json roles
+        json show_ids
+        boolean is_active
+        timestamp joined_at
+    }
+    ORGANIZATION_INVITATIONS {
+        bigint id PK
+        bigint organization_id FK
+        bigint created_by_user_id FK
+        string token_hash UK
+        text encrypted_token
+        json roles
+        json show_ids
+        int max_uses
+        int uses
+        timestamp expires_at
+        timestamp revoked_at
+    }
+    SEASON_SCHEDULES {
+        bigint id PK
+        bigint season_id FK
+        json configuration
+    }
+    USERS ||--o{ ORGANIZATIONS : creates
+    USERS ||--o{ ORGANIZATION_MEMBERSHIPS : joins
+    ORGANIZATIONS ||--|{ ORGANIZATION_MEMBERSHIPS : has_team
+    ORGANIZATIONS ||--o{ ORGANIZATION_INVITATIONS : invites
+    ORGANIZATION_INVITATIONS o|--o{ ORGANIZATION_MEMBERSHIPS : originates
+    ORGANIZATIONS ||--o{ SHOWS : owns
+    ORGANIZATIONS ||--o{ VENUES : owns
+    ORGANIZATIONS ||--o{ PEOPLE : owns
+    ORGANIZATIONS ||--o{ BUYERS : owns
 
     USERS ||--o{ ADMIN_ACCESS_TOKENS : authenticates_with
     USERS o|--o{ ORDERS : creates
@@ -257,10 +308,10 @@ erDiagram
 
 ## Cardinalidades principales
 
-- Un show tiene muchas funciones.
-- Un show define tipos de entrada a traves de sus funciones.
+- Un show tiene muchas temporadas, que agrupan funciones y tipos de entrada.
+- Cada tipo de entrada se define una sola vez por temporada.
 - Un espacio puede alojar muchas funciones.
-- Una funcion ofrece muchos tipos de entrada.
+- Una función ofrece los tipos activos de su temporada; no existe tabla intermedia de disponibilidad.
 - Un tipo de entrada puede tener una regla promocional embebida.
 - Una persona puede participar en muchos shows.
 - Una persona puede tener muchos roles en un mismo show o en distintos shows.
@@ -271,11 +322,19 @@ erDiagram
 - Un item puede tener un unico snapshot historico de la promocion aplicada.
 - Cada item genera una o mas entradas individuales.
 - Una orden puede tener uno o mas registros de pago.
-- Un usuario administrador puede crear ordenes manuales.
+- Un miembro autorizado de una organización puede crear órdenes manuales.
+- Cada usuario global puede integrar varias organizaciones con roles diferentes.
+- `organization_memberships` es única por organización y usuario. `season_schedules` es única por temporada.
+- Email y documento de personas, y email de compradores, son únicos dentro de su organización.
 
 ## Reglas relevantes del modelo
 
-- `presentation_ticket_types.stock` limita ventas de ese tipo; si es `null`, no aplica limite por tipo.
+- `season_ticket_types.stock` limita ventas de ese tipo en cada función por separado; `null` no aplica límite propio y `0` significa agotado.
+- La disponibilidad cuenta tickets `VALID` y `USED` por el par función y tipo. Agotar un tipo no agota toda la función.
+- El código promocional se normaliza a minúsculas y es único por temporada entre tipos no eliminados, aunque estén inactivos.
+- `Show` no tiene estado ni duración persistida. La duración de una función se deriva de `ends_at - starts_at`.
+- `season_schedules.configuration` guarda la configuración editable de recurrencia; no es un log de ventas.
+- Las órdenes pendientes de Mercado Pago no reservan cupo. Los tickets se emiten al aprobar el pago; la política de reservas queda pendiente.
 - `presentations.capacity` limita el total de tickets activos para la funcion.
 - Los tickets activos para cupo son `VALID` y `USED`.
 - `order_item_promotions` no apunta a una tabla de promociones: guarda una copia historica de los campos promocionales aplicados.

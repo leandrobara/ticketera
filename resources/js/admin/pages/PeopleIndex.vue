@@ -144,9 +144,9 @@
                 <td>
                   <div class="d-flex align-items-center">
                     <span
-                      v-if="person.photo_path"
+                      v-if="person.photo_url || person.photo_path"
                       class="avatar me-2"
-                      :style="{ backgroundImage: `url(${person.photo_path})` }"
+                      :style="{ backgroundImage: `url(${person.photo_url || person.photo_path})` }"
                     ></span>
                     <span v-else class="avatar me-2">{{ person.display_name?.charAt(0) ?? 'P' }}</span>
                     <div>

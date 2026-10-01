@@ -10,7 +10,7 @@ class ListShowLinkRequest extends FormRequest
     {
         return [
             'show_id' => ['nullable', 'integer', 'exists:shows,id'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:1000'],
         ];
     }
 }

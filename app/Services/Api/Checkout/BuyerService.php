@@ -13,12 +13,13 @@ class BuyerService
         //
     }
 
-    public function findOrCreate(array $buyerData): Buyer
+    public function findOrCreate(array $buyerData, int $organizationId): Buyer
     {
         $buyerData = $this->normalizeEmailAndPhone($buyerData);
-        $buyer = $this->buyerRepository->findByEmailWithTrashed($buyerData['email']);
+        $buyerData['organization_id'] = $organizationId;
+        $buyer = Buyer::withTrashed()->where('organization_id', $organizationId)->where('email', $buyerData['email'])->first();
 
-        if (!$buyer) {
+        if (! $buyer) {
             return $this->buyerRepository->store($buyerData);
         }
 

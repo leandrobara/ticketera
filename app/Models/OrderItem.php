@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderItem extends Model
 {
+    use BelongsToOrganization;
     use SoftDeletes;
 
     protected $fillable = [
@@ -29,7 +31,7 @@ class OrderItem extends Model
         'discount_amount',
         'service_fee_total_amount',
         'total_amount',
-        'presentation_ticket_type_id',
+        'season_ticket_type_id',
     ];
 
     protected function casts(): array
@@ -56,9 +58,9 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function presentationTicketType(): BelongsTo
+    public function seasonTicketType(): BelongsTo
     {
-        return $this->belongsTo(PresentationTicketType::class);
+        return $this->belongsTo(SeasonTicketType::class)->withTrashed();
     }
 
     public function promotionSnapshot(): HasOne

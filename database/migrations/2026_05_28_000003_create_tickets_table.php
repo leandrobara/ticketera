@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             $table->foreignId('order_item_id')->constrained('order_items')->cascadeOnDelete();
             $table->foreignId('presentation_id')->constrained('presentations')->cascadeOnDelete();
-            $table->foreignId('presentation_ticket_type_id')->nullable()->constrained('presentation_ticket_types')->nullOnDelete();
+            $table->foreignId('season_ticket_type_id')->nullable()->constrained('season_ticket_types')->nullOnDelete();
             $table->string('code')->unique();
             $table->enum('status', ['VALID', 'USED', 'CANCELED'])->default('VALID')->index();
             $table->timestamp('checked_in_at')->nullable();
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->index(['show_id', 'presentation_id', 'status']);
-            $table->index(['presentation_ticket_type_id', 'status']);
+            $table->index(['season_ticket_type_id', 'status']);
 
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

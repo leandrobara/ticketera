@@ -34,7 +34,7 @@ class TicketService
                     'order_item_id' => $item->id,
                     'code' => $this->makeUniqueCode(),
                     'presentation_id' => $order->presentation_id,
-                    'presentation_ticket_type_id' => $item->presentation_ticket_type_id,
+                    'season_ticket_type_id' => $item->season_ticket_type_id,
                 ]);
             }
         }

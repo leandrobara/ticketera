@@ -2,13 +2,12 @@
 
 namespace App\Services\Api\Site;
 
-use App\Models\Season;
 use App\Models\Presentation;
-use Illuminate\Support\Collection;
-use App\Models\PresentationTicketType;
-use App\Services\Api\OrderItemPricingService;
+use App\Models\Season;
+use App\Models\SeasonTicketType;
 use App\Repositories\Site\PresentationRepository;
-
+use App\Services\Api\OrderItemPricingService;
+use Illuminate\Support\Collection;
 
 class PresentationService
 {
@@ -29,7 +28,7 @@ class PresentationService
         $promotionAccessCode = $this->normalizeAccessCode($data['promo_code'] ?? null);
 
         foreach ($presentations as $presentation) {
-            $isFinished = !$presentation->starts_at->isFuture();
+            $isFinished = ! $presentation->starts_at->isFuture();
             $availableTicketsCount = $isFinished ? 0 : $this->calculateAvailableTicketsCount($presentation);
 
             $ticketTypesForSaleData = [];
@@ -37,7 +36,7 @@ class PresentationService
             if ($availableTicketsCount > 0) {
                 foreach ($presentation->ticketTypes as $ticketType) {
                     // validamos si tenemos que mostrar las entradas en el front
-                    if (!$this->shouldDisplayTicketType($ticketType, $promotionAccessCode)) {
+                    if (! $this->shouldDisplayTicketType($ticketType, $promotionAccessCode)) {
                         continue;
                     }
 
@@ -45,8 +44,7 @@ class PresentationService
                     // Si tiene stock propio, descuenta las entradas ya vendidas sin permitir valores negativos.
                     $availableTicketsForTicketTypeCount = $ticketType->stock === null
                         ? $availableTicketsCount
-                        : max(0, $ticketType->stock - $ticketType->sold_tickets_count)
-                    ;
+                        : max(0, $ticketType->stock - $ticketType->sold_tickets_count);
 
                     // Calculan cuántas entradas como máximo puede seleccionar una persona en esta compra.
                     $availableTicketsForPurchaseCount = min(
@@ -54,7 +52,7 @@ class PresentationService
                         $availableTicketsForTicketTypeCount,
                         self::MAX_PURCHASE_QUANTITY,
                     );
-                    
+
                     // Contiene los tipos de entrada que se pueden ofrecer públicamente,
                     // junto con su disponibilidad máxima de compra y promoción aplicable.
                     $ticketTypesForSaleData[] = [
@@ -76,16 +74,15 @@ class PresentationService
         return $presentationsSalesData;
     }
 
-    private function buildPromotionData(PresentationTicketType $ticketType, ?string $promotionAccessCode): ?array
+    private function buildPromotionData(SeasonTicketType $ticketType, ?string $promotionAccessCode): ?array
     {
         $promotion = $this->orderItemPricingService->findApplicablePromotion($ticketType, $promotionAccessCode);
-        if (!$promotion) {
+        if (! $promotion) {
             return null;
         }
 
         $calculatedPromoPricingForDisplay = $this->orderItemPricingService
-            ->calculatePromotionPricingForDisplay($promotion)
-        ;
+            ->calculatePromotionPricingForDisplay($promotion);
 
         return [
             'name' => $promotion->promotion_name,
@@ -102,16 +99,16 @@ class PresentationService
         ];
     }
 
-    private function shouldDisplayTicketType(PresentationTicketType $ticketType, ?string $promotionAccessCode): bool
+    private function shouldDisplayTicketType(SeasonTicketType $ticketType, ?string $promotionAccessCode): bool
     {
-        if (!$ticketType->promotion_is_active || blank($ticketType->promotion_access_code)) {
+        if (! $ticketType->promotion_is_active || blank($ticketType->promotion_access_code)) {
             return true;
         }
 
         return filled($promotionAccessCode) && $ticketType->promotion_access_code === $promotionAccessCode;
     }
 
-    private function buildPromotionLabel(PresentationTicketType $ticketType): string
+    private function buildPromotionLabel(SeasonTicketType $ticketType): string
     {
         return match ($ticketType->promotion_type) {
             'percent_discount' => 'Promoción '.$this->formatPromotionValueForLabel($ticketType->promotion_value).'%',
@@ -138,6 +135,7 @@ class PresentationService
     private function normalizeAccessCode(?string $promotionAccessCode): ?string
     {
         $promotionAccessCode = trim((string) $promotionAccessCode);
+
         return $promotionAccessCode === '' ? null : mb_strtolower($promotionAccessCode);
     }
 }

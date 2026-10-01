@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Presentation extends Model
 {
+    use BelongsToOrganization;
     use SoftDeletes;
 
     protected $fillable = [
@@ -17,6 +19,7 @@ class Presentation extends Model
         'season_id',
         'capacity',
         'starts_at',
+        'ends_at',
     ];
 
     protected function casts(): array
@@ -25,6 +28,7 @@ class Presentation extends Model
             'capacity' => 'integer',
             'revenue_amount' => 'decimal:6',
             'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
         ];
     }
 
@@ -34,11 +38,11 @@ class Presentation extends Model
     }
 
     /**
-     * @return HasMany<PresentationTicketType>
+     * @return HasMany<SeasonTicketType>
      */
     public function ticketTypes(): HasMany
     {
-        return $this->hasMany(PresentationTicketType::class);
+        return $this->hasMany(SeasonTicketType::class, 'season_id', 'season_id');
     }
 
     public function orders(): HasMany
@@ -50,5 +54,4 @@ class Presentation extends Model
     {
         return $this->hasMany(Ticket::class);
     }
-
 }

@@ -7,7 +7,6 @@ use Illuminate\Validation\Rule;
 
 class CreateShowRequest extends FormRequest
 {
-
     public function rules(): array
     {
         return [
@@ -26,11 +25,13 @@ class CreateShowRequest extends FormRequest
             'faqs.*.question' => ['required_with:faqs', 'string', 'max:255'],
             'faqs.*.answer' => ['required_with:faqs', 'string'],
             'faqs.*.sort_order' => ['nullable', 'integer', 'min:1'],
+            'contact_email' => ['nullable', 'email', 'max:255'],
+            'whatsapp_phone' => ['nullable', 'regex:/^\+?[1-9][0-9]{6,14}$/'],
+            'comments_enabled' => ['sometimes', 'boolean'],
             'title' => ['required', 'string', 'max:160'],
             'subtitle' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:100'],
-            'format' => ['nullable', 'string', 'max:100'],
-            'duration_minutes' => ['nullable', 'integer', 'min:0'],
+            'format' => ['nullable', 'in:theater'],
             'service_fee_type' => ['required', Rule::in(['fixed_amount', 'percentage'])],
             'service_fee_fixed_amount' => [
                 'nullable',

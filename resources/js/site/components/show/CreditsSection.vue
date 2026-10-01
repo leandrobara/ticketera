@@ -25,7 +25,7 @@
         </div>
         <div>
           <h3 class="cast-name">{{ credit.name }}</h3>
-          <p class="cast-role">Como: {{ credit.character_name || credit.role }}</p>
+          <p v-if="credit.character_name?.trim()" class="cast-role">Como: {{ credit.character_name }}</p>
         </div>
       </li>
     </ul>

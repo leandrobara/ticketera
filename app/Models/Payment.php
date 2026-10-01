@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
+    use BelongsToOrganization;
     use SoftDeletes;
 
     protected $fillable = [
@@ -36,5 +38,4 @@ class Payment extends Model
     {
         return $this->belongsTo(Order::class);
     }
-
 }

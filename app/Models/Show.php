@@ -2,20 +2,27 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Database\Factories\ShowFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Show extends Model
 {
+    use BelongsToOrganization;
+
     /** @use HasFactory<ShowFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'organization_id',
         'title',
+        'contact_email',
+        'whatsapp_phone',
+        'comments_enabled',
         'slug',
         'genre',
         'format',
@@ -36,14 +43,13 @@ class Show extends Model
         'service_fee_fixed_amount',
         'service_fee_percentage',
         'service_fee_minimum_unit_amount',
-        'duration_minutes',
     ];
 
     protected function casts(): array
     {
         return [
+            'comments_enabled' => 'boolean',
             'faqs' => 'array',
-            'duration_minutes' => 'integer',
             'service_fee_fixed_amount' => 'decimal:6',
             'service_fee_percentage' => 'decimal:6',
             'service_fee_minimum_unit_amount' => 'decimal:6',

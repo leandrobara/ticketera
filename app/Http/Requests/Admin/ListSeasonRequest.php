@@ -14,6 +14,7 @@ class ListSeasonRequest extends FormRequest
             'show_id' => ['nullable', 'integer', 'exists:shows,id'],
             'venue_id' => ['nullable', 'integer', 'exists:venues,id'],
             'status' => ['nullable', Rule::in(['draft', 'published', 'finished', 'cancelled'])],
+            'period' => ['nullable', Rule::in(['upcoming', 'ongoing', 'past', 'undated'])],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:1000'],
         ];
     }

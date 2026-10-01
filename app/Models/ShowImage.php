@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ShowImage extends Model
 {
+    use BelongsToOrganization;
     use SoftDeletes;
 
     protected $fillable = [
@@ -39,7 +41,7 @@ class ShowImage extends Model
 
     public function getUrlAttribute(): ?string
     {
-        if (!$this->path) {
+        if (! $this->path) {
             return null;
         }
 
@@ -49,6 +51,6 @@ class ShowImage extends Model
             return 'https://'.rtrim($cloudfrontDomain, '/').'/'.ltrim($this->path, '/');
         }
 
-        return null;
+        return str_starts_with($this->path, '/') ? $this->path : '/storage/'.$this->path;
     }
 }

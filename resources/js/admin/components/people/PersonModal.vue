@@ -14,6 +14,10 @@
   const modalInstance = ref(null);
   const isSubmitting = ref(false);
   const isLoadingCandidates = ref(false);
+  const photoInput = ref(null);
+  const selectedPhoto = ref(null);
+  const localPhotoUrl = ref('');
+  const photoRemoved = ref(false);
   const form = reactive({
     bio: '',
     email: '',
@@ -32,10 +36,37 @@
   const hasDuplicateCandidates = computed(() => duplicateCandidates.value.length > 0);
   const modalTitle = computed(() => isEditing.value ? 'Editar persona' : 'Crear una nueva persona');
   const submitLabel = computed(() => isEditing.value ? 'Guardar cambios' : 'Crear persona');
+  const displayedPhotoUrl = computed(() => localPhotoUrl.value || (photoRemoved.value ? '' : currentPerson.value?.photo_url ?? currentPerson.value?.photo_path ?? ''));
 
   const nullable = (value) => value === '' ? null : value;
 
+  const resetPhoto = () => {
+    if (localPhotoUrl.value) URL.revokeObjectURL(localPhotoUrl.value);
+    selectedPhoto.value = null;
+    localPhotoUrl.value = '';
+    photoRemoved.value = false;
+    if (photoInput.value) photoInput.value.value = '';
+  };
+
+  const selectPhoto = (event) => {
+    const file = event.target.files?.[0];
+    if (localPhotoUrl.value) URL.revokeObjectURL(localPhotoUrl.value);
+    selectedPhoto.value = file ?? null;
+    localPhotoUrl.value = file ? URL.createObjectURL(file) : '';
+    if (file) photoRemoved.value = false;
+    fieldErrors.value = { ...fieldErrors.value, photo: undefined };
+  };
+
+  const removePhoto = () => {
+    if (localPhotoUrl.value) URL.revokeObjectURL(localPhotoUrl.value);
+    selectedPhoto.value = null;
+    localPhotoUrl.value = '';
+    photoRemoved.value = true;
+    if (photoInput.value) photoInput.value.value = '';
+  };
+
   const resetForm = () => {
+    resetPhoto();
     form.bio = '';
     form.email = '';
     form.phone = '';
@@ -53,6 +84,7 @@
   };
 
   const fillForm = (person) => {
+    resetPhoto();
     form.bio = person.bio ?? '';
     form.email = person.email ?? '';
     form.phone = person.phone ?? '';
@@ -75,7 +107,7 @@
       email: nullable(form.email),
       phone: nullable(form.phone),
       last_name: nullable(form.last_name),
-      photo_path: nullable(form.photo_path),
+      photo_path: photoRemoved.value ? null : nullable(form.photo_path),
       first_name: nullable(form.first_name),
       website_url: nullable(form.website_url),
       display_name: form.display_name,
@@ -84,6 +116,18 @@
       document_number: nullable(form.document_number),
       allow_duplicate_name: allowDuplicateName,
     };
+  };
+
+  const getSubmitPayload = (allowDuplicateName) => {
+    const payload = getPayload(allowDuplicateName);
+    if (!selectedPhoto.value) return payload;
+
+    const formData = new FormData();
+    Object.entries(payload).forEach(([key, value]) => {
+      formData.append(key, typeof value === 'boolean' ? (value ? '1' : '0') : value ?? '');
+    });
+    formData.append('photo', selectedPhoto.value);
+    return formData;
   };
 
   const getFieldError = (field) => {
@@ -142,9 +186,9 @@
 
     try {
       if (isEditing.value) {
-        await PersonService.getInstance().updatePerson(currentPerson.value.id, getPayload(allowDuplicateName));
+        await PersonService.getInstance().updatePerson(currentPerson.value.id, getSubmitPayload(allowDuplicateName));
       } else {
-        await PersonService.getInstance().createPerson(getPayload(allowDuplicateName));
+        await PersonService.getInstance().createPerson(getSubmitPayload(allowDuplicateName));
       }
 
       emit('saved');
@@ -184,6 +228,7 @@
   });
 
   onBeforeUnmount(() => {
+    resetPhoto();
     modalInstance.value?.dispose();
   });
 </script>
@@ -215,9 +260,9 @@
                 <div class="row align-items-center">
                   <div class="col-auto">
                     <span
-                      v-if="candidate.photo_path"
+                      v-if="candidate.photo_url || candidate.photo_path"
                       class="avatar"
-                      :style="{ backgroundImage: `url(${candidate.photo_path})` }"
+                      :style="{ backgroundImage: `url(${candidate.photo_url || candidate.photo_path})` }"
                     ></span>
                     <span v-else class="avatar">{{ candidate.display_name?.charAt(0) ?? 'P' }}</span>
                   </div>
@@ -251,7 +296,7 @@
           <div class="row">
             <div class="col-md-6">
               <div class="mb-3">
-                <label class="form-label" for="person-display-name">Nombre público</label>
+                <label class="form-label required" for="person-display-name">Nombre público</label>
                 <input
                   id="person-display-name"
                   v-model.trim="form.display_name"
@@ -375,17 +420,23 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label" for="person-photo-path">Foto</label>
+            <label class="form-label" for="person-photo">Foto</label>
+            <div v-if="displayedPhotoUrl" class="wizard-image-preview mb-3" style="position: relative; display: inline-block; max-width: 100%">
+              <img :src="displayedPhotoUrl" alt="Foto de la persona" class="wizard-image" style="display: block">
+              <button class="btn btn-sm btn-danger wizard-image-remove" type="button"
+                style="position: absolute; right: .5rem; bottom: .5rem" @click="removePhoto">Eliminar</button>
+            </div>
             <input
-              id="person-photo-path"
-              v-model.trim="form.photo_path"
+              id="person-photo"
+              ref="photoInput"
               class="form-control"
-              :class="{ 'is-invalid': getFieldError('photo_path') }"
-              type="text"
-              maxlength="255"
+              :class="{ 'is-invalid': getFieldError('photo') }"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              @change="selectPhoto"
             >
-            <div v-if="getFieldError('photo_path')" class="invalid-feedback">
-              {{ getFieldError('photo_path') }}
+            <div v-if="getFieldError('photo')" class="invalid-feedback">
+              {{ getFieldError('photo') }}
             </div>
           </div>
 

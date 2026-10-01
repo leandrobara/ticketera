@@ -20,7 +20,7 @@ class VenueService
 
     public function list(array $filters): LengthAwarePaginator
     {
-        return $this->venueRepository->listPaginated($filters['search'] ?? null);
+        return $this->venueRepository->listPaginated($filters['search'] ?? null, $filters['per_page'] ?? 20);
     }
 
     public function getOne(Venue $venue): Venue

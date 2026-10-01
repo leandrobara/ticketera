@@ -16,6 +16,10 @@ export default class SeasonService {
     return ApiService.getInstance().get('/api/admin/seasons', { params });
   }
 
+  getSeason(id) {
+    return ApiService.getInstance().get(`/api/admin/seasons/${id}`);
+  }
+
   createSeason(payload) {
     return ApiService.getInstance().post('/api/admin/seasons', payload);
   }

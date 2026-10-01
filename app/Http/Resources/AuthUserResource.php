@@ -13,7 +13,7 @@ class AuthUserResource extends JsonResource
             'id' => $this->resource->id,
             'name' => $this->resource->name,
             'email' => $this->resource->email,
-            'role' => $this->resource->role,
+            'memberships' => $this->resource->memberships()->where('is_active', true)->whereHas('organization')->with('organization')->get(),
         ];
     }
 }

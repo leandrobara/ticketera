@@ -15,23 +15,29 @@ trait ValidatesCommentToken
             ->where('token_hash', hash('sha256', (string) $this->route('token')))
             ->first();
 
-        if (!$commentToken) {
+        if (! $commentToken) {
             $validator->errors()->add('token', 'invalid_comment_token');
+
             return;
         }
 
+        abort_unless($commentToken->show?->comments_enabled, 403, 'comments_disabled');
+
         if ($commentToken->used_at || $commentToken->revoked_at) {
             $validator->errors()->add('token', 'comment_token_not_available');
+
             return;
         }
 
         if ($commentToken->expires_at->isPast()) {
             $validator->errors()->add('token', 'comment_token_expired');
+
             return;
         }
 
-        if (!$commentToken->buyer) {
+        if (! $commentToken->buyer) {
             $validator->errors()->add('token', 'comment_buyer_not_available');
+
             return;
         }
 
@@ -41,8 +47,9 @@ trait ValidatesCommentToken
             ->where('status', 'APPROVED')
             ->exists();
 
-        if (!$hasApprovedOrder) {
+        if (! $hasApprovedOrder) {
             $validator->errors()->add('token', 'comment_order_not_approved');
+
             return;
         }
 

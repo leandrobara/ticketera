@@ -40,7 +40,7 @@
     }
 
     if (props.show.format) {
-      return props.show.format;
+      return props.show.format === 'theater' ? 'Teatro' : props.show.format;
     }
 
     return 'Teatro';

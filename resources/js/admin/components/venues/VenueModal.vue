@@ -115,13 +115,14 @@
     isSubmitting.value = true;
 
     try {
+      let response;
       if (isEditing.value) {
-        await VenueService.getInstance().updateVenue(currentVenue.value.id, getPayload());
+        response = await VenueService.getInstance().updateVenue(currentVenue.value.id, getPayload());
       } else {
-        await VenueService.getInstance().createVenue(getPayload());
+        response = await VenueService.getInstance().createVenue(getPayload());
       }
 
-      emit('saved');
+      emit('saved', response.data.data);
       close();
     } catch (error) {
       fieldErrors.value = error.response?.data?.errors ?? {};

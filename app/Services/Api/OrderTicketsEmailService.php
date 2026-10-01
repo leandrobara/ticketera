@@ -25,7 +25,7 @@ class OrderTicketsEmailService
             'payments',
             'presentation.season.show',
             'presentation.season.venue',
-            'tickets.presentationTicketType',
+            'tickets.seasonTicketType',
         ]);
 
         $response = $this->brevoTransactionalEmailService->send([

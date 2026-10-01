@@ -4,7 +4,7 @@ namespace App\Services\Api\Checkout;
 
 use App\Models\Order;
 use App\Repositories\PresentationRepository;
-use App\Repositories\PresentationTicketTypeRepository;
+use App\Repositories\SeasonTicketTypeRepository;
 use App\Services\Api\MercadoPagoService;
 use App\Services\Api\OrderItemPricingService;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +20,7 @@ class CheckoutOrderService
         private readonly PresentationRepository $presentationRepository,
         private readonly OrderItemPricingService $orderItemPricingService,
         private readonly PresentationCapacityService $presentationCapacityService,
-        private readonly PresentationTicketTypeRepository $presentationTicketTypeRepository,
+        private readonly SeasonTicketTypeRepository $seasonTicketTypeRepository,
     ) {
         //
     }
@@ -40,13 +40,13 @@ class CheckoutOrderService
     {
         return DB::transaction(function () use ($data) {
             // Lock del tipo de ticket para no vender el mismo stock en paralelo.
-            $ticketType = $this->presentationTicketTypeRepository->findAndLockOrFail(
-                $data['presentation_ticket_type_id']
+            $ticketType = $this->seasonTicketTypeRepository->findAndLockOrFail(
+                $data['season_ticket_type_id']
             );
 
             // Lock de la función y su temporada.
             $presentation = $this->presentationRepository->findAndLockWithSeasonOrFail(
-                $ticketType->presentation_id
+                $data['presentation_id']
             );
 
             // ¿Hay cupo en la función y stock en este tipo de ticket?
@@ -57,7 +57,7 @@ class CheckoutOrderService
             );
 
             // Reusa el comprador por email o lo crea.
-            $buyer = $this->buyerService->findOrCreate($data['buyer']);
+            $buyer = $this->buyerService->findOrCreate($data['buyer'], $presentation->season->show->organization_id);
 
             // Promo válida para este tipo de ticket, si mandaron código.
             $promotion = $this->orderItemPricingService->findApplicablePromotion(

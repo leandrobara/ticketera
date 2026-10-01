@@ -581,11 +581,10 @@
               <div v-else class="list-group">
                 <div v-for="credit in castCredits" :key="credit.id" class="list-group-item">
                   <div class="row align-items-center">
-                    <div class="col-auto" v-if="credit.photo_url">
-                      <span
-                        class="avatar"
-                        :style="{ backgroundImage: `url(${credit.photo_url})` }"
-                      ></span>
+                    <div class="col-auto">
+                      <span v-if="credit.photo_url" class="avatar avatar-sm rounded-circle"
+                        :style="{ backgroundImage: `url(${credit.photo_url})` }" aria-hidden="true"></span>
+                      <span v-else class="avatar avatar-sm rounded-circle" aria-hidden="true">{{ getCreditPersonName(credit).trim().charAt(0).toLocaleUpperCase('es-AR') || 'P' }}</span>
                     </div>
                     <div class="col">
                       <div class="fw-semibold">
@@ -622,11 +621,10 @@
               <div v-else class="list-group">
                 <div v-for="credit in technicalCredits" :key="credit.id" class="list-group-item">
                   <div class="row align-items-center">
-                    <div class="col-auto" v-if="credit.photo_url">
-                      <span
-                        class="avatar"
-                        :style="{ backgroundImage: `url(${credit.photo_url})` }"
-                      ></span>
+                    <div class="col-auto">
+                      <span v-if="credit.photo_url" class="avatar avatar-sm rounded-circle"
+                        :style="{ backgroundImage: `url(${credit.photo_url})` }" aria-hidden="true"></span>
+                      <span v-else class="avatar avatar-sm rounded-circle" aria-hidden="true">{{ getCreditPersonName(credit).trim().charAt(0).toLocaleUpperCase('es-AR') || 'P' }}</span>
                     </div>
                     <div class="col">
                       <div class="fw-semibold">

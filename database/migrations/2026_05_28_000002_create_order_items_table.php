@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('show_id')->constrained('shows')->cascadeOnDelete();
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
-            $table->foreignId('presentation_ticket_type_id')->nullable()->constrained('presentation_ticket_types')->nullOnDelete();
+            $table->foreignId('season_ticket_type_id')->nullable()->constrained('season_ticket_types')->nullOnDelete();
             $table->string('name');
             $table->unsignedInteger('quantity');
             $table->unsignedInteger('paid_quantity');
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['show_id', 'order_id', 'presentation_ticket_type_id']);
+            $table->index(['show_id', 'order_id', 'season_ticket_type_id']);
 
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

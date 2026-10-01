@@ -15,13 +15,12 @@ class AuthService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly AdminAccessTokenRepository $adminAccessTokenRepository,
-    ) {
-    }
+    ) {}
 
     public function loginUser(array $credentials): array
     {
         $user = $this->userRepository->findByEmail($credentials['email']);
-        if (!$this->isValidAdminLogin($user, $credentials['password'])) {
+        if (! $this->isValidAdminLogin($user, $credentials['password'])) {
             throw new AuthorizationException('invalid_user_or_password');
         }
 
@@ -46,7 +45,6 @@ class AuthService
     private function isValidAdminLogin(?User $user, string $password): bool
     {
         return $user !== null
-            && Hash::check($password, $user->password)
-            && $user->role === 'admin';
+            && Hash::check($password, $user->password);
     }
 }

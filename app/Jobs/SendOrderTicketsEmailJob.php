@@ -28,7 +28,7 @@ class SendOrderTicketsEmailJob implements ShouldQueue
     {
         $order = $this->reserveOrderForSending();
 
-        if (!$order) {
+        if (! $order) {
             return;
         }
 
@@ -59,11 +59,10 @@ class SendOrderTicketsEmailJob implements ShouldQueue
                     'payments',
                     'presentation.season.show',
                     'presentation.season.venue',
-                    'tickets.presentationTicketType',
+                    'tickets.seasonTicketType',
                 ])
                 ->lockForUpdate()
-                ->findOrFail($this->orderId)
-            ;
+                ->findOrFail($this->orderId);
 
             if ($order->status !== 'APPROVED') {
                 return null;
@@ -94,7 +93,7 @@ class SendOrderTicketsEmailJob implements ShouldQueue
                 'payments',
                 'presentation.season.show',
                 'presentation.season.venue',
-                'tickets.presentationTicketType',
+                'tickets.seasonTicketType',
             ]);
         });
     }

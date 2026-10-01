@@ -96,7 +96,7 @@
                                     @foreach ($order->tickets as $ticket)
                                         <tr>
                                             <td style="padding: 14px 0; border-bottom: 1px solid #f0f2f5;">
-                                                {{ $ticket->presentationTicketType?->name ?? 'Entrada' }}
+                                                {{ $ticket->orderItem?->name ?? $ticket->seasonTicketType?->name ?? 'Entrada' }}
                                             </td>
                                             <td style="padding: 14px 0; border-bottom: 1px solid #f0f2f5; font-weight: 700;">
                                                 {{ $ticket->code }}

@@ -2,11 +2,10 @@
 
 namespace App\Http\Requests\Admin;
 
-
-use App\Models\Season;
 use App\Models\Presentation;
-use Illuminate\Validation\Rule;
+use App\Models\Season;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePresentationRequest extends FormRequest
 {
@@ -14,6 +13,7 @@ class UpdatePresentationRequest extends FormRequest
     {
         return [
             'notes' => ['nullable', 'string'],
+            'ends_at' => ['sometimes', 'date'],
             'starts_at' => ['nullable', 'date'],
             'capacity' => ['nullable', 'integer', 'min:0'],
             'season_id' => ['nullable', 'integer', 'exists:seasons,id'],
@@ -23,7 +23,7 @@ class UpdatePresentationRequest extends FormRequest
 
     public function withValidator($validator): void
     {
-        if (!$validator->failed()) {
+        if (! $validator->failed()) {
             $validator->after(function ($validator) {
                 $presentation = $this->route('presentation');
                 $seasonId = $this->input('season_id', $presentation?->season_id);
@@ -33,8 +33,7 @@ class UpdatePresentationRequest extends FormRequest
                     ->where('season_id', $seasonId)
                     ->where('starts_at', $startsAt)
                     ->whereKeyNot($presentation?->id)
-                    ->exists()
-                ;
+                    ->exists();
 
                 if ($exists) {
                     $validator->errors()->add(

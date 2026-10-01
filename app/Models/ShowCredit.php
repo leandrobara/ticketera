@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ShowCredit extends Model
 {
+    use BelongsToOrganization;
     use SoftDeletes;
 
     protected $fillable = [
@@ -45,7 +47,7 @@ class ShowCredit extends Model
 
     public function getPhotoUrlAttribute(): ?string
     {
-        if (!$this->photo_path_override) {
+        if (! $this->photo_path_override) {
             return null;
         }
 

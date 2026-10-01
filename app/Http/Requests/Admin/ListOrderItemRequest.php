@@ -11,7 +11,7 @@ class ListOrderItemRequest extends FormRequest
         return [
             'search' => ['nullable', 'string', 'max:160'],
             'order_id' => ['nullable', 'integer', 'exists:orders,id'],
-            'presentation_ticket_type_id' => ['nullable', 'integer', 'exists:presentation_ticket_types,id'],
+            'season_ticket_type_id' => ['nullable', 'integer', 'exists:season_ticket_types,id'],
         ];
     }
 }

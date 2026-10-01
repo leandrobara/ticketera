@@ -16,8 +16,7 @@ class OrderRepository
     {
         return Order::query()
             ->where('code', $orderCode)
-            ->first()
-        ;
+            ->first();
     }
 
     public function existsByCode(string $code): bool
@@ -41,8 +40,7 @@ class OrderRepository
         return Order::query()
             ->with(['items', 'tickets'])
             ->lockForUpdate()
-            ->findOrFail($orderId)
-        ;
+            ->findOrFail($orderId);
     }
 
     public function findApprovedForComment(
@@ -55,8 +53,7 @@ class OrderRepository
             ->where('buyer_id', $buyerId)
             ->where('status', 'APPROVED')
             ->latest('id')
-            ->first()
-        ;
+            ->first();
     }
 
     public function listPaginated(array $filters, int $limit = 20): LengthAwarePaginator
@@ -69,7 +66,7 @@ class OrderRepository
                 'items.promotionSnapshot',
                 'payments',
                 'tickets.orderItem',
-                'tickets.presentationTicketType',
+                'tickets.seasonTicketType',
             ])
             ->when($filters['buyer_id'] ?? null, fn ($query, int $buyerId) => $query->where('buyer_id', $buyerId))
             ->when($filters['presentation_id'] ?? null, fn ($query, int $presentationId) => $query->where('presentation_id', $presentationId))
@@ -89,8 +86,7 @@ class OrderRepository
                 });
             })
             ->latest()
-            ->paginate($limit)
-        ;
+            ->paginate($limit);
     }
 
     public function getOne(Order $order): Order
@@ -102,7 +98,7 @@ class OrderRepository
             'createdByUser',
             'items.promotionSnapshot',
             'tickets.orderItem',
-            'tickets.presentationTicketType',
+            'tickets.seasonTicketType',
             'payments',
         ]);
     }
@@ -115,13 +111,14 @@ class OrderRepository
     public function update(Order $order, array $attrs): Order
     {
         $order->update($attrs);
+
         return $order->fresh([
             'buyer',
             'presentation.season.show',
             'presentation.season.venue',
             'items.promotionSnapshot',
             'tickets.orderItem',
-            'tickets.presentationTicketType',
+            'tickets.seasonTicketType',
             'payments',
         ]);
     }

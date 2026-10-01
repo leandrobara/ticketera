@@ -26,7 +26,7 @@ class CreateOrderItemRequest extends FormRequest
             'total_amount' => ['nullable', 'numeric', 'decimal:0,6', 'min:0'],
             'show_id' => ['required', 'integer', 'exists:shows,id'],
             'order_id' => ['required', 'integer', 'exists:orders,id'],
-            'presentation_ticket_type_id' => ['nullable', 'integer', 'exists:presentation_ticket_types,id'],
+            'season_ticket_type_id' => ['nullable', 'integer', 'exists:season_ticket_types,id'],
         ];
     }
 }

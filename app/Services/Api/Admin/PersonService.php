@@ -2,6 +2,7 @@
 
 namespace App\Services\Api\Admin;
 
+use App\Helpers\ImageHelper;
 use App\Helpers\RedisHelper;
 use App\Models\Person;
 use App\Repositories\PersonRepository;
@@ -14,6 +15,7 @@ use Illuminate\Validation\ValidationException;
 class PersonService
 {
     public function __construct(
+        private readonly ImageHelper $imageHelper,
         private readonly PersonRepository $personRepository,
         private readonly ShowCreditRepository $showCreditRepository,
         private readonly RedisHelper $redisHelper,
@@ -50,6 +52,7 @@ class PersonService
         $data = $this->normalizeData($data);
         $this->validateStrongIdentifiers($data);
         $this->validatePossibleNameDuplicate($data, null, $allowDuplicateName);
+        $data = $this->storePhotoIfPresent($data);
 
         return $this->personRepository->store($data);
     }
@@ -62,6 +65,7 @@ class PersonService
         $data = $this->normalizeData($data, $person);
         $this->validateStrongIdentifiers($data, $person->id);
         $this->validatePossibleNameDuplicate($data, $person->id, $allowDuplicateName);
+        $data = $this->storePhotoIfPresent($data);
 
         $person = $this->personRepository->update($person, $data);
 
@@ -192,5 +196,17 @@ class PersonService
         $name = preg_replace('/[^a-z0-9]+/i', ' ', $name);
 
         return trim(preg_replace('/\s+/', ' ', $name));
+    }
+
+    private function storePhotoIfPresent(array $data): array
+    {
+        $photo = $data['photo'] ?? null;
+        unset($data['photo']);
+
+        if ($photo) {
+            $data['photo_path'] = $this->imageHelper->uploadImage($photo, 'people');
+        }
+
+        return $data;
     }
 }

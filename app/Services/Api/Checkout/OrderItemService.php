@@ -5,7 +5,7 @@ namespace App\Services\Api\Checkout;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Presentation;
-use App\Models\PresentationTicketType;
+use App\Models\SeasonTicketType;
 use App\Repositories\OrderItemPromotionRepository;
 use App\Repositories\OrderItemRepository;
 use App\Services\Api\OrderItemPricingService;
@@ -23,10 +23,10 @@ class OrderItemService
     public function createItem(
         Order $order,
         Presentation $presentation,
-        PresentationTicketType $ticketType,
+        SeasonTicketType $ticketType,
         array $pricing,
         int $quantity,
-        ?PresentationTicketType $promotion,
+        ?SeasonTicketType $promotion,
     ): OrderItem {
         $orderItem = $this->orderItemRepository->store([
             'order_id' => $order->id,
@@ -46,7 +46,7 @@ class OrderItemService
             'discount_amount' => $pricing['discount_amount'],
             'service_fee_total_amount' => $pricing['service_fee_total_amount'],
             'total_amount' => $pricing['total_amount'],
-            'presentation_ticket_type_id' => $ticketType->id,
+            'season_ticket_type_id' => $ticketType->id,
         ]);
 
         if ($promotion) {

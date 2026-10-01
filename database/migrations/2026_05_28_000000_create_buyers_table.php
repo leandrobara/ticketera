@@ -10,12 +10,14 @@ return new class extends Migration
     {
         Schema::create('buyers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('organization_id')->constrained()->restrictOnDelete();
             $table->string('name');
             $table->string('last_name')->nullable();
-            
-            $table->string('email')->unique();
+
+            $table->string('email');
+            $table->unique(['organization_id', 'email']);
             $table->string('phone')->nullable();
-            
+
             $table->string('dni')->nullable();
 
             $table->timestamps();

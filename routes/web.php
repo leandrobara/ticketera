@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ShowController;
 use App\Http\Controllers\Site\CheckoutController;
-use App\Http\Controllers\Site\StaticPageController;
 use App\Http\Controllers\Site\ShowController as SiteShowController;
-
+use App\Http\Controllers\Site\StaticPageController;
+use Illuminate\Support\Facades\Route;
 
 // FRONT DINAMIC PAGES
 Route::get('/shows/{season}/{slug?}', [SiteShowController::class, 'index']);
@@ -26,7 +25,7 @@ Route::get('/preguntas-frecuentes', [StaticPageController::class, 'frequentlyAsk
 Route::get('/comentarios/{token}', [StaticPageController::class, 'comment'])->where('token', '[A-Za-z0-9]{64}');
 
 // ADMIN
-Route::redirect('/admin', '/admin/shows');
+Route::redirect('/admin', '/admin/events');
 Route::get('/admin/login', [ShowController::class, 'index']);
 Route::get('/admin/shows', [ShowController::class, 'index']);
 Route::get('/admin/venues', [ShowController::class, 'index']);
@@ -38,4 +37,17 @@ Route::get('/admin/presentations', [ShowController::class, 'index']);
 Route::get('/admin/seasons', [ShowController::class, 'index']);
 Route::get('/admin/newsletter-subscribers', [ShowController::class, 'index']);
 Route::get('/admin/comments', [ShowController::class, 'index']);
-Route::get('/admin/presentation-ticket-types', [ShowController::class, 'index']);
+Route::get('/admin/season-ticket-types', [ShowController::class, 'index']);
+Route::get('/admin/organizations', [ShowController::class, 'index']);
+Route::get('/admin/account', [ShowController::class, 'index']);
+Route::get('/admin/organizations/new', [ShowController::class, 'index']);
+Route::get('/admin/organizations/{organization}/edit', [ShowController::class, 'index'])->whereNumber('organization');
+Route::get('/admin/team', [ShowController::class, 'index']);
+Route::get('/admin/team/{member}/edit', [ShowController::class, 'index'])->whereNumber('member');
+Route::get('/admin/invitations/new', [ShowController::class, 'index']);
+Route::get('/admin/invitations/{invitation}/edit', [ShowController::class, 'index'])->whereNumber('invitation');
+Route::get('/admin/door', [ShowController::class, 'index']);
+Route::get('/admin/events/new', [ShowController::class, 'index']);
+Route::get('/admin/events', [ShowController::class, 'index']);
+Route::get('/admin/events/{season}', [ShowController::class, 'index'])->whereNumber('season');
+Route::get('/admin/invitation/{token}', [ShowController::class, 'index'])->where('token', '[A-Za-z0-9]{64}');

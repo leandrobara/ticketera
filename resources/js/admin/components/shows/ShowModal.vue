@@ -23,12 +23,14 @@
     additional_information: '',
     production_note: '',
     genre: '',
-    format: '',
+    format: 'theater',
+    contact_email: '',
+    whatsapp_phone: '',
+    comments_enabled: true,
     service_fee_type: 'fixed_amount',
     service_fee_fixed_amount: '0',
     service_fee_percentage: '',
     service_fee_minimum_unit_amount: '2000',
-    duration_minutes: '',
     age_rating: 'ATP',
   });
 
@@ -43,7 +45,8 @@
     form.title = '';
     form.subtitle = '';
     form.genre = '';
-    form.format = '';
+    form.format = 'theater';
+    form.contact_email = ''; form.whatsapp_phone = ''; form.comments_enabled = true;
     form.service_fee_type = 'fixed_amount';
     form.service_fee_fixed_amount = '0';
     form.service_fee_percentage = '';
@@ -54,7 +57,6 @@
     fieldErrors.value = {};
     form.age_rating = 'ATP';
     errorMessage.value = '';
-    form.duration_minutes = '';
   };
 
   const fillForm = (show) => {
@@ -62,7 +64,8 @@
     form.title = show.title ?? '';
     form.subtitle = show.subtitle ?? '';
     form.genre = show.genre ?? '';
-    form.format = show.format ?? '';
+    form.format = 'theater';
+    form.contact_email = show.contact_email ?? ''; form.whatsapp_phone = show.whatsapp_phone ?? ''; form.comments_enabled = show.comments_enabled ?? true;
     form.service_fee_type = show.service_fee_type ?? 'fixed_amount';
     form.service_fee_fixed_amount = normalizeDecimalInput(show.service_fee_fixed_amount);
     form.service_fee_percentage = normalizeDecimalInput(show.service_fee_percentage);
@@ -71,7 +74,6 @@
     form.additional_information = show.additional_information ?? '';
     form.production_note = show.production_note ?? '';
     form.age_rating = show.age_rating ?? 'ATP';
-    form.duration_minutes = show.duration_minutes ?? '';
     fieldErrors.value = {};
     errorMessage.value = '';
   };
@@ -89,7 +91,8 @@
       additional_information: nullable(form.additional_information),
       production_note: nullable(form.production_note),
       genre: nullable(form.genre),
-      format: nullable(form.format),
+      format: 'theater',
+      contact_email: nullable(form.contact_email), whatsapp_phone: nullable(form.whatsapp_phone), comments_enabled: form.comments_enabled,
       service_fee_type: form.service_fee_type,
       service_fee_fixed_amount: form.service_fee_type === 'fixed_amount'
         ? (form.service_fee_fixed_amount === '' ? 0 : form.service_fee_fixed_amount)
@@ -98,7 +101,6 @@
         ? form.service_fee_percentage
         : null,
       service_fee_minimum_unit_amount: nullable(form.service_fee_minimum_unit_amount),
-      duration_minutes: form.duration_minutes === '' ? null : Number(form.duration_minutes),
       age_rating: form.age_rating,
     };
   };
@@ -310,7 +312,7 @@
                 <label class="form-label" for="show-format">Formato</label>
                 <input
                   id="show-format"
-                  v-model.trim="form.format"
+                  :value="'Teatro'" disabled
                   class="form-control"
                   :class="{ 'is-invalid': getFieldError('format') }"
                   type="text"
@@ -322,24 +324,9 @@
               </div>
             </div>
 
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label class="form-label" for="show-duration">Duración</label>
-                <input
-                  id="show-duration"
-                  v-model="form.duration_minutes"
-                  class="form-control"
-                  :class="{ 'is-invalid': getFieldError('duration_minutes') }"
-                  type="number"
-                  min="0"
-                >
-                <div v-if="getFieldError('duration_minutes')" class="invalid-feedback">
-                  {{ getFieldError('duration_minutes') }}
-                </div>
-              </div>
-            </div>
-
+            <div class="col-md-4"><label class="form-check mt-4"><input v-model="form.comments_enabled" type="checkbox" class="form-check-input"><span class="form-check-label">Habilitar comentarios</span></label></div>
           </div>
+          <div class="row"><div class="col-md-6 mb-3"><label for="show-email" class="form-label">Email de contacto</label><input id="show-email" v-model="form.contact_email" type="email" class="form-control"></div><div class="col-md-6 mb-3"><label for="show-whatsapp" class="form-label">WhatsApp con código de país</label><input id="show-whatsapp" v-model="form.whatsapp_phone" type="tel" class="form-control"></div></div>
 
           <div class="row">
             <div class="col-md-4">
